@@ -4,6 +4,7 @@
 #endif
 
 //CRUCIAL
+#define _XM_NO_INTRINSICS_
 #include <windows.h>
 #include <DirectXMath.h>
 #include <DirectXMathMatrix.inl>
@@ -25,6 +26,7 @@ using namespace DirectX::SimpleMath;
 #pragma comment (lib, "d3dcompiler.lib")
 
 #include "Cam.h"
+#include "MayaLoader.h"
 
 class Main{
 public:
@@ -34,6 +36,7 @@ public:
 
 private:
 	bool Init();
+	void InitVariables();
 	bool InitWindow();
 	bool InitDirect3D(HWND hWindow);
 	void SetViewport();
@@ -121,6 +124,8 @@ private:
 	ID3D11Buffer* cWorldDataBuffer = nullptr; //constantbuffer!
 
 	ID3D11Buffer* testVertexBuffer = nullptr;
+
+	MayaLoader *mayaLoader = nullptr;
 };
 
 

@@ -23,7 +23,7 @@ struct VS_OUT
 {
 	float4 Pos : SV_POSITION;
 	float2 Tex : TEXCOORD;
-	float3 normals : NORMAL;
+	float4 normals : NORMAL;
 };
 
 //-----------------------------------------------------------------------------------------
@@ -36,7 +36,8 @@ VS_OUT main(VS_IN input)
 	float4 inputpos = float4(input.Pos, 1.0f);
 		// Change the position vector to be 4 units for proper matrix calculations.
 		// Calculate the position of the vertex against the world, view, and projection matrices.
-	inputpos = mul(inputpos, WorldSpace);
+	//inputpos = mul(mul(mul(inputpos, WorldSpace),View), Projection);
+	//inputpos = mul(inputpos, WorldSpace);
 	//inputpos = mul(inputpos, View);
 	//inputpos = mul(inputpos, Projection);
 

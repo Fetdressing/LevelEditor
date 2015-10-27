@@ -40,6 +40,22 @@ Main::Main(HINSTANCE hInstance, UINT scrW, UINT scrH){
 	this->screenWidth = scrW;
 	this->screenHeight = scrH;
 	pMain = this;
+
+
+	 DefaultForward = Vector4(0.0f, -1.0f, 0.0f, 0.0f);
+	 DefaultRight = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
+	 camForward = Vector4(0.0f, 0.0f, 1.0f, 0.0f);
+	 camRight = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
+
+	 moveLeftRight = 0.0f;
+	 moveBackForward = 0.0f;
+	 camYaw = 0.0f;
+	 camPitch = 0.0f;
+	 speed = 0.0f;
+	 boost = 0.0f;
+	 zoom = 0.0f;
+
+
 	Init();
 }
 
@@ -49,6 +65,7 @@ Main::~Main(){
 
 bool Main::Init()
 {
+	InitVariables(); //klassinstanser och variabler som ska nollställas
 	if (!InitWindow()){
 		return false; //gick inte att skapa window
 	}
@@ -60,8 +77,8 @@ bool Main::Init()
 	CreateShaders();
 	CreateBuffers();
 
-	Run();
-
+	mayaLoader = new MayaLoader(gDevice, gDeviceContext);
+	Run();	
 	return true;
 }
 
@@ -89,7 +106,7 @@ int Main::Run(){
 
 
 void Main::Update(){
-	camRotationMatrix = DirectX::XMMatrixRotationRollPitchYaw(camPitch, camYaw, 0);
+	camRotationMatrix = XMMatrixRotationRollPitchYaw(camPitch, camYaw, 0);
 
 	camTarget = XMVector3TransformCoord(DefaultForward, camRotationMatrix);
 	camTarget = XMVector3Normalize(camTarget);
@@ -117,10 +134,10 @@ void Main::Update(){
 	XMStoreFloat4x4(&WorldData.Projection, XMMatrixTranspose(CamProjection));
 	XMStoreFloat4x4(&WorldData.WorldSpace, XMMatrixTranspose(XMMatrixIdentity()));
 	XMStoreFloat4x4(&WorldData.InvWorld, XMMatrixTranspose(XMMatrixInverse(NULL, XMMatrixIdentity())));
-	//XMStoreFloat4x4(&WorldData.lightView, XMMatrixTranspose(shadowMap->GetLightView()));
-	//XMStoreFloat4x4(&WorldData.lightProjection, XMMatrixTranspose(shadowMap->GetLightProj()));
+	XMStoreFloat4x4(&WorldData.lightView, XMMatrixTranspose(XMMatrixIdentity()));
+	XMStoreFloat4x4(&WorldData.lightProjection, XMMatrixTranspose(XMMatrixIdentity()));
 
-
+	mayaLoader->TryReadAMessage();
 	Render();
 }
 
@@ -143,15 +160,25 @@ void Main::Render(){
 	
 	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	gDeviceContext->VSSetShader(defaultVS, nullptr, 0);
+	gDeviceContext->GSSetShader(nullptr, nullptr, 0);
 	gDeviceContext->HSSetShader(nullptr, nullptr, 0);
 	gDeviceContext->DSSetShader(nullptr, nullptr, 0);
 	gDeviceContext->PSSetShader(defaultPS, nullptr, 0);
+	gDeviceContext->PSSetSamplers(0, 1, &wrap_Sampstate);
 	
 	gDeviceContext->Draw(4, 0);
+
+	mayaLoader->DrawScene(); //här så att den får med alla rtv stuff n shiet!
 
 	gSwapChain->Present(0, 0);
 }
 
+void Main::InitVariables(){
+
+	camPosition = Vector4(50.0f, 10.70f, 50.0f, 0.0f);
+	fpsCam.SetLens(0.25f*3.14f, screenWidth / screenHeight, 1.0f, 1000.0f);
+
+}
 
 bool Main::InitWindow(){
 	WNDCLASSEX wcex;
@@ -196,9 +223,6 @@ bool Main::InitWindow(){
 }
 
 bool Main::InitDirect3D(HWND hWindow){
-
-	camPosition = Vector4(50.0f, 10.70f, 50.0f, 0.0f);
-	fpsCam.SetLens(0.25f*3.14f, screenWidth / screenHeight, 1.0f, 1000.0f);
 
 	DXGI_SWAP_CHAIN_DESC scd;
 	//Describe our SwapChain Buffer
@@ -367,21 +391,21 @@ void Main::CreateBuffers(){
 	}
 	PlaneVertices[4] =
 	{
-		-1.0f, -1.0f, -1.0f,		//v0 
+		-1.0f, -1.0f, -0.0f,		//v0 
 		0.0f, 1.0f,			//t0
 		0.0f, 1.0f, 1.0f,
 
 
-		-1.0f, 1.0f, -1.0f,		//v1
+		-1.0f, 1.0f, -0.0f,		//v1
 		0.0f, 0.0f,				//t1
 		0.0f, 1.0f, 1.0f,
 
-		1.0f, -1.0f, -1.0f,		//v2
+		1.0f, -1.0f, -0.0f,		//v2
 		1.0f, 1.0f,			//t2
 		0.0f, 1.0f, 1.0f,		//n3
 		
 
-		1.0f, 1.0f, -1.0f,		//v3
+		1.0f, 1.0f, -0.0f,		//v3
 		1.0f, 0.0f,			//t3
 		0.0f, 1.0f, 1.0f	//v3
 

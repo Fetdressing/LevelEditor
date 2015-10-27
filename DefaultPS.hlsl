@@ -7,12 +7,12 @@ struct VS_OUT
 {
 	float4 Pos : SV_POSITION;
 	float2 Tex : TEXCOORD;
-	float3 normals : NORMAL;
+	float4 normals : NORMAL;
 };
 
 float4 main(VS_OUT input) : SV_Target
 {
 	//float4 diffuse = txDiffuse.Sample(sampAni, input.Tex);
-	return float4(1.0f, 0.0f, 0.0f, 1.0f);
+	return float4(1.0f, 1.0f, 0.0f, 1.0f);
 	//return diffuse;
 };

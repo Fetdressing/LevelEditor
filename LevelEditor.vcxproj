@@ -55,7 +55,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Simon\Documents\Visual Studio 2013\Projects\LevelEditor\DirectXTK\Inc;C:\Users\Simon\Documents\Visual Studio 2013\Projects\LevelEditor\LevelEditor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Simon\Downloads\Important Stuff\DirectXToolkit\Inc;C:\Users\Simon\Documents\Visual Studio 2013\Projects\LevelEditor\LevelEditor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -85,13 +85,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Cam.h" />
-    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Transform.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="MeshData.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MayaLoader.h" />
+    <ClInclude Include="ObjectData.h" />
+    <ClInclude Include="Mutex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cam.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MayaLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="DefaultPS.hlsl">
@@ -101,6 +109,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">main</EntryPointName>
     </FxCompile>
     <FxCompile Include="DefaultVS.hlsl">
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
@@ -112,7 +121,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Downloads\Programmering\3DProjectFINAL\3DProjekt_FINAL_0.1\DirectXTK\DirectXTK_Desktop_2013.vcxproj">
+    <ProjectReference Include="..\..\..\..\..\Downloads\Important Stuff\DirectXToolkit\DirectXTK_Desktop_2013.vcxproj">
       <Project>{e0b52ae7-e160-4d32-bf3f-910b785e5a8e}</Project>
     </ProjectReference>
   </ItemGroup>

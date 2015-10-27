@@ -46,10 +46,13 @@ public:
 		
 	}
 	~Mesh(){
-		free(name);
-		free(vertices);
-		free(indecies);
-		free(meshData);
+		vertexBuffer->Release();
+		indexBuffer->Release();
+
+		delete(name);
+		delete(vertices);
+		delete(indecies);
+		delete(meshData);
 	}
 	void CreateBuffers();
 	void EmptyVariables(); //används när meshen behöver bygga om värden (namn)

@@ -14,6 +14,6 @@ public:
 
 	}
 	~CameraObj(){
-		free(name);
+		delete(name);
 	}
 };

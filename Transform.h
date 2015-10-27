@@ -30,11 +30,11 @@ public:
 	}
 	Transform(){}
 	~Transform(){
-		free(name);
+		delete(name);
 	}
 	void EmptyVariables(){
-		free(name);
-		free(parentName);
+		delete(name);
+		delete(parentName);
 	}
 private:
 	ID3D11Device* gDevice = nullptr;

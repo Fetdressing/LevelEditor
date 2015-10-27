@@ -12,6 +12,6 @@ public:
 
 	Light(){}
 	~Light(){
-		free(name);
+		delete(name);
 	}
 };

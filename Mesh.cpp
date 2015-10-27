@@ -8,18 +8,18 @@ void Mesh::CreateBuffers(){
 }
 
 void Mesh::EmptyVariables(){
-	free(name);	
+	delete(name);
 }
 
 void Mesh::EmptyBuffersAndArrays(){
-	free(meshData);
+	delete(meshData);
 
 	vertexBuffer->Release();
 	indexBuffer->Release();
 }
 
 void Mesh::CreateIndices(){
-	nrIndecies = meshData->nrIPos;
+	nrIndecies = meshData->nrI;
 	if (indecies != nullptr)
 		free(indecies);
 
@@ -34,7 +34,7 @@ void Mesh::CreateIndices(){
 }
 
 void Mesh::CreateVertices(){
-	nrVertices = meshData->nrIPos;
+	nrVertices = meshData->nrI;
 	if (vertices != nullptr)
 		free(vertices);
 

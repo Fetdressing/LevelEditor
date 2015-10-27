@@ -14,7 +14,7 @@ public:
 	}
 	//skapa constantbuffer här???
 	void EmptyVariables(){
-		free(name);
+		delete(name);
 	}
 
 };

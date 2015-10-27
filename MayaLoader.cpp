@@ -297,9 +297,9 @@ void MayaLoader::ReadMeshData(size_t offSetStart, size_t reducedMessageSize){
 	//
 	memcpy(meshMessage->transformName, (unsigned char*)mMessageData + offSetStart, sizeof(meshMessage->transformName));
 	UINT offset = sizeof(char) * 100;
-	memcpy(meshMessage->meshData, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * 6);
+	memcpy(meshMessage->meshData, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * 5);
 
-	offset += sizeof(int) * 7;
+	offset += sizeof(int) * 5; //7
 
 	memcpy(meshMessage->meshData->positions, (unsigned char*)mMessageData + offSetStart + offset, sizeof(Float3) * meshMessage->meshData->nrPos);
 	offset += sizeof(Float3) * meshMessage->meshData->nrPos;
@@ -309,13 +309,14 @@ void MayaLoader::ReadMeshData(size_t offSetStart, size_t reducedMessageSize){
 	offset += sizeof(Float2) * meshMessage->meshData->nrUV;
 
 	
-	memcpy(meshMessage->meshData->indexPositions, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->nrIPos);
-	offset += sizeof(int) * meshMessage->meshData->nrIPos;	
-	memcpy(meshMessage->meshData->indexNormals, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->nrINor);
-	offset += sizeof(int) * meshMessage->meshData->nrINor;	
-	memcpy(meshMessage->meshData->indexUVs, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->nrIUV);
-	offset += sizeof(int) * meshMessage->meshData->nrIUV;
-	memcpy(meshMessage->meshData->indexTriangles, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->triangleCount);
+	memcpy(meshMessage->meshData->indexPositions, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->nrI);
+	offset += sizeof(int) * meshMessage->meshData->nrI;
+	memcpy(meshMessage->meshData->indexNormals, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->nrI);
+	offset += sizeof(int) * meshMessage->meshData->nrI;
+	memcpy(meshMessage->meshData->indexUVs, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->nrI);
+	offset += sizeof(int) * meshMessage->meshData->nrI;
+
+	memcpy(meshMessage->meshData->trianglesPerFace, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->triangleCount);
 
 	//meshMessage->meshData.vertices = new Vertex[nrVert];
 	//meshMessage->meshData.indecies = new Index[nrIndecies];
@@ -535,7 +536,7 @@ void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm){
 	}
 
 }
-void MayaLoader::TransformDeleted(MessageHeader mh){
+void MayaLoader::TransformDeleted(MessageHeader mh){ //ta bort från alla vektorer!!! inte bara allTransforms!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	char* objName = messageHeader.objectName;
 
 	for (int i = 0; i < allTransforms.size(); i++){
@@ -543,6 +544,27 @@ void MayaLoader::TransformDeleted(MessageHeader mh){
 			delete allTransforms[i];
 			allTransforms.erase(allTransforms.begin() + i); //rätt index?
 			break;
+		}
+	}
+
+	for (int i = 0; i < allMeshTransforms.size(); i++){
+		if (strcmp(objName, allMeshTransforms[i]->name) == 0){
+			allMeshTransforms.erase(allMeshTransforms.begin() + i); //rätt index?
+			return;
+		}
+	}
+
+	for (int i = 0; i < allLightTransforms.size(); i++){
+		if (strcmp(objName, allLightTransforms[i]->name) == 0){
+			allLightTransforms.erase(allLightTransforms.begin() + i); //rätt index?
+			return;
+		}
+	}
+
+	for (int i = 0; i < allCameraTransforms.size(); i++){
+		if (strcmp(objName, allCameraTransforms[i]->name) == 0){
+			allCameraTransforms.erase(allCameraTransforms.begin() + i); //rätt index?
+			return;
 		}
 	}
 }

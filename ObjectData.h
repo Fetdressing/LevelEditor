@@ -153,7 +153,7 @@ struct CameraData{
 };
 
 struct MeshData{
-	int nrPos, nrNor, nrUV, nrIPos, nrINor, nrIUV;
+	int nrPos, nrNor, nrUV, nrI;
 	int triangleCount;
 	Float3 *positions;
 	Float3 *normals;
@@ -162,17 +162,18 @@ struct MeshData{
 	int *indexPositions;
 	int *indexNormals;
 	int *indexUVs;
-	int *indexTriangles;
+	//int *indexTriangles;
+	int *trianglesPerFace;
 	//Material *material; //pekar på ett specifikt material i en vektor av material
 	~MeshData(){
-		free(positions);
-		free(normals);
-		free(uvs);
+		delete(positions);
+		delete(normals);
+		delete(uvs);
 		
-		free(indexPositions);
-		free(indexNormals);
-		free(indexUVs);
-		free(indexTriangles);
+		delete(indexPositions);
+		delete(indexNormals);
+		delete(indexUVs);
+		delete(trianglesPerFace);
 	}
 };
 

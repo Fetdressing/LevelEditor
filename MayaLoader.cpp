@@ -67,7 +67,7 @@ void MayaLoader::CreateFileMaps(unsigned int messageFilemapSize){
 
 	mInfoData = MapViewOfFile(hInfoFileMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
 	SetFilemapInfoValues(0, 0, 0, mSize); //storar de i filemapen oxå! sätt negativa värden om man inte vill nått värde ska ändras :)
-
+	
 	if (hInfoFileMap == NULL){
 		cout << "Couldn't create infofilemap\n";
 	}
@@ -295,8 +295,10 @@ void MayaLoader::ReadMeshData(size_t offSetStart, size_t reducedMessageSize){
 	//int nrVert = messageHeader.nrVerts;
 	//int nrIndecies = messageHeader.nrIndecies;
 	//
-	memcpy(meshMessage->transformName, (unsigned char*)mMessageData + offSetStart, sizeof(meshMessage->transformName));
-	UINT offset = sizeof(char) * 100;
+	memcpy(meshMessage->objectName, (unsigned char*)mMessageData + offSetStart, sizeof(meshMessage->objectName));
+	UINT offset = (sizeof(char) * 100);
+	memcpy(meshMessage->transformName, (unsigned char*)mMessageData + offSetStart + offset, sizeof(meshMessage->transformName));
+	offset += (sizeof(char) * 100);
 	memcpy(meshMessage->meshData, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * 5);
 
 	offset += sizeof(int) * 5; //7

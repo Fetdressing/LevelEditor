@@ -99,22 +99,27 @@ private:
 	
 	//har kvar vissa av dessa structsen även om de är lite onödiga då alla värden i vissa redan ligger i en full struct, men vill hålla det cleant med namngivning :-)
 	struct TransformMessage{
+		char objectName[100];
 		char parentName[100];
 		TransformData transformData;
 	};
 	struct CameraMessage{
+		char objectName[100];
 		char transformName[100];
 		CameraData cameraData;
 	};
 	struct MeshMessage{
+		char objectName[100];
 		char transformName[100];
 		MeshData *meshData;
 	};
 	struct MaterialMessage{ //namnet på den ligger i headern sen
+		char objectName[100];
 		MaterialData materialData;
 	};
 	struct LightMessage{
 		//ljusvärden
+		char objectName[100];
 		char transformName[100];
 		LightData lightdata;
 	};

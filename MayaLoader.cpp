@@ -12,6 +12,9 @@ MayaLoader::MayaLoader(ID3D11Device* gd, ID3D11DeviceContext* gdc){
 	lightMessage = (LightMessage*)malloc(lightMessage_MaxSize);
 	materialMessage = (MaterialMessage*)malloc(materialMessage_MaxSize);
 
+
+	Material *defaultMaterial = new Material(gDevice);
+	materials.push_back(defaultMaterial); //lägg till default material, viktigt den ligger på första platsen
 	/*TryWriteAMessage();
 	TryReadAMessage();*/
 }
@@ -104,6 +107,12 @@ void MayaLoader::DrawScene(){
 	//set rätt constantbuffers, ljus, kamera och material stuff!
 	for (int i = 0; i < allMeshTransforms.size(); i++){
 		gDeviceContext->IASetVertexBuffers(0, 1, &allMeshTransforms[i]->mesh->vertexBuffer, &vertexSize2, &offset2);
+		try{
+			gDeviceContext->PSSetConstantBuffers(1, 0, &materials[allMeshTransforms[i]->mesh->materialID]->materialCbuffer); //materialID är satt till 0 i början, dvs default material
+		}
+		catch (...){ //gick inte assigna det materialet (inte skapat ännu förmodligen), använd default istället
+			gDeviceContext->PSSetConstantBuffers(1, 0, &materials[0]->materialCbuffer); //defaultmat
+		}
 		gDeviceContext->Draw(allMeshTransforms[i]->mesh->nrVertices, 0);
 	}
 }
@@ -575,7 +584,7 @@ void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm){
 	char* materialName = mh.objectName;
 
 	Material *tempMat; //pekar på den mesh som redan finns storad eller så blir det en helt ny
-	tempMat = new Material();
+	tempMat = new Material(gDevice);
 	tempMat->name = mh.objectName;
 	tempMat->materialData.diffuse = mm->materialData.diffuse;
 	tempMat->materialData.specular = mm->materialData.specular;
@@ -593,7 +602,7 @@ void MayaLoader::MaterialChange(MessageHeader mh, MaterialMessage *mm){
 			break;
 		}
 	}
-	tempMat->EmptyVariables();
+	tempMat->EmptyVariables(); //viktigt så att vi inte tappar referens till något som vi ska ta bort
 	tempMat->name = mh.objectName;
 	tempMat->materialData.diffuse = mm->materialData.diffuse;
 	tempMat->materialData.specular = mm->materialData.specular;

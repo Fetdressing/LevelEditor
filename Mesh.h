@@ -38,12 +38,12 @@ public:
 	ID3D11Buffer *indexBuffer;
 	//std::vector<Vertex> vertices;
 	MeshData *meshData; //pekare till denna för att den har massa egna pekare nu, förstör objektet när det ska vara nya värden!
-	int materialID;
+	int materialID = 0;;
 
 	Mesh(ID3D11Device* gd, ID3D11DeviceContext* gdc){
 		this->gDevice = gd; //freea dessa inte här, görs i main duuh
 		this->gDeviceContext = gdc;
-		
+		materialID = 0; //default material ligger på index 0
 	}
 	~Mesh(){
 		vertexBuffer->Release();

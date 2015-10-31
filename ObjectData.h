@@ -60,7 +60,12 @@ struct Float3{
 
 struct Float4{
 	float x, y, z, w;
-	Float4(){}
+	Float4(){
+		x = 0;
+		y = 0;
+		z = 0;
+		w = 1; //hmm?
+	}
 	Float4(float fx, float fy, float fz, float fw){
 		x = fx;
 		y = fy;
@@ -130,18 +135,6 @@ struct Index{
 	}
 
 };
-
-//
-//struct Mesh{
-//	char* meshName; //det riktiga namnet finns i Transformen
-//	//XMMATRIX pos, rot, scale, world;
-//	ID3D11Buffer *vertexBuffer;
-//	ID3D11Buffer *indexBuffer;
-//	//std::vector<Vertex> vertices;
-//	int nrVerts, nrIndecies;
-//	Vertex *vertices;
-//	Index *indecies;
-//};
 
 struct TransformData{
 	Float3 pos, rot, scale;

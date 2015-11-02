@@ -13,7 +13,7 @@ MayaLoader::MayaLoader(ID3D11Device* gd, ID3D11DeviceContext* gdc){
 	materialMessage = (MaterialMessage*)malloc(materialMessage_MaxSize);
 
 
-	Material *defaultMaterial = new Material(gDevice);
+	Material *defaultMaterial = new Material(gDevice, gDeviceContext);
 	materials.push_back(defaultMaterial); //lägg till default material, viktigt den ligger på första platsen
 	/*TryWriteAMessage();
 	TryReadAMessage();*/
@@ -113,6 +113,9 @@ void MayaLoader::DrawScene(){
 		catch (...){ //gick inte assigna det materialet (inte skapat ännu förmodligen), använd default istället
 			gDeviceContext->PSSetConstantBuffers(1, 0, &materials[0]->materialCbuffer); //defaultmat
 		}
+
+		//set transformcbufferns värden, updatesubresource
+		allMeshTransforms[i]->UpdateCBuffer(); //slå först ihop med parentens värden innan vi updaterar cbuffern
 		gDeviceContext->Draw(allMeshTransforms[i]->mesh->nrVertices, 0);
 	}
 }
@@ -442,7 +445,7 @@ void MayaLoader::TryWriteAMessage(){
 
 
 void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){
-	char* meshName = mh.objectName;
+	char* meshName = mm->objectName;
 	char* transformName = mm->transformName;
 	Transform *meshTransform = nullptr; //hitta den
 	Mesh *activeMesh = nullptr;
@@ -461,7 +464,7 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){
 	
 	activeMesh = new Mesh(gDevice, gDeviceContext);
 
-	activeMesh->name = mh.objectName;
+	activeMesh->name = mm->objectName;
 	activeMesh->meshData = mm->meshData;
 	/*activeMesh->meshData.nrVerts = mh.nrVerts;
 	activeMesh->meshData.nrIndecies = mh.nrIndecies;
@@ -474,7 +477,7 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){
 	
 }
 void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm){ //MÅSTE HA TRANSFORMEN FÖRST, SEN SKAPA ETT MESH OBJEKT I TRANSFORMEN
-	char* meshName = mh.objectName;
+	char* meshName = mm->objectName;
 	char* transformName = mm->transformName;
 	Transform *meshTransform = nullptr; //hitta den
 	Mesh *activeMesh = nullptr;
@@ -493,7 +496,7 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm){ //MÅSTE HA TRANS
 	activeMesh->EmptyBuffersAndArrays(); //viktigt att göra dessa, annars kommer variablerna gå lost utan referens!!
 	activeMesh->EmptyVariables();
 
-	activeMesh->name = mh.objectName;
+	activeMesh->name = mm->objectName;
 	activeMesh->meshData = mm->meshData;
 	//activeMesh->meshData.nrVerts = mh.nrVerts;
 	//activeMesh->meshData.nrIndecies = mh.nrIndecies;
@@ -506,7 +509,7 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm){ //MÅSTE HA TRANS
 }
 
 void MayaLoader::TransformAdded(MessageHeader mh, TransformMessage *mm){
-	char* transformName = mh.objectName;
+	char* transformName = mm->objectName;
 	Transform *transform = new Transform(gDevice, gDeviceContext); //hitta den
 
 	transform->name = transformName;
@@ -523,7 +526,7 @@ void MayaLoader::TransformAdded(MessageHeader mh, TransformMessage *mm){
 	allTransforms.push_back(transform);
 }
 void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm){
-	char* transformName = mh.objectName;
+	char* transformName = mm->objectName;
 	Transform *transform = nullptr;
 
 	for (int i = 0; i < allTransforms.size(); i++){
@@ -548,51 +551,52 @@ void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm){
 
 }
 void MayaLoader::TransformDeleted(MessageHeader mh){ //ta bort från alla vektorer!!! inte bara allTransforms!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	char* objName = messageHeader.objectName;
+	//char* objName = messageHeader.objectName;
 
-	for (int i = 0; i < allTransforms.size(); i++){
-		if (strcmp(objName, allTransforms[i]->name) == 0){
-			delete allTransforms[i];
-			allTransforms.erase(allTransforms.begin() + i); //rätt index?
-			break;
-		}
-	}
+	//for (int i = 0; i < allTransforms.size(); i++){
+	//	if (strcmp(objName, allTransforms[i]->name) == 0){
+	//		delete allTransforms[i];
+	//		allTransforms.erase(allTransforms.begin() + i); //rätt index?
+	//		break;
+	//	}
+	//}
 
-	for (int i = 0; i < allMeshTransforms.size(); i++){
-		if (strcmp(objName, allMeshTransforms[i]->name) == 0){
-			allMeshTransforms.erase(allMeshTransforms.begin() + i); //rätt index?
-			return;
-		}
-	}
+	//for (int i = 0; i < allMeshTransforms.size(); i++){
+	//	if (strcmp(objName, allMeshTransforms[i]->name) == 0){
+	//		allMeshTransforms.erase(allMeshTransforms.begin() + i); //rätt index?
+	//		return;
+	//	}
+	//}
 
-	for (int i = 0; i < allLightTransforms.size(); i++){
-		if (strcmp(objName, allLightTransforms[i]->name) == 0){
-			allLightTransforms.erase(allLightTransforms.begin() + i); //rätt index?
-			return;
-		}
-	}
+	//for (int i = 0; i < allLightTransforms.size(); i++){
+	//	if (strcmp(objName, allLightTransforms[i]->name) == 0){
+	//		allLightTransforms.erase(allLightTransforms.begin() + i); //rätt index?
+	//		return;
+	//	}
+	//}
 
-	for (int i = 0; i < allCameraTransforms.size(); i++){
-		if (strcmp(objName, allCameraTransforms[i]->name) == 0){
-			allCameraTransforms.erase(allCameraTransforms.begin() + i); //rätt index?
-			return;
-		}
-	}
+	//for (int i = 0; i < allCameraTransforms.size(); i++){
+	//	if (strcmp(objName, allCameraTransforms[i]->name) == 0){
+	//		allCameraTransforms.erase(allCameraTransforms.begin() + i); //rätt index?
+	//		return;
+	//	}
+	//}
 }
 
 void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm){
-	char* materialName = mh.objectName;
+	//char* materialName = mm->objectName;
 
 	Material *tempMat; //pekar på den mesh som redan finns storad eller så blir det en helt ny
-	tempMat = new Material(gDevice);
-	tempMat->name = mh.objectName;
+	tempMat = new Material(gDevice, gDeviceContext);
+	tempMat->name = mm->objectName;
 	tempMat->materialData.diffuse = mm->materialData.diffuse;
 	tempMat->materialData.specular = mm->materialData.specular;
 
+	tempMat->UpdateCBuffer(); //lägger in de nya värdena i cbuffern
 	materials.push_back(tempMat);
 }
 void MayaLoader::MaterialChange(MessageHeader mh, MaterialMessage *mm){
-	char* materialName = mh.objectName;
+	char* materialName = mm->objectName;
 
 	Material *tempMat = nullptr;
 
@@ -603,21 +607,22 @@ void MayaLoader::MaterialChange(MessageHeader mh, MaterialMessage *mm){
 		}
 	}
 	tempMat->EmptyVariables(); //viktigt så att vi inte tappar referens till något som vi ska ta bort
-	tempMat->name = mh.objectName;
+	tempMat->UpdateCBuffer();
+	tempMat->name = mm->objectName;
 	tempMat->materialData.diffuse = mm->materialData.diffuse;
 	tempMat->materialData.specular = mm->materialData.specular;
 	
 }
 void MayaLoader::MaterialDeleted(MessageHeader mh){
-	char* materialName = mh.objectName;
+	//char* materialName = mh.objectName;
 
-	for (int i = 0; i < materials.size(); i++){
-		if (strcmp(materialName, materials[i]->name) == 0){
-			delete materials[i];
-			materials.erase(materials.begin() + i); //rätt index?
-			break;
-		}
-	}
+	//for (int i = 0; i < materials.size(); i++){
+	//	if (strcmp(materialName, materials[i]->name) == 0){
+	//		delete materials[i];
+	//		materials.erase(materials.begin() + i); //rätt index?
+	//		break;
+	//	}
+	//}
 }
 
 void MayaLoader::LightAdded(MessageHeader mh, LightMessage *mm){
@@ -638,7 +643,7 @@ void MayaLoader::LightAdded(MessageHeader mh, LightMessage *mm){
 
 	tempLight = lightTransform->light;
 	tempLight = new Light();
-	tempLight->name = mh.objectName;
+	tempLight->name = mm->objectName;
 	tempLight->lightData = mm->lightdata;
 
 	allLightTransforms.push_back(lightTransform); //lägger den i lightTransformsen
@@ -660,7 +665,7 @@ void MayaLoader::LightChange(MessageHeader mh, LightMessage *mm){
 	}
 
 	tempLight = lightTransform->light;
-	tempLight->name = mh.objectName;
+	tempLight->name = mm->objectName;
 	tempLight->lightData = mm->lightdata;
 }
 
@@ -681,7 +686,7 @@ void MayaLoader::CameraAdded(MessageHeader mh, CameraMessage *mm){
 
 	tempCamera = cameraTransform->camera;
 	tempCamera = new CameraObj();
-	tempCamera->name = mh.objectName;
+	tempCamera->name = mm->objectName;
 	tempCamera->cameraData = mm->cameraData;
 
 	allCameraTransforms.push_back(cameraTransform);
@@ -702,6 +707,6 @@ void MayaLoader::CameraChange(MessageHeader mh, CameraMessage *mm){
 	}
 
 	tempCamera = cameraTransform->camera;
-	tempCamera->name = mh.objectName;
+	tempCamera->name = mm->objectName;
 	tempCamera->cameraData = mm->cameraData;
 }

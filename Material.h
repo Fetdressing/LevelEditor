@@ -6,20 +6,26 @@
 class Material{
 public:
 	ID3D11Device * gDevice = nullptr;
+	ID3D11DeviceContext * gDeviceContext = nullptr;
 	char *name;
 	MaterialData materialData;
 	ID3D11Buffer *materialCbuffer = nullptr; //här ligger den storade materialdatan
 
-	Material(ID3D11Device *gDevice){
+	Material(ID3D11Device *gDevice, ID3D11DeviceContext *gDevC){
 		this->gDevice = gDevice;
-
+		this->gDeviceContext = gDevC;
+		CreateMaterialCBuffer();
 	}
 	~Material(){
 		free(name);
 	}
 	//skapa constantbuffer här???
+	void UpdateCBuffer(){
+		//updatesubresource med den nya materialData
+		gDeviceContext->UpdateSubresource(materialCbuffer, 0, NULL, &materialData, 0, 0);
+	}
 	void CreateMaterialCBuffer(){
-		D3D11_BUFFER_DESC cbDesc;
+		D3D11_BUFFER_DESC cbDesc = { 0 };
 		cbDesc.ByteWidth = sizeof(MaterialData); //kolla så den är 16 byte alligned sen!!
 		cbDesc.Usage = D3D11_USAGE_DYNAMIC;
 		cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -29,7 +35,7 @@ public:
 
 		// Fill in the subresource data.
 		D3D11_SUBRESOURCE_DATA InitData;
-		InitData.pSysMem = &materialData; //rätt??
+		InitData.pSysMem = &materialData; //ger den startvärde, default, använd updatesubresource sen
 		InitData.SysMemPitch = 0;
 		InitData.SysMemSlicePitch = 0;
 

@@ -83,7 +83,7 @@ private:
 			//consumersLeft = 0; //consumers kvar att passera!
 			byteSize = 0;
 			bytePadding = 0;
-			nameElementSize = 0;
+			//nameElementSize = 0;
 		}
 
 		int nodeType;
@@ -91,8 +91,8 @@ private:
 		//int consumersLeft;
 		size_t byteSize;
 		size_t bytePadding;
-		int nameElementSize; //hur stort är namnet i karaktärer
-		char objectName[100]; //dynamisk eller inte, char compare funktionen vad göra?
+		//int nameElementSize; //hur stort är namnet i karaktärer
+		//char objectName[100]; //dynamisk eller inte, char compare funktionen vad göra?
 	};
 	MessageHeader messageHeader;
 	bool headerDidFit; //true om den fick plats på denna sidan av filemapen, annars är den på andra, används vid läsning av meddelanden

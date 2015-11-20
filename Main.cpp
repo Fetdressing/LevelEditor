@@ -526,4 +526,5 @@ void Main::Dealloc(){
 	gDevice->Release();
 	gDeviceContext->Release();
 
+	free(mayaLoader);
 }

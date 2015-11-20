@@ -465,6 +465,7 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){
 	activeMesh = new Mesh(gDevice, gDeviceContext);
 
 	activeMesh->name = mm->objectName;
+	activeMesh->transformName = mm->transformName;
 	activeMesh->meshData = mm->meshData;
 	/*activeMesh->meshData.nrVerts = mh.nrVerts;
 	activeMesh->meshData.nrIndecies = mh.nrIndecies;

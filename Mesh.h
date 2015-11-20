@@ -29,6 +29,7 @@ using namespace DirectX::SimpleMath;
 class Mesh{
 public:
 	char* name; //det riktiga namnet finns i Transformen
+	char* transformName;
 	//XMMATRIX pos, rot, scale, world;
 	int nrVertices;
 	int nrIndecies;

@@ -6,7 +6,7 @@
 
 #include "ObjectData.h"
 #include "Mesh.h"
-#include "Camera.h"
+#include "CameraObj.h"
 #include "Light.h"
 
 class Transform{

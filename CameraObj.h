@@ -1,6 +1,6 @@
 #pragma once
-#ifndef LIGHT_H
-#define LIGHT_H
+#ifndef CAMERA_H
+#define CAMERA_H
 #endif
 
 #include "ObjectData.h"
@@ -8,30 +8,32 @@
 
 class Transform; //forward declaration, den ska bara känna till att det finns en class som heter Transform, denna pekar på transform och transform pekar på denna
 
-class Light{
-	struct LightCBufferData {
-		LightData lData;
+class CameraObj{
+	struct CameraCBufferData {
+		CameraData cData;
 		TransformData tData;
 	};
+
 public:
 	ID3D11Device * gDevice = nullptr;
 	ID3D11DeviceContext * gDeviceContext = nullptr;
 
 	char *name;
-	LightData lightData;
+	CameraData cameraData;
 
 	Transform *transform = nullptr; //så jag alltid kan komma åt transformvärdet direkt
-	LightCBufferData lightCBufferData; //datan som skickas in i cbuffern
-	ID3D11Buffer *lightCbuffer = nullptr; //här ligger den storade cameradatan
+	CameraCBufferData cameraCBufferData;
+	ID3D11Buffer *cameraCbuffer = nullptr; //här ligger den storade cameradatan
 
-	Light(ID3D11Device *gDevice, ID3D11DeviceContext *gDevC) {
+
+	CameraObj(ID3D11Device *gDevice, ID3D11DeviceContext *gDevC) {
 		this->gDevice = gDevice;
 		this->gDeviceContext = gDevC;
-		
+		//CreateCameraCBuffer();
 	}
-	~Light(){
+	~CameraObj(){
 		delete(name);
-		lightCbuffer->Release();
+		cameraCbuffer->Release();
 	}
 
 	void UpdateCBuffer();

@@ -11,9 +11,7 @@
 #include <string>
 
 #include "Transform.h"
-#include "Mesh.h"
 #include "Material.h"
-#include "Light.h"
 #include "Mutex.h"
 #include "FileHandler.h"
 
@@ -131,6 +129,7 @@ private:
 		//ljusvärden
 		char objectName[MAX_NAME_SIZE];
 		char transformName[MAX_NAME_SIZE];
+		int lightType;
 		LightData lightdata;
 	};
 

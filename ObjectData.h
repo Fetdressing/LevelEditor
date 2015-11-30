@@ -186,5 +186,11 @@ struct MaterialData{
 };
 
 struct LightData{
+	Float4 color;
+	Float4 direction;
+	Float4 range;
+	Float4 radius;
+	float dropOff;
+	//offset stuff
 
 };

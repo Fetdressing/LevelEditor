@@ -4,8 +4,9 @@ Mutex mutexInfo("__info_Mutex__");
 MayaLoader::MayaLoader(ID3D11Device* gd, ID3D11DeviceContext* gdc){
 	this->gDevice = gd;
 	this->gDeviceContext = gdc;
-	CreateFileMaps(4096);
 
+	CreateFileMaps(4096);
+	
 	transformMessage = (TransformMessage*)malloc(transformMessage_MaxSize);
 	meshMessage = (MeshMessage*)malloc(meshMessage_MaxSize);
 	cameraMessage = (CameraMessage*)malloc(cameraMessage_MaxSize);
@@ -20,7 +21,6 @@ MayaLoader::MayaLoader(ID3D11Device* gd, ID3D11DeviceContext* gdc){
 }
 MayaLoader::~MayaLoader(){
 	
-
 	UnmapViewOfFile((LPCVOID)mMessageData);
 	CloseHandle(hMessageFileMap);
 
@@ -36,6 +36,7 @@ MayaLoader::~MayaLoader(){
 }
 
 void MayaLoader::CreateFileMaps(unsigned int messageFilemapSize){
+	//mutexInfo.Unlock(); //kanske inte den smartaste idéen?
 	//messagefilemap
 	mSize = messageFilemapSize;
 	hMessageFileMap = CreateFileMapping(INVALID_HANDLE_VALUE,
@@ -56,7 +57,7 @@ void MayaLoader::CreateFileMaps(unsigned int messageFilemapSize){
 		
 	}
 	else{
-		cout << "Creating new filemap\n";		
+		cout << "Creating new filemap\n";
 	}
 	
 
@@ -69,8 +70,7 @@ void MayaLoader::CreateFileMaps(unsigned int messageFilemapSize){
 		(LPCWSTR) "infoFileMap");
 
 	mInfoData = MapViewOfFile(hInfoFileMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-	SetFilemapInfoValues(0, 0, 0, mSize); //storar de i filemapen oxå! sätt negativa värden om man inte vill nått värde ska ändras :)
-	
+
 	if (hInfoFileMap == NULL){
 		cout << "Couldn't create infofilemap\n";
 	}
@@ -83,11 +83,18 @@ void MayaLoader::CreateFileMaps(unsigned int messageFilemapSize){
 
 
 	}
+	
+
+	SetFilemapInfoValues(0, 0, 0, mSize); //storar de i filemapen oxå! sätt negativa värden om man inte vill nått värde ska ändras :)
+
 }
 
 void MayaLoader::SetFilemapInfoValues(size_t headPlacement, size_t tailPlacement, size_t nonAccessMemoryPlacement, size_t messageFileMapTotalSize){
-	mutexInfo.Lock();	
-	memcpy(&fileMapInfo, mInfoData, sizeof(FilemapInfo));
+	
+	//mutexInfo.TryLock();
+	while (mutexInfo.Lock(1000) == false) Sleep(10); //kommer kalla raden under massa onödiga gånger :s
+		//Sleep(1000);
+	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo));
 	if (headPlacement >= 0)
 		fileMapInfo.head_ByteOffset = headPlacement;
 	if (tailPlacement >= 0)
@@ -97,7 +104,7 @@ void MayaLoader::SetFilemapInfoValues(size_t headPlacement, size_t tailPlacement
 	if (messageFileMapTotalSize > 0)
 		fileMapInfo.messageFilemap_Size = messageFileMapTotalSize;
 	
-	memcpy(mInfoData, &fileMapInfo, sizeof(FilemapInfo));
+	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo));
 	mutexInfo.Unlock();
 }
 
@@ -108,7 +115,7 @@ void MayaLoader::DrawScene(){
 	for (int i = 0; i < allMeshTransforms.size(); i++){
 		gDeviceContext->IASetVertexBuffers(0, 1, &allMeshTransforms[i]->mesh->vertexBuffer, &vertexSize2, &offset2);
 		try{
-			gDeviceContext->PSSetConstantBuffers(1, 0, &materials[allMeshTransforms[i]->mesh->materialID]->materialCbuffer); //materialID är satt till 0 i början, dvs default material
+			gDeviceContext->PSSetConstantBuffers(1, 0, &allMeshTransforms[i]->mesh->material->materialCbuffer); //materialID är satt till 0 i början, dvs default material
 		}
 		catch (...){ //gick inte assigna det materialet (inte skapat ännu förmodligen), använd default istället
 			gDeviceContext->PSSetConstantBuffers(1, 0, &materials[0]->materialCbuffer); //defaultmat
@@ -122,46 +129,46 @@ void MayaLoader::DrawScene(){
 
 void MayaLoader::TryReadAMessage(){
 	//bool canMoveOne = false; //kan jag flyttade vidare denna consumer i minnet eller måste jag vänta på producern?
-	////size_t messageSize;
-	//while (canMoveOne == false){ //kolla data från infofilemappen
-		//mutexInfo.Lock();
-		memcpy(&fileMapInfo, mInfoData, sizeof(FilemapInfo)); //hämta filemapinfo datan om jag har fått mutexInfo till den
-		//mutexInfo.Unlock();
-		//messageSize = messageFile.header.byteSize + messageFile.header.bytePadding;
-		if (thisApplication_filemap_MemoryOffset != fileMapInfo.head_ByteOffset){ //sålänge consumern inte har hunnit till headern
-			//KAN LÄSA!!
-			if ((thisApplication_filemap_MemoryOffset + sizeof(MessageHeader)) < mSize){ //headern ligger på denna sidan!
-				headerDidFit = true;
-				memcpy(&messageHeader, (unsigned char*)mMessageData + thisApplication_filemap_MemoryOffset, sizeof(MessageHeader)); //läs headern som vanligt
-			}
-			else{ //headern ligger på andra sidan, headern får inte plats
-				headerDidFit = false;
-				memcpy(&messageHeader, (unsigned char*)mMessageData, sizeof(MessageHeader)); //läs headern i början på filen
-				thisApplication_filemap_MemoryOffset = 0; //flytta över hela meddelandet till andra sidan
-			}
-			//enum NodeTypes { TTransform, TMesh, TCamera, TLight, TMaterial };
-			
-			switch (messageHeader.nodeType){
-				case 0:
-					ReadTransform(messageHeader.messageType);					
-					break;
-				case 1:
-					ReadMesh(messageHeader.messageType);
-					break;
-				case 2:
-					//nodeType = TCamera;
-					break;
-				case 3:
-					//nodeType = TLight;
-					break;
-				case 4:
-					//nodeType = TMaterial;
-					break;
-				default:
-					printf("Invalid message ID");
-			}
 
+	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo)); //hämta filemapinfo datan om jag har fått mutexInfo till den
+
+	//mutexInfo.Unlock();
+	//messageSize = messageFile.header.byteSize + messageFile.header.bytePadding;
+	if (thisApplication_filemap_MemoryOffset != fileMapInfo.head_ByteOffset){ //sålänge consumern inte har hunnit till headern
+		//KAN LÄSA!!
+		if ((thisApplication_filemap_MemoryOffset + sizeof(MessageHeader)) < mSize){ //headern ligger på denna sidan!
+			headerDidFit = true;
+			memcpy(&messageHeader, (unsigned char*)mMessageData + thisApplication_filemap_MemoryOffset, sizeof(MessageHeader)); //läs headern som vanligt
 		}
+		else{ //headern ligger på andra sidan, headern får inte plats
+			headerDidFit = false;
+			memcpy(&messageHeader, (unsigned char*)mMessageData, sizeof(MessageHeader)); //läs headern i början på filen
+			thisApplication_filemap_MemoryOffset = 0; //flytta över hela meddelandet till andra sidan
+		}
+		//enum NodeTypes { TTransform, TMesh, TCamera, TLight, TMaterial };
+			
+		switch (messageHeader.nodeType){
+			case 0:
+									
+				break;
+			case 1:
+				ReadMesh(messageHeader.messageType);
+				break;
+			case 2:
+				//nodeType = TCamera;
+				ReadTransform(messageHeader.messageType);
+				break;
+			case 3:
+				//nodeType = TLight;
+				break;
+			case 4:
+				//nodeType = TMaterial;
+				break;
+			default:
+				printf("Invalid message ID");
+		}
+
+	}
 
 }
 
@@ -204,11 +211,11 @@ void MayaLoader::ReadTransform(int i){
 
 
 	//flytta tailen
-	mutexInfo.Lock();
+	while (mutexInfo.Lock(1000) == false) Sleep(10);
 	cout << "Move tail!!!!!" << thisApplication_filemap_MemoryOffset << "\n";
-	memcpy(&fileMapInfo, mInfoData, sizeof(FilemapInfo));
+	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo));
 	fileMapInfo.tail_ByteOffset = thisApplication_filemap_MemoryOffset;
-	memcpy(mInfoData, &fileMapInfo, sizeof(FilemapInfo));
+	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo));
 	mutexInfo.Unlock();
 
 
@@ -250,11 +257,11 @@ void MayaLoader::ReadMaterial(int i){
 
 
 	//flytta tailen
-	mutexInfo.Lock();
+	while (mutexInfo.Lock(1000) == false) Sleep(10);
 	cout << "Move tail!!!!!" << thisApplication_filemap_MemoryOffset << "\n";
-	memcpy(&fileMapInfo, mInfoData, sizeof(FilemapInfo));
+	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo));
 	fileMapInfo.tail_ByteOffset = thisApplication_filemap_MemoryOffset;
-	memcpy(mInfoData, &fileMapInfo, sizeof(FilemapInfo));
+	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo));
 	mutexInfo.Unlock();
 
 }
@@ -294,11 +301,11 @@ void MayaLoader::ReadMesh(int i){
 		MeshChange(messageHeader, meshMessage); //tar hand om den aktualla meshen
 	}
 	//flytta tailen
-	mutexInfo.Lock();
+	while (mutexInfo.Lock(1000) == false) Sleep(10);
 	cout << "Move tail!!!!!" << thisApplication_filemap_MemoryOffset << "\n";
-	memcpy(&fileMapInfo, mInfoData, sizeof(FilemapInfo));
+	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo));
 	fileMapInfo.tail_ByteOffset = thisApplication_filemap_MemoryOffset;
-	memcpy(mInfoData, &fileMapInfo, sizeof(FilemapInfo));
+	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo));
 	mutexInfo.Unlock();
 
 }
@@ -371,11 +378,11 @@ void MayaLoader::ReadLight(int i){
 	}
 	
 	//flytta tailen
-	mutexInfo.Lock();
+	while (mutexInfo.Lock(1000) == false) Sleep(10);
 	cout << "Move tail!!!!!" << thisApplication_filemap_MemoryOffset << "\n";
-	memcpy(&fileMapInfo, mInfoData, sizeof(FilemapInfo));
+	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo));
 	fileMapInfo.tail_ByteOffset = thisApplication_filemap_MemoryOffset;
-	memcpy(mInfoData, &fileMapInfo, sizeof(FilemapInfo));
+	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo));
 	mutexInfo.Unlock();
 
 }
@@ -412,11 +419,11 @@ void MayaLoader::ReadCamera(int i){
 	}
 
 	//flytta tailen
-	mutexInfo.Lock();
+	while (mutexInfo.Lock(1000) == false) Sleep(10);
 	cout << "Move tail!!!!!" << thisApplication_filemap_MemoryOffset << "\n";
-	memcpy(&fileMapInfo, mInfoData, sizeof(FilemapInfo));
+	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo));
 	fileMapInfo.tail_ByteOffset = thisApplication_filemap_MemoryOffset;
-	memcpy(mInfoData, &fileMapInfo, sizeof(FilemapInfo));
+	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo));
 	mutexInfo.Unlock();
 
 }
@@ -436,15 +443,15 @@ void MayaLoader::TryWriteAMessage(){
 	memcpy((unsigned char*)mMessageData + fileMapInfo.head_ByteOffset + sizeof(MessageHeader), transformMessage, messageFileH.byteSize - sizeof(MessageHeader));
 
 	//flytta headern (i filemapen, det lokala värdet ändras lite tidigare)
-	mutexInfo.Lock(); //behöver inte låsa förrens här becuz producern är den ända som faktiskt kan ändra headern, fast samtidigt kan den ändra andra värden???
-	memcpy(&fileMapInfo, mInfoData, sizeof(FilemapInfo)); //hämta filemapinfo datan om jag har fått mutexInfo till den
+	while (mutexInfo.Lock(1000) == false) Sleep(10); //behöver inte låsa förrens här becuz producern är den ända som faktiskt kan ändra headern, fast samtidigt kan den ändra andra värden???
+	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo)); //hämta filemapinfo datan om jag har fått mutexInfo till den
 	fileMapInfo.head_ByteOffset = 0;
-	memcpy(mInfoData, &fileMapInfo, sizeof(FilemapInfo)); //skriv till infofilemappen
+	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo)); //skriv till infofilemappen
 	mutexInfo.Unlock();
 }
 
 
-void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){
+void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){ //material måste alltid komma före meshes!!
 	char* meshName = mm->objectName;
 	char* transformName = mm->transformName;
 	Transform *meshTransform = nullptr; //hitta den
@@ -457,24 +464,35 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){
 		}
 	}
 	if (meshTransform == nullptr){
-		printf("Hitta inte transformen");
+		printf("Hittade inte transformen");
 	}
+	else
+	{
+		activeMesh = meshTransform->mesh;
 
-	activeMesh = meshTransform->mesh;
-	
-	activeMesh = new Mesh(gDevice, gDeviceContext);
+		activeMesh = new Mesh(gDevice, gDeviceContext);
 
-	activeMesh->name = mm->objectName;
-	activeMesh->transformName = mm->transformName;
-	activeMesh->meshData = mm->meshData;
-	/*activeMesh->meshData.nrVerts = mh.nrVerts;
-	activeMesh->meshData.nrIndecies = mh.nrIndecies;
+		activeMesh->name = mm->objectName;
+		activeMesh->transformName = mm->transformName;
+		activeMesh->materialName = mm->materialName;
+		activeMesh->meshData = mm->meshData;
 
-	activeMesh->meshData.vertices = mm->meshData.vertices;
-	activeMesh->meshData.indecies = mm->meshData.indecies;*/
+		activeMesh->material = materials[0]; //default material
+		for (int i = 0; i < materials.size(); i++) {
+			if (strcmp(mm->materialName, materials[i]->name) == 0) {
+				activeMesh->material = materials[i];
+				break;
+			}
+		}
+		/*activeMesh->meshData.nrVerts = mh.nrVerts;
+		activeMesh->meshData.nrIndecies = mh.nrIndecies;
 
-	activeMesh->CreateBuffers();
-	allMeshTransforms.push_back(meshTransform); //skickar in denna transform i allMeshTransforms oxå!! så den kommer vara refererad i båda vektorerna
+		activeMesh->meshData.vertices = mm->meshData.vertices;
+		activeMesh->meshData.indecies = mm->meshData.indecies;*/
+
+		activeMesh->CreateBuffers();
+		allMeshTransforms.push_back(meshTransform); //skickar in denna transform i allMeshTransforms oxå!! så den kommer vara refererad i båda vektorerna
+	}
 	
 }
 void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm){ //MÅSTE HA TRANSFORMEN FÖRST, SEN SKAPA ETT MESH OBJEKT I TRANSFORMEN
@@ -490,41 +508,62 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm){ //MÅSTE HA TRANS
 		}
 	}
 	if (meshTransform == nullptr){
-		printf("Hitta inte transformen");
+		printf("Hittade inte transformen");
 	}
+	else
+	{
+		activeMesh = meshTransform->mesh;
+		activeMesh->EmptyBuffers(); //ska denna göras? man remappar ju dem -> kolla upp!!
+		activeMesh->EmptyVariables(); //viktigt att göra dessa, annars kommer variablerna gå lost utan referens!!
 
-	activeMesh = meshTransform->mesh;
-	activeMesh->EmptyBuffersAndArrays(); //viktigt att göra dessa, annars kommer variablerna gå lost utan referens!!
-	activeMesh->EmptyVariables();
+		activeMesh->name = mm->objectName;
+		activeMesh->materialName = mm->materialName;
+		activeMesh->meshData = mm->meshData;
 
-	activeMesh->name = mm->objectName;
-	activeMesh->meshData = mm->meshData;
-	//activeMesh->meshData.nrVerts = mh.nrVerts;
-	//activeMesh->meshData.nrIndecies = mh.nrIndecies;
+		activeMesh->material = materials[0]; //default material
+		for (int i = 0; i < materials.size(); i++) {
+			if (strcmp(mm->materialName, materials[i]->name) == 0) {
+				activeMesh->material = materials[i];
+				break;
+			}
+		}
+		//activeMesh->meshData.nrVerts = mh.nrVerts;
+		//activeMesh->meshData.nrIndecies = mh.nrIndecies;
 
-	//activeMesh->meshData.vertices = mm->meshData.vertices;
-	//activeMesh->meshData.indecies = mm->meshData.indecies;
+		//activeMesh->meshData.vertices = mm->meshData.vertices;
+		//activeMesh->meshData.indecies = mm->meshData.indecies;
 
-	activeMesh->RemapVertexBuffer();	
-
+		activeMesh->RemapVertexBuffer();
+	}
 }
 
 void MayaLoader::TransformAdded(MessageHeader mh, TransformMessage *mm){
-	char* transformName = mm->objectName;
 	Transform *transform = new Transform(gDevice, gDeviceContext); //hitta den
 
-	transform->name = transformName;
-	transform->transformData = mm->transformData;
+	transform->name = mm->objectName;
 	transform->parentName = mm->parentName;
-	
-	if (transform->parentName[0] == '0'){
-		transform->hasParent = false;
-	}
-	else{
-		transform->hasParent = true;
-	}
+	transform->transformData = mm->transformData;
+
+	if (transform->parentName[0] != '0'){ //namnet är inte tomt -> den har en parent, så hitta den
+		for (int i = 0; i < allTransforms.size(); i++) {
+			if (strcmp(transform->parentName, allTransforms[i]->name) == 0) {
+				transform->parent = allTransforms[i];
+				break;
+			}
+		}
+	}	
 
 	allTransforms.push_back(transform);
+
+	//test!!!!
+	fileHandler = new FileHandler();
+	const char* skitName = "Hej" + 0;
+	fileHandler->SaveScene(MAX_NAME_SIZE, (char*)skitName,
+		materials,
+		allTransforms,
+		allMeshTransforms,
+		allLightTransforms);
+	//test!!!!
 }
 void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm){
 	char* transformName = mm->objectName;
@@ -537,17 +576,22 @@ void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm){
 		}
 	}
 
-	transform->EmptyVariables();
+	if (transform != nullptr)
+	{
+		transform->EmptyVariables();
 
-	transform->name = transformName;
-	transform->parentName = mm->parentName;
-	transform->transformData = mm->transformData;
+		transform->name = transformName;
+		transform->parentName = mm->parentName;
+		transform->transformData = mm->transformData;
 
-	if (transform->parentName[0] == '0'){
-		transform->hasParent = false;
-	}
-	else{
-		transform->hasParent = true;
+		if (transform->parentName[0] != '0') { //namnet är inte tomt -> den har en parent, så hitta den
+			for (int i = 0; i < allTransforms.size(); i++) {
+				if (strcmp(transform->parentName, allTransforms[i]->name) == 0) {
+					transform->parent = allTransforms[i];
+					break;
+				}
+			}
+		}
 	}
 
 }
@@ -589,9 +633,10 @@ void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm){
 
 	Material *tempMat; //pekar på den mesh som redan finns storad eller så blir det en helt ny
 	tempMat = new Material(gDevice, gDeviceContext);
+	tempMat->CreateCBuffer();
 	tempMat->name = mm->objectName;
 	tempMat->materialData.diffuse = mm->materialData.diffuse;
-	tempMat->materialData.specular = mm->materialData.specular;
+	tempMat->materialData.specular = mm->materialData.specular;	
 
 	tempMat->UpdateCBuffer(); //lägger in de nya värdena i cbuffern
 	materials.push_back(tempMat);
@@ -608,10 +653,10 @@ void MayaLoader::MaterialChange(MessageHeader mh, MaterialMessage *mm){
 		}
 	}
 	tempMat->EmptyVariables(); //viktigt så att vi inte tappar referens till något som vi ska ta bort
-	tempMat->UpdateCBuffer();
 	tempMat->name = mm->objectName;
 	tempMat->materialData.diffuse = mm->materialData.diffuse;
 	tempMat->materialData.specular = mm->materialData.specular;
+	tempMat->UpdateCBuffer();
 	
 }
 void MayaLoader::MaterialDeleted(MessageHeader mh){
@@ -639,15 +684,22 @@ void MayaLoader::LightAdded(MessageHeader mh, LightMessage *mm){
 		}
 	}
 	if (lightTransform == nullptr){
-		printf("Hitta inte transformen");
+		printf("Hittade inte transformen");
 	}
+	else
+	{
+		tempLight = lightTransform->light;
+		tempLight = new Light(gDevice, gDeviceContext);
 
-	tempLight = lightTransform->light;
-	tempLight = new Light();
-	tempLight->name = mm->objectName;
-	tempLight->lightData = mm->lightdata;
+		tempLight->transform = lightTransform;
+		tempLight->CreateCBuffer();
 
-	allLightTransforms.push_back(lightTransform); //lägger den i lightTransformsen
+		tempLight->name = mm->objectName;
+		tempLight->lightData = mm->lightdata;
+		tempLight->UpdateCBuffer();
+
+		allLightTransforms.push_back(lightTransform); //lägger den i lightTransformsen
+	}
 }
 void MayaLoader::LightChange(MessageHeader mh, LightMessage *mm){
 	
@@ -664,10 +716,15 @@ void MayaLoader::LightChange(MessageHeader mh, LightMessage *mm){
 	if (lightTransform == nullptr){
 		printf("Hitta inte transformen");
 	}
+	else
+	{
+		tempLight = lightTransform->light;
+		tempLight->EmptyVariables();
 
-	tempLight = lightTransform->light;
-	tempLight->name = mm->objectName;
-	tempLight->lightData = mm->lightdata;
+		tempLight->name = mm->objectName;
+		tempLight->lightData = mm->lightdata;
+		tempLight->UpdateCBuffer();
+	}
 }
 
 void MayaLoader::CameraAdded(MessageHeader mh, CameraMessage *mm){
@@ -682,19 +739,26 @@ void MayaLoader::CameraAdded(MessageHeader mh, CameraMessage *mm){
 		}
 	}
 	if (cameraTransform == nullptr){
-		printf("Hitta inte transformen");
+		printf("Hittade inte transformen");
 	}
+	else
+	{
+		tempCamera = cameraTransform->camera;
+		tempCamera = new CameraObj(gDevice, gDeviceContext);
 
-	tempCamera = cameraTransform->camera;
-	tempCamera = new CameraObj();
-	tempCamera->name = mm->objectName;
-	tempCamera->cameraData = mm->cameraData;
+		tempCamera->transform = cameraTransform;
+		tempCamera->CreateCBuffer();
+		
+		tempCamera->name = mm->objectName;
+		tempCamera->cameraData = mm->cameraData;
+		tempCamera->UpdateCBuffer();
 
-	allCameraTransforms.push_back(cameraTransform);
+		allCameraTransforms.push_back(cameraTransform);
+	}
 }
 void MayaLoader::CameraChange(MessageHeader mh, CameraMessage *mm){
 	char* transformName = mm->transformName;
-	Transform *cameraTransform = nullptr; //hitta den
+	Transform *cameraTransform = nullptr; //hitta den för att hitta vilken camera den syftar på
 	CameraObj *tempCamera = nullptr;
 
 	for (int i = 0; i < allCameraTransforms.size(); i++){
@@ -703,11 +767,18 @@ void MayaLoader::CameraChange(MessageHeader mh, CameraMessage *mm){
 			break;
 		}
 	}
-	if (cameraTransform == nullptr){
-		printf("Hitta inte transformen");
+	if (cameraTransform == nullptr){ //ha kvar pekaren på den gamla transformen!
+		printf("Hittade inte transformen");
 	}
+	else
+	{
+		tempCamera = cameraTransform->camera;
+		tempCamera->EmptyVariables();
+	
+		//tempCamera->transform = cameraTransform; //ge kameran reference till transformen, bara vid starten? den byter väl inte transform?
 
-	tempCamera = cameraTransform->camera;
-	tempCamera->name = mm->objectName;
-	tempCamera->cameraData = mm->cameraData;
+		tempCamera->name = mm->objectName;
+		tempCamera->cameraData = mm->cameraData;
+		tempCamera->UpdateCBuffer();
+	}
 }

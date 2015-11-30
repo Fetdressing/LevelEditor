@@ -25,26 +25,34 @@ using namespace DirectX::SimpleMath;
 #pragma comment (lib, "d3dcompiler.lib")
 
 #include "ObjectData.h"
+#include "Material.h"
 
 class Mesh{
 public:
 	char* name; //det riktiga namnet finns i Transformen
 	char* transformName;
+	char* materialName;
 	//XMMATRIX pos, rot, scale, world;
+	MeshData *meshData; //pekare till denna för att den har massa egna pekare nu, förstör objektet när det ska vara nya värden!
+
+
 	int nrVertices;
 	int nrIndecies;
+
 	Vertex *vertices = nullptr; //dessa kan inte ligga i meshData då 
 	Index *indecies = nullptr;
-	ID3D11Buffer *vertexBuffer;
-	ID3D11Buffer *indexBuffer;
+	ID3D11Buffer *vertexBuffer = nullptr;
+	ID3D11Buffer *indexBuffer = nullptr;
 	//std::vector<Vertex> vertices;
-	MeshData *meshData; //pekare till denna för att den har massa egna pekare nu, förstör objektet när det ska vara nya värden!
-	int materialID = 0;;
+	
+	
+	Material* material = nullptr;
+	//int materialID = 0;;
 
 	Mesh(ID3D11Device* gd, ID3D11DeviceContext* gdc){
 		this->gDevice = gd; //freea dessa inte här, görs i main duuh
 		this->gDeviceContext = gdc;
-		materialID = 0; //default material ligger på index 0
+		//materialID = 0; //default material ligger på index 0
 	}
 	~Mesh(){
 		vertexBuffer->Release();
@@ -57,7 +65,8 @@ public:
 	}
 	void CreateBuffers();
 	void EmptyVariables(); //används när meshen behöver bygga om värden (namn)
-	void EmptyBuffersAndArrays(); //används när meshen behöver bygga om värden (vertices)
+	void EmptyBuffers();
+	//void EmptyBuffersAndArrays(); //används när meshen behöver bygga om värden (vertices)
 	void CreateVertices();
 	void CreateIndices();
 	void CreateVertexBuffer(); //dessa använder sig av den aktiva vertices och indecies

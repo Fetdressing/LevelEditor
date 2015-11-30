@@ -15,9 +15,10 @@
 #include "Material.h"
 #include "Light.h"
 #include "Mutex.h"
+#include "FileHandler.h"
 
 using namespace std;
-
+const int MAX_NAME_SIZE = 100;
 class MayaLoader{
 	
 public:	
@@ -42,9 +43,12 @@ public:
 	void TryWriteAMessage();
 
 private:
+	//externa grejer
 	ID3D11Device* gDevice = nullptr;
 	ID3D11DeviceContext* gDeviceContext = nullptr;
 
+	FileHandler *fileHandler = nullptr;
+	//lokala-isch grejer
 	//data om filemapen
 	struct FilemapInfo{
 		size_t head_ByteOffset; //offset in bytes from beginning of the shared memory
@@ -58,19 +62,19 @@ private:
 			tail_ByteOffset = 0;
 			non_accessmemoryOffset = 10;
 			//totalConsumers = 0;
-			messageFilemap_Size = 0; //storleken på filemapen med meddelanden
+			messageFilemap_Size = 1024; //storleken på filemapen med meddelanden
 		}
 
 	};
 	FilemapInfo fileMapInfo;
 
 	void SetFilemapInfoValues(size_t headPlacement, size_t tailPlacement, size_t nonAccessMemoryPlacement, size_t messageFileMapTotalSize); //sätt negativa värden om den inte ska ändras!
-	HANDLE hMessageFileMap;
-	LPVOID mMessageData;
+	HANDLE hMessageFileMap = nullptr;
+	LPVOID mMessageData = nullptr;
 	unsigned int mSize = 1 << 13; //2^15, denna sätts vid skapelsen av filemapen, parameter värdet till funktionen
 	//will hold information about where heads and tails are for example, aswell as where the free memory is in the other shared memory
-	HANDLE hInfoFileMap;
-	LPVOID mInfoData;
+	HANDLE hInfoFileMap = nullptr;
+	LPVOID mInfoData = nullptr;
 	unsigned int mInfoSize = 1 << 6;
 
 	size_t thisApplication_filemap_MemoryOffset = 0; //hur långt ifrån starten i bytes den är på filemapen med meddelanden
@@ -97,30 +101,36 @@ private:
 	MessageHeader messageHeader;
 	bool headerDidFit; //true om den fick plats på denna sidan av filemapen, annars är den på andra, används vid läsning av meddelanden
 	
+	
 	//har kvar vissa av dessa structsen även om de är lite onödiga då alla värden i vissa redan ligger i en full struct, men vill hålla det cleant med namngivning :-)
 	struct TransformMessage{
-		char objectName[100];
-		char parentName[100];
+		char objectName[MAX_NAME_SIZE];
+		char parentName[MAX_NAME_SIZE];
 		TransformData transformData;
 	};
 	struct CameraMessage{
-		char objectName[100];
-		char transformName[100];
+		char objectName[MAX_NAME_SIZE];
+		char transformName[MAX_NAME_SIZE];
 		CameraData cameraData;
 	};
 	struct MeshMessage{
-		char objectName[100];
-		char transformName[100];
+		char objectName[MAX_NAME_SIZE];
+		char transformName[MAX_NAME_SIZE];
+		char materialName[MAX_NAME_SIZE];
 		MeshData *meshData;
 	};
 	struct MaterialMessage{ //namnet på den ligger i headern sen
-		char objectName[100];
+		char objectName[MAX_NAME_SIZE];
+		char textureName[MAX_NAME_SIZE];
+		char normalMapName[MAX_NAME_SIZE];
+		char specularMapName[MAX_NAME_SIZE];
+		char emissionMapName[MAX_NAME_SIZE];
 		MaterialData materialData;
 	};
 	struct LightMessage{
 		//ljusvärden
-		char objectName[100];
-		char transformName[100];
+		char objectName[MAX_NAME_SIZE];
+		char transformName[MAX_NAME_SIZE];
 		LightData lightdata;
 	};
 
@@ -132,7 +142,7 @@ private:
 
 	size_t transformMessage_MaxSize = 512;
 	size_t cameraMessage_MaxSize = 512;
-	size_t meshMessage_MaxSize = 4096; //kan ju fan inte hårdkodas!
+	size_t meshMessage_MaxSize = 4096; //kan ju fan inte hårdkodas! (maxstorlek de e luuuugnt)
 	size_t materialMessage_MaxSize = 512;
 	size_t lightMessage_MaxSize = 512;
 
@@ -159,4 +169,5 @@ private:
 
 	void CameraAdded(MessageHeader mh, CameraMessage *mm);
 	void CameraChange(MessageHeader mh, CameraMessage *mm);
+
 };

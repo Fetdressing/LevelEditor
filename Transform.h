@@ -15,12 +15,12 @@ class Transform{
 	};
 public:
 	//char* name;
-	//Transform transformData;	
+	//Transform transformData;
 	char *name;
 	char *parentName;
-	Transform *parent; //använd parenten och hämta dess transformation
-	bool hasParent;
 	TransformData transformData;
+
+	Transform *parent = nullptr; //använd parenten och hämta dess transformation
 	TransformCBufferData transformCBufferData;
 	ID3D11Buffer *transformCBuffer;
 

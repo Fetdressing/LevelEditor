@@ -9,14 +9,21 @@ void Mesh::CreateBuffers(){
 
 void Mesh::EmptyVariables(){
 	delete(name);
+	delete(materialName);
+	delete(meshData);
 }
 
-void Mesh::EmptyBuffersAndArrays(){
-	delete(meshData);
-
+void Mesh::EmptyBuffers() {
 	vertexBuffer->Release();
 	indexBuffer->Release();
 }
+//
+//void Mesh::EmptyBuffersAndArrays(){
+//	delete(meshData);
+//
+//	vertexBuffer->Release();
+//	indexBuffer->Release();
+//}
 
 void Mesh::CreateIndices(){
 	nrIndecies = meshData->nrI;

@@ -24,6 +24,14 @@ using namespace DirectX::SimpleMath;
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
+//struct Scene {
+//	vector<Material*> materials;
+//	vector<Transform*> allTransforms;
+//	vector<Transform*> allMeshTransforms;
+//	vector<Transform*> allLightTransforms;
+//	vector<Transform*> allCameraTransforms;
+//};
+
 struct Float2{
 	float u, v;
 	Float2(){}

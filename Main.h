@@ -18,12 +18,13 @@
 #include <memory>
 #include <SimpleMath.h>
 
+#pragma comment (lib, "d3d11.lib")
+#pragma comment (lib, "d3dcompiler.lib")
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-#pragma comment (lib, "d3d11.lib")
-#pragma comment (lib, "d3dcompiler.lib")
+
 
 #include "Cam.h"
 #include "MayaLoader.h"

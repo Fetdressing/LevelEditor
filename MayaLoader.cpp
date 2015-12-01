@@ -154,15 +154,17 @@ void MayaLoader::TryReadAMessage(){
 			case 1:
 				ReadMesh(messageHeader.messageType);
 				break;
-			case 2:
-				//nodeType = TCamera;
+			case 2:				
 				ReadTransform(messageHeader.messageType);
 				break;
 			case 3:
-				//nodeType = TLight;
+				ReadCamera(messageHeader.messageType);				
 				break;
 			case 4:
-				//nodeType = TMaterial;
+				ReadLight(messageHeader.messageType);				
+				break;
+			case 5:
+				ReadMaterial(messageHeader.messageType);
 				break;
 			default:
 				printf("Invalid message ID");
@@ -544,7 +546,7 @@ void MayaLoader::TransformAdded(MessageHeader mh, TransformMessage *mm){
 	transform->parentName = mm->parentName;
 	transform->transformData = mm->transformData;
 
-	if (transform->parentName[0] != '0'){ //namnet är inte tomt -> den har en parent, så hitta den
+	if (transform->parentName[0] != 0){ //namnet är inte tomt -> den har en parent, så hitta den
 		for (int i = 0; i < allTransforms.size(); i++) {
 			if (strcmp(transform->parentName, allTransforms[i]->name) == 0) {
 				transform->parent = allTransforms[i];

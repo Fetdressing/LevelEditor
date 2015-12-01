@@ -59,6 +59,15 @@ void FileHandler::SaveTransforms(int nrTransforms, vector<Transform*> &allTransf
 		ofs.write((char*)&transformNameSize, sizeof(int));
 		ofs.write(parentName, sizeof(char) * parentNameSize);
 		ofs.write(transformName, sizeof(char) * transformNameSize);
+
+		if (transformNameSize == 0) //den är dynamiskt allokerad!
+		{
+			delete(transformName);
+		}
+		if (parentNameSize == 0) //den är dynamiskt allokerad!
+		{
+			delete(parentName);
+		}
 		
 		ofs.write((char*)&allTransforms[i]->transformData.pos, sizeof(allTransforms[i]->transformData.pos));
 		ofs.write((char*)&allTransforms[i]->transformData.rot, sizeof(allTransforms[i]->transformData.rot));
@@ -81,6 +90,15 @@ void FileHandler::SaveMeshes(int nrMeshes, vector<Transform*> &allMeshTransforms
 		ofs.write(transformName, sizeof(char) * transformNameSize);
 		ofs.write(meshName, sizeof(char) * meshNameSize);
 
+		if (transformNameSize == 0) //den är dynamiskt allokerad!
+		{
+			delete(transformName);
+		}
+		if (meshNameSize == 0) //den är dynamiskt allokerad!
+		{
+			delete(meshName);
+		}
+
 		/*ofs.write((char*)&allMeshTransforms[i]->mesh->nrVertices, sizeof(int));
 		ofs.write((char*)&allMeshTransforms[i]->mesh->nrIndecies, sizeof(int));
 		*/
@@ -89,6 +107,11 @@ void FileHandler::SaveMeshes(int nrMeshes, vector<Transform*> &allMeshTransforms
 
 		ofs.write((char*)&materialNameSize, sizeof(int));
 		ofs.write(materialName, sizeof(char) * materialNameSize);
+
+		if (materialNameSize == 0) //den är dynamiskt allokerad!
+		{
+			delete(materialName);
+		}
 		//headerEND****
 
 		//messageSTART****
@@ -111,12 +134,17 @@ void FileHandler::SaveMeshes(int nrMeshes, vector<Transform*> &allMeshTransforms
 
 void FileHandler::SaveMaterials(int nrMats, vector<Material*> &materials)
 {
-	for (int i = 0; i < nrMats; i++) {
+	for (int i = 1; i < nrMats; i++) { //läs inte default materialet!
 		char* materialName = materials[i]->name;
 		int materialNameSize = CorrectName(materialName);
 
 		ofs.write((char*)&materialNameSize, sizeof(int));
 		ofs.write(materialName, sizeof(char) * materialNameSize);
+
+		if (materialNameSize == 0) //den är dynamiskt allokerad!
+		{
+			delete(materialName);
+		}
 	}
 }
 
@@ -133,6 +161,14 @@ void FileHandler::SaveLights(int nrLights, vector<Transform*> &allLightTransform
 		ofs.write(transformName, sizeof(char) * transformNameSize);
 		ofs.write(lightName, sizeof(char) * lightNameSize);
 
+		if (transformNameSize == 0) //den är dynamiskt allokerad!
+		{
+			delete(transformName);
+		}
+		if (lightNameSize == 0) //den är dynamiskt allokerad!
+		{
+			delete(lightName);
+		}
 		//lightdata!!
 
 	}
@@ -148,20 +184,27 @@ void FileHandler::LoadScene()
 int FileHandler::CorrectName(char *&referenceName) { //kör tills nollbyten och biter av resterande chars
 	char *tempName = nullptr;
 	int nameSize = 0;
-
-	for (int i = 0; i < max_Name_Size; i++) {
-		if (referenceName[i] == 0) { //nullterminator!!!!!!!!!!!
-			break;
+	if (referenceName != nullptr)
+	{
+		for (int i = 0; i < max_Name_Size; i++) {
+			if (referenceName[i] == 0) { //nullterminator!!!!!!!!!!!
+				break;
+			}
+			nameSize++; //här ??
 		}
-		nameSize++; //här ??
-	}
 
-	tempName = new char[nameSize];
-	for (int i = 0; i < nameSize; i++) {
-		tempName[i] = referenceName[i];
-	}
+		tempName = new char[nameSize];
+		for (int i = 0; i < nameSize; i++) {
+			tempName[i] = referenceName[i];
+		}
 
-	delete(referenceName);
-	referenceName = tempName;
-	return nameSize;
+		//delete(referenceName); haha arrayen som den pekar på är statisk är ju fan statisk!
+		referenceName = new char[nameSize];
+		referenceName = tempName;
+		return nameSize;
+	}
+	else
+	{
+		return 0;
+	}
 }

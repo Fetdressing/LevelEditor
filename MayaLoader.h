@@ -102,7 +102,7 @@ private:
 	
 	//har kvar vissa av dessa structsen även om de är lite onödiga då alla värden i vissa redan ligger i en full struct, men vill hålla det cleant med namngivning :-)
 	struct TransformMessage{
-		char objectName[MAX_NAME_SIZE];
+		char objectName[MAX_NAME_SIZE]; //ifall dessa ska ändras till dynamiskt allokerade så kolla FileHandler->CorrectName!!
 		char parentName[MAX_NAME_SIZE];
 		TransformData transformData;
 	};

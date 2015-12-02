@@ -82,7 +82,8 @@ private:
 		MessageHeader(){
 			nodeType = 0;
 			messageType = 0;
-			//consumersLeft = 0; //consumers kvar att passera!
+			msgConfig = 0;
+			byteTotal = 0;
 			byteSize = 0;
 			bytePadding = 0;
 			//nameElementSize = 0;
@@ -90,7 +91,8 @@ private:
 
 		int nodeType;
 		int messageType;
-		//int consumersLeft;
+		int msgConfig;
+		size_t byteTotal;
 		size_t byteSize;
 		size_t bytePadding;
 		//int nameElementSize; //hur stort är namnet i karaktärer

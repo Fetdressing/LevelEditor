@@ -32,7 +32,7 @@ public:
 
 	void ReadTransform(int i); //parameter för edited/added/removed
 	void ReadMesh(int i);
-	void ReadMeshData(size_t offSetStart, size_t reducedMessageSize); //bara så det inte ska bli lika mkt kod
+	void ReadMeshData(size_t offSetStart); //bara så det inte ska bli lika mkt kod
 	void ReadLight(int i);
 	void ReadMaterial(int i);
 	void ReadCamera(int i);
@@ -135,15 +135,15 @@ private:
 		LightData lightdata;
 	};
 
-	TransformMessage *transformMessage;
-	CameraMessage *cameraMessage;
-	MeshMessage *meshMessage;
-	MaterialMessage *materialMessage;
-	LightMessage *lightMessage;
+	TransformMessage *transformMessage = nullptr;
+	CameraMessage *cameraMessage = nullptr;
+	MeshMessage *meshMessage = nullptr;
+	MaterialMessage *materialMessage = nullptr;
+	LightMessage *lightMessage = nullptr;
 
 	size_t transformMessage_MaxSize = 512;
 	size_t cameraMessage_MaxSize = 512;
-	size_t meshMessage_MaxSize = 4096; //kan ju fan inte hårdkodas! (maxstorlek de e luuuugnt)
+	size_t meshMessage_MaxSize = 1024 * 1024 * 4; //kan ju fan inte hårdkodas! (maxstorlek de e luuuugnt)
 	size_t materialMessage_MaxSize = 512;
 	size_t lightMessage_MaxSize = 512;
 

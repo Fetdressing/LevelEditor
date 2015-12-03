@@ -1,5 +1,5 @@
 //VERTEX SHADER
-cbuffer World : register (b0)
+cbuffer World : register (b10)
 {
 	matrix View;
 	matrix Projection;
@@ -10,6 +10,10 @@ cbuffer World : register (b0)
 	matrix lightProjection;
 };
 
+cbuffer World : register (b0)
+{
+	matrix World;
+};
 
 struct VS_IN
 {
@@ -41,6 +45,7 @@ VS_OUT main(VS_IN input)
 	//inputpos = mul(inputpos, View);
 	//inputpos = mul(inputpos, Projection);
 
+	//inputpos = mul(inputpos, World);
 	output.Pos = inputpos;
 	output.Tex = input.Tex;
 	output.normals = float4(input.normals, 1.0f);

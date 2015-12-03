@@ -156,7 +156,7 @@ void Main::Render(){
 	UINT32 offset2 = 0;
 	
 	gDeviceContext->IASetInputLayout(defaultInputLayout);
-	gDeviceContext->IASetVertexBuffers(0, 1, &testVertexBuffer, &vertexSize2, &offset2);
+	//gDeviceContext->IASetVertexBuffers(0, 1, &testVertexBuffer, &vertexSize2, &offset2);
 	
 	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	gDeviceContext->VSSetShader(defaultVS, nullptr, 0);
@@ -166,7 +166,7 @@ void Main::Render(){
 	gDeviceContext->PSSetShader(defaultPS, nullptr, 0);
 	gDeviceContext->PSSetSamplers(0, 1, &wrap_Sampstate);
 	
-	gDeviceContext->Draw(4, 0);
+	//gDeviceContext->Draw(4, 0);
 
 	mayaLoader->DrawScene(); //här så att den får med alla rtv stuff n shiet!
 

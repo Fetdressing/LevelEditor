@@ -11,7 +11,7 @@
 
 class Transform{
 	struct TransformCBufferData{
-		XMFLOAT4 world;
+		XMFLOAT4X4 world;
 	};
 public:
 	//char* name;
@@ -40,8 +40,24 @@ public:
 	}
 	void UpdateCBuffer(){
 		//updatesubresource med den nya transformData
+		XMMATRIX tempWorld = XMMatrixIdentity();
+
+		XMMATRIX tempScale = XMMatrixIdentity();
+		XMMATRIX tempRotation = XMMatrixIdentity();
+		XMMATRIX tempPosition = XMMatrixIdentity();
+
+		tempScale = XMMatrixScaling(transformData.scale.x, transformData.scale.y, transformData.scale.z);
+		//XMMatrixRotationQuaternion använd en quaternion istället! cool stuff, sen bör det funka	
+		tempRotation = XMMatrixRotationX(transformData.rot.x);
+		tempRotation = XMMatrixRotationY(transformData.rot.y);
+		tempRotation = XMMatrixRotationZ(transformData.rot.z);
+		tempPosition = XMMatrixTranslation(transformData.pos.x, transformData.pos.y, transformData.pos.z);
+
+		tempWorld = tempScale * tempRotation * tempPosition;
+		
+		XMStoreFloat4x4(&transformCBufferData.world, XMMatrixTranspose(tempWorld));
 		//transformdata ligger på plats 0, material på 1, osv
-		gDeviceContext->UpdateSubresource(transformCBuffer, 0, NULL, &transformCBufferData, 0, 0); //skapa en separat struct för transformdata som ska in i shadern, world osv
+		gDeviceContext->UpdateSubresource(transformCBuffer, 0, NULL, &transformCBufferData.world, 0, 0); //skapa en separat struct för transformdata som ska in i shadern, world osv
 	}
 	void CreateTransformCBuffer(){ //glöm inte parentens skit?
 		D3D11_BUFFER_DESC cbDesc = { 0 };

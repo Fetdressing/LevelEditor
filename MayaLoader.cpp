@@ -5,15 +5,8 @@ MayaLoader::MayaLoader(ID3D11Device* gd, ID3D11DeviceContext* gdc){
 	this->gDevice = gd;
 	this->gDeviceContext = gdc;
 
-	CreateFileMaps(4096);
+	CreateFileMaps(1024 * 1024 * 10);
 	
-	//transformMessage = (TransformMessage*)malloc(transformMessage_MaxSize);
-	//meshMessage = (MeshMessage*)malloc(meshMessage_MaxSize);
-	//cameraMessage = (CameraMessage*)malloc(cameraMessage_MaxSize);
-	//lightMessage = (LightMessage*)malloc(lightMessage_MaxSize);
-	//materialMessage = (MaterialMessage*)malloc(materialMessage_MaxSize);
-
-
 	Material *defaultMaterial = new Material(gDevice, gDeviceContext);
 	materials.push_back(defaultMaterial); //lägg till default material, viktigt den ligger på första platsen
 
@@ -118,7 +111,7 @@ void MayaLoader::DrawScene(){
 		catch (...){ //gick inte assigna det materialet (inte skapat ännu förmodligen), använd default istället
 			gDeviceContext->PSSetConstantBuffers(1, 0, &materials[0]->materialCbuffer); //defaultmat
 		}
-
+		//transformdata ligger på plats 0, material på 1, osv
 		//set transformcbufferns värden, updatesubresource
 		allMeshTransforms[i]->UpdateCBuffer(); //slå först ihop med parentens värden innan vi updaterar cbuffern
 		gDeviceContext->Draw(allMeshTransforms[i]->mesh->nrVertices, 0);
@@ -274,11 +267,11 @@ void MayaLoader::ReadMesh(int i){
 		meshMessage = (MeshMessage*)malloc(meshMessage_MaxSize);
 		if (messageHeader.msgConfig == 1) { //meddelandet får däremot inte plats -> meddelandet är skickat till andra sidan
 			//memcpy(meshMessage, (unsigned char*)mMessageData, messageHeader.byteSize); //läser i början på filen utan nån offset
-			ReadMeshData(0, 0); //?? parameter värdena här?
+			ReadMeshData(0); //?? parameter värdena här?
 			thisApplication_filemap_MemoryOffset = messageHeader.byteSize + messageHeader.bytePadding;
 		}
 		else { //meddelandet får plats!!
-			ReadMeshData(0, sizeof(MessageHeader));
+			ReadMeshData(thisApplication_filemap_MemoryOffset + sizeof(MessageHeader));
 			//memcpy(meshMessage, (unsigned char*)mMessageData + thisApplication_filemap_MemoryOffset + sizeof(MessageHeader), messageHeader.byteSize);
 			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal + thisApplication_filemap_MemoryOffset;
 		}
@@ -292,7 +285,7 @@ void MayaLoader::ReadMesh(int i){
 		}
 		else { //annars bara läs den rakt av från där denna redan är placerad
 			meshMessage = (MeshMessage*)malloc(meshMessage_MaxSize);
-			ReadMeshData(sizeof(MessageHeader), sizeof(MessageHeader));
+			ReadMeshData(sizeof(MessageHeader));
 			//memcpy(meshMessage, (unsigned char*)mMessageData + sizeof(MessageHeader), messageHeader.byteSize);
 			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal;
 		}
@@ -314,15 +307,25 @@ void MayaLoader::ReadMesh(int i){
 	mutexInfo.Unlock();
 
 }
-void MayaLoader::ReadMeshData(size_t offSetStart, size_t reducedMessageSize){
+void MayaLoader::ReadMeshData(size_t offSetStart){
+	meshMessage->meshData = new MeshData();
 
 	memcpy(meshMessage->objectName, (unsigned char*)mMessageData + offSetStart, sizeof(meshMessage->objectName));
 	UINT offset = (sizeof(char) * 100);
 	memcpy(meshMessage->transformName, (unsigned char*)mMessageData + offSetStart + offset, sizeof(meshMessage->transformName));
 	offset += (sizeof(char) * 100);
 	memcpy(meshMessage->meshData, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * 5);
-
 	offset += sizeof(int) * 5; //7
+
+	//allokera minne till att variabler!
+	meshMessage->meshData->positions = new Float3[meshMessage->meshData->nrPos];
+	meshMessage->meshData->normals = new Float3[meshMessage->meshData->nrNor];
+	meshMessage->meshData->uvs = new Float2[meshMessage->meshData->nrUV];
+
+	meshMessage->meshData->indexPositions = new int[meshMessage->meshData->nrI];
+	meshMessage->meshData->indexNormals = new int[meshMessage->meshData->nrI];
+	meshMessage->meshData->indexUVs = new int[meshMessage->meshData->nrI];
+	meshMessage->meshData->trianglesPerFace = new int[meshMessage->meshData->triangleCount];
 
 	memcpy(meshMessage->meshData->positions, (unsigned char*)mMessageData + offSetStart + offset, sizeof(Float3) * meshMessage->meshData->nrPos);
 	offset += sizeof(Float3) * meshMessage->meshData->nrPos;
@@ -330,7 +333,6 @@ void MayaLoader::ReadMeshData(size_t offSetStart, size_t reducedMessageSize){
 	offset += sizeof(Float3) * meshMessage->meshData->nrNor;
 	memcpy(meshMessage->meshData->uvs, (unsigned char*)mMessageData + offSetStart + offset, sizeof(Float2) * meshMessage->meshData->nrUV);
 	offset += sizeof(Float2) * meshMessage->meshData->nrUV;
-
 	
 	memcpy(meshMessage->meshData->indexPositions, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->nrI);
 	offset += sizeof(int) * meshMessage->meshData->nrI;
@@ -340,11 +342,6 @@ void MayaLoader::ReadMeshData(size_t offSetStart, size_t reducedMessageSize){
 	offset += sizeof(int) * meshMessage->meshData->nrI;
 
 	memcpy(meshMessage->meshData->trianglesPerFace, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->triangleCount);
-
-	//meshMessage->meshData.vertices = new Vertex[nrVert];
-	//meshMessage->meshData.indecies = new Index[nrIndecies];
-	//memcpy(meshMessage->meshData.vertices, (unsigned char*)mMessageData + offSetStart, messageHeader.byteSize - reducedMessageSize - (sizeof(Index) * nrIndecies));
-	//memcpy(meshMessage->meshData.indecies, (unsigned char*)mMessageData + offSetStart + (sizeof(Vertex) * nrVert), messageHeader.byteSize - reducedMessageSize - (sizeof(Vertex) * nrVert));
 
 }
 void MayaLoader::ReadLight(int i){
@@ -474,9 +471,9 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){ //material måste 
 	}
 	else
 	{
+		
+		meshTransform->mesh = new Mesh(gDevice, gDeviceContext);
 		activeMesh = meshTransform->mesh;
-
-		activeMesh = new Mesh(gDevice, gDeviceContext);
 
 		activeMesh->name = mm->objectName;
 		activeMesh->transformName = mm->transformName;
@@ -484,17 +481,15 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){ //material måste 
 		activeMesh->meshData = mm->meshData;
 
 		activeMesh->material = materials[0]; //default material
-		for (int i = 0; i < materials.size(); i++) {
-			if (strcmp(mm->materialName, materials[i]->name) == 0) {
-				activeMesh->material = materials[i];
-				break;
-			}
-		}
-		/*activeMesh->meshData.nrVerts = mh.nrVerts;
-		activeMesh->meshData.nrIndecies = mh.nrIndecies;
-
-		activeMesh->meshData.vertices = mm->meshData.vertices;
-		activeMesh->meshData.indecies = mm->meshData.indecies;*/
+		//if (activeMesh->material->name != nullptr)
+		//{
+		//	for (int i = 0; i < materials.size(); i++) {
+		//		if (strcmp(mm->materialName, materials[i]->name) == 0) {
+		//			activeMesh->material = materials[i];
+		//			break;
+		//		}
+		//	}
+		//}
 
 		activeMesh->CreateBuffers();
 		allMeshTransforms.push_back(meshTransform); //skickar in denna transform i allMeshTransforms oxå!! så den kommer vara refererad i båda vektorerna

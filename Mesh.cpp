@@ -68,6 +68,7 @@ void Mesh::CreateVertexBuffer(){ //får skapa vertexarrayen oxå!!!!! hämta all da
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	bufferDesc.ByteWidth = sizeof(Vertex) * nrVertices;
+	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 	D3D11_SUBRESOURCE_DATA data;
 	data.pSysMem = vertices;

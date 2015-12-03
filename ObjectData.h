@@ -145,7 +145,10 @@ struct Index{
 };
 
 struct TransformData{
-	Float3 pos, rot, scale;
+	Float3 pos;
+	Float4 rot;
+	Float3 scale;
+	//Float3 pos, rot, scale;
 };
 
 struct CameraData{

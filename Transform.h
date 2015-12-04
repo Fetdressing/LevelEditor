@@ -47,10 +47,9 @@ public:
 		XMMATRIX tempPosition = XMMatrixIdentity();
 
 		tempScale = XMMatrixScaling(transformData.scale.x, transformData.scale.y, transformData.scale.z);
-		//XMMatrixRotationQuaternion använd en quaternion istället! cool stuff, sen bör det funka	
-		tempRotation = XMMatrixRotationX(transformData.rot.x);
-		tempRotation = XMMatrixRotationY(transformData.rot.y);
-		tempRotation = XMMatrixRotationZ(transformData.rot.z);
+		//XMMatrixRotationQuaternion använd en quaternion istället! cool stuff, sen bör det funka
+		XMVECTOR rotationQuat = XMVectorSet(transformData.rot.x, transformData.rot.y, transformData.rot.z, transformData.rot.w);
+		tempRotation = XMMatrixRotationQuaternion(rotationQuat);
 		tempPosition = XMMatrixTranslation(transformData.pos.x, transformData.pos.y, transformData.pos.z);
 
 		tempWorld = tempScale * tempRotation * tempPosition;

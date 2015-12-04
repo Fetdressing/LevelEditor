@@ -14,19 +14,21 @@
 #include "Material.h"
 #include "Mutex.h"
 #include "FileHandler.h"
+#include "Cam.h"
 
 using namespace std;
 const int MAX_NAME_SIZE = 100;
 class MayaLoader{
 	
 public:	
-	MayaLoader(ID3D11Device* gd, ID3D11DeviceContext* gdc);
+	MayaLoader(ID3D11Device* gd, ID3D11DeviceContext* gdc, UINT screenWidth, UINT screenHeight);
 	MayaLoader();
 	~MayaLoader();
 	void DrawScene();
 
 	//void StartSyncing(); //startar hela processen
 	void CreateFileMaps(unsigned int messageFilemapSize);
+	void InitVariables();
 
 	void TryReadAMessage();
 
@@ -44,6 +46,19 @@ private:
 	//externa grejer
 	ID3D11Device* gDevice = nullptr;
 	ID3D11DeviceContext* gDeviceContext = nullptr;
+	UINT screenWidth, screenHeight;
+
+	//*camera*********camera*
+	void UpdateCameraValues();
+	struct CameraCBufferData
+	{
+		XMFLOAT4X4 View;
+		XMFLOAT4X4 Projection;
+		
+	};
+	CameraCBufferData cameraCBufferData;
+	ID3D11Buffer* cCameraConstantBuffer = nullptr;
+	//*camera*********camera*
 
 	FileHandler *fileHandler = nullptr;
 	//lokala-isch grejer

@@ -1,13 +1,8 @@
 //VERTEX SHADER
-cbuffer World : register (b10)
+cbuffer Camera : register (b10)
 {
 	matrix View;
-	matrix Projection;
-	matrix WorldSpace;
-	matrix WorldSpaceInv;
-
-	matrix lightView;
-	matrix lightProjection;
+	matrix Projection;	
 };
 
 cbuffer World : register (b0)

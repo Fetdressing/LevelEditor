@@ -1,3 +1,8 @@
+#pragma once
+#ifndef CAM_H
+#define CAM_H
+#endif
+
 #include <windows.h>
 #include <DirectXMath.h>
 #include <DirectXMathMatrix.inl>

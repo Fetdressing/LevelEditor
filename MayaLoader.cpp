@@ -1,11 +1,14 @@
 #include "MayaLoader.h"
 
 Mutex mutexInfo("__info_Mutex__");
-MayaLoader::MayaLoader(ID3D11Device* gd, ID3D11DeviceContext* gdc){
+MayaLoader::MayaLoader(ID3D11Device* gd, ID3D11DeviceContext* gdc, UINT screenWidth, UINT screenHeight){
 	this->gDevice = gd;
 	this->gDeviceContext = gdc;
+	this->screenWidth = screenWidth;
+	this->screenHeight = screenHeight;
 
 	CreateFileMaps(1024 * 1024 * 10);
+	InitVariables();
 	
 	Material *defaultMaterial = new Material(gDevice, gDeviceContext);
 	materials.push_back(defaultMaterial); //lägg till default material, viktigt den ligger på första platsen
@@ -80,6 +83,16 @@ void MayaLoader::CreateFileMaps(unsigned int messageFilemapSize){
 	SetFilemapInfoValues(0, 0, 10, mSize); //storar de i filemapen oxå! sätt negativa värden om man inte vill nått värde ska ändras :)
 
 }
+void MayaLoader::InitVariables() {
+	D3D11_BUFFER_DESC cameraBufferDesc;
+	memset(&cameraBufferDesc, 0, sizeof(cameraBufferDesc));
+	cameraBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cameraBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	cameraBufferDesc.ByteWidth = sizeof(CameraCBufferData);
+	gDevice->CreateBuffer(&cameraBufferDesc, NULL, &cCameraConstantBuffer);
+
+	//fpsCam.SetLens(0.25f*3.14f, screenWidth / screenHeight, 1.0f, 1000.0f);
+}
 
 void MayaLoader::SetFilemapInfoValues(size_t headPlacement, size_t tailPlacement, size_t nonAccessMemoryPlacement, size_t messageFileMapTotalSize){
 	
@@ -103,6 +116,8 @@ void MayaLoader::DrawScene(){
 	UINT32 vertexSize2 = sizeof(float) * 8;
 	UINT32 offset2 = 0;
 	//set rätt constantbuffers, ljus, kamera och material stuff!
+	UpdateCameraValues(); //updaterar oxå camera cbuffern
+
 	for (int i = 0; i < allMeshTransforms.size(); i++){
 		gDeviceContext->IASetVertexBuffers(0, 1, &allMeshTransforms[i]->mesh->vertexBuffer, &vertexSize2, &offset2);
 		try{
@@ -430,29 +445,6 @@ void MayaLoader::ReadCamera(int i){
 	mutexInfo.Unlock();
 
 }
-
-void MayaLoader::TryWriteAMessage(){
-	MessageHeader messageFileH;
-	messageFileH.nodeType = 0;
-	messageFileH.byteSize = 1024;
-	messageFileH.bytePadding = 0;
-	//messageFileH.objectName = "hej";
-	
-	//TransformMessage *t;
-	transformMessage->transformData.pos = Float3(1, 1, 1);
-	transformMessage->transformData.rot = Float3(2, 1, 7);
-	transformMessage->transformData.scale = Float3(1, 0, 2);
-	memcpy((unsigned char*)mMessageData + fileMapInfo.head_ByteOffset, &messageFileH, sizeof(MessageHeader));
-	memcpy((unsigned char*)mMessageData + fileMapInfo.head_ByteOffset + sizeof(MessageHeader), transformMessage, messageFileH.byteSize - sizeof(MessageHeader));
-
-	//flytta headern (i filemapen, det lokala värdet ändras lite tidigare)
-	while (mutexInfo.Lock(1000) == false) Sleep(10); //behöver inte låsa förrens här becuz producern är den ända som faktiskt kan ändra headern, fast samtidigt kan den ändra andra värden???
-	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo)); //hämta filemapinfo datan om jag har fått mutexInfo till den
-	fileMapInfo.head_ByteOffset = 0;
-	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo)); //skriv till infofilemappen
-	mutexInfo.Unlock();
-}
-
 
 void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){ //material måste alltid komma före meshes!!
 	char* meshName = mm->objectName;
@@ -782,4 +774,11 @@ void MayaLoader::CameraChange(MessageHeader mh, CameraMessage *mm){
 		tempCamera->cameraData = mm->cameraData;
 		tempCamera->UpdateCBuffer();
 	}
+}
+
+void MayaLoader::UpdateCameraValues() {
+
+
+	gDeviceContext->UpdateSubresource(cCameraConstantBuffer, 0, NULL, &cameraCBufferData, 0, 0);
+	gDeviceContext->VSSetConstantBuffers(10, 1, &cCameraConstantBuffer);
 }

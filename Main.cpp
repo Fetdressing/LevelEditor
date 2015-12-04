@@ -41,21 +41,6 @@ Main::Main(HINSTANCE hInstance, UINT scrW, UINT scrH){
 	this->screenHeight = scrH;
 	pMain = this;
 
-
-	 DefaultForward = Vector4(0.0f, -1.0f, 0.0f, 0.0f);
-	 DefaultRight = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
-	 camForward = Vector4(0.0f, 0.0f, 1.0f, 0.0f);
-	 camRight = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
-
-	 moveLeftRight = 0.0f;
-	 moveBackForward = 0.0f;
-	 camYaw = 0.0f;
-	 camPitch = 0.0f;
-	 speed = 0.0f;
-	 boost = 0.0f;
-	 zoom = 0.0f;
-
-
 	Init();
 }
 
@@ -77,7 +62,7 @@ bool Main::Init()
 	CreateShaders();
 	CreateBuffers();
 
-	mayaLoader = new MayaLoader(gDevice, gDeviceContext);
+	mayaLoader = new MayaLoader(gDevice, gDeviceContext, screenWidth, screenHeight);
 	Run();	
 	return true;
 }
@@ -106,36 +91,36 @@ int Main::Run(){
 
 
 void Main::Update(){
-	camRotationMatrix = XMMatrixRotationRollPitchYaw(camPitch, camYaw, 0);
+	//camRotationMatrix = XMMatrixRotationRollPitchYaw(camPitch, camYaw, 0);
 
-	camTarget = XMVector3TransformCoord(DefaultForward, camRotationMatrix);
-	camTarget = XMVector3Normalize(camTarget);
+	//camTarget = XMVector3TransformCoord(DefaultForward, camRotationMatrix);
+	//camTarget = XMVector3Normalize(camTarget);
 
 
-	camRight = XMVector3TransformCoord(DefaultRight, camRotationMatrix);
-	camForward = XMVector3TransformCoord(DefaultForward, camRotationMatrix);
-	camUp = XMVector3Cross(camForward, camRight);
+	//camRight = XMVector3TransformCoord(DefaultRight, camRotationMatrix);
+	//camForward = XMVector3TransformCoord(DefaultForward, camRotationMatrix);
+	//camUp = XMVector3Cross(camForward, camRight);
 
-	camPosition += moveLeftRight*camRight;
-	camPosition += moveBackForward*camForward;
+	//camPosition += moveLeftRight*camRight;
+	//camPosition += moveBackForward*camForward;
 
-	moveLeftRight = 0.0f;
-	moveBackForward = 0.0f;
-	camTarget = camPosition + camTarget;
+	//moveLeftRight = 0.0f;
+	//moveBackForward = 0.0f;
+	//camTarget = camPosition + camTarget;
 
-	fpsCamLook = XMMatrixLookAtLH(camPosition, camTarget, camUp);
-	//Update cam
-	fpsCam.UpdateViewMatrix();
-	CamView = fpsCamLook;
-	CamProjection = fpsCam.Proj();
+	//fpsCamLook = XMMatrixLookAtLH(camPosition, camTarget, camUp);
+	////Update cam
+	//fpsCam.UpdateViewMatrix();
+	//CamView = fpsCamLook;
+	//CamProjection = fpsCam.Proj();
 
-	//WVP AND OTHERS
-	XMStoreFloat4x4(&WorldData.View, XMMatrixTranspose(CamView));
-	XMStoreFloat4x4(&WorldData.Projection, XMMatrixTranspose(CamProjection));
-	XMStoreFloat4x4(&WorldData.WorldSpace, XMMatrixTranspose(XMMatrixIdentity()));
-	XMStoreFloat4x4(&WorldData.InvWorld, XMMatrixTranspose(XMMatrixInverse(NULL, XMMatrixIdentity())));
-	XMStoreFloat4x4(&WorldData.lightView, XMMatrixTranspose(XMMatrixIdentity()));
-	XMStoreFloat4x4(&WorldData.lightProjection, XMMatrixTranspose(XMMatrixIdentity()));
+	////WVP AND OTHERS
+	//XMStoreFloat4x4(&WorldData.View, XMMatrixTranspose(CamView));
+	//XMStoreFloat4x4(&WorldData.Projection, XMMatrixTranspose(CamProjection));
+	//XMStoreFloat4x4(&WorldData.WorldSpace, XMMatrixTranspose(XMMatrixIdentity()));
+	//XMStoreFloat4x4(&WorldData.InvWorld, XMMatrixTranspose(XMMatrixInverse(NULL, XMMatrixIdentity())));
+	//XMStoreFloat4x4(&WorldData.lightView, XMMatrixTranspose(XMMatrixIdentity()));
+	//XMStoreFloat4x4(&WorldData.lightProjection, XMMatrixTranspose(XMMatrixIdentity()));
 
 	mayaLoader->TryReadAMessage();
 	Render();
@@ -147,10 +132,6 @@ void Main::Render(){
 	float clearColor[] = { 0.0, 0.3, 0.7f, 1.0f };
 	gDeviceContext->ClearRenderTargetView(gBackRufferRenderTargetView, clearColor);
 	gDeviceContext->ClearDepthStencilView(gDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-	gDeviceContext->UpdateSubresource(cWorldDataBuffer, 0, NULL, &WorldData, 0, 0);
-	gDeviceContext->VSSetConstantBuffers(0, 1, &cWorldDataBuffer);
-
 
 	UINT32 vertexSize2 = sizeof(float) * 8;
 	UINT32 offset2 = 0;
@@ -174,10 +155,7 @@ void Main::Render(){
 }
 
 void Main::InitVariables(){
-
-	camPosition = Vector4(50.0f, 10.70f, 50.0f, 0.0f);
-	fpsCam.SetLens(0.25f*3.14f, screenWidth / screenHeight, 1.0f, 1000.0f);
-
+ //camera grejer var här innan
 }
 
 bool Main::InitWindow(){
@@ -372,15 +350,6 @@ void Main::SetViewport(){
 }
 
 void Main::CreateBuffers(){
-	// Rotatation And transform World Buffer
-	D3D11_BUFFER_DESC transformbuffer;
-	memset(&transformbuffer, 0, sizeof(transformbuffer));
-	transformbuffer.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	transformbuffer.Usage = D3D11_USAGE_DEFAULT;
-	transformbuffer.ByteWidth = sizeof(World);
-	gDevice->CreateBuffer(&transformbuffer, NULL, &cWorldDataBuffer);
-
-
 
 	struct PlaneVertex
 	{
@@ -526,5 +495,5 @@ void Main::Dealloc(){
 	gDevice->Release();
 	gDeviceContext->Release();
 
-	free(mayaLoader);
+	delete(mayaLoader);
 }

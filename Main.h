@@ -84,45 +84,32 @@ private:
 	ID3D11PixelShader *defaultPS;
 	
 
-	//Fps camera
-	Vector4 camPosition;
-	Vector4 camTarget;
-	Vector4 camUp;// = Vector4(0.0f, 1.0f, 0.0f, 0.0f);;
-	Vector4 DefaultForward = Vector4(0.0f, -1.0f, 0.0f, 0.0f);
-	Vector4 DefaultRight = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
-	Vector4 camForward = Vector4(0.0f, 0.0f, 1.0f, 0.0f);
-	Vector4 camRight = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
+	////Fps camera
+	//Vector4 camPosition;
+	//Vector4 camTarget;
+	//Vector4 camUp;// = Vector4(0.0f, 1.0f, 0.0f, 0.0f);;
+	//Vector4 DefaultForward = Vector4(0.0f, -1.0f, 0.0f, 0.0f);
+	//Vector4 DefaultRight = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
+	//Vector4 camForward = Vector4(0.0f, 0.0f, 1.0f, 0.0f);
+	//Vector4 camRight = Vector4(1.0f, 0.0f, 0.0f, 0.0f);
 
-	XMMATRIX camRotationMatrix;
-	XMMATRIX fpsCamLook;
-	XMMATRIX CamProjection;
-	XMMATRIX CamView;
+	//XMMATRIX camRotationMatrix;
+	//XMMATRIX fpsCamLook;
+	//XMMATRIX CamProjection;
+	//XMMATRIX CamView;
 
-	float moveLeftRight = 0.0f;
-	float moveBackForward = 0.0f;
-	float camYaw = 0.0f;
-	float camPitch = 0.0f;
-	float speed = 0.0f;
-	float boost = 0.0f;
-	float zoom = 0.0f;
+	//float moveLeftRight = 0.0f;
+	//float moveBackForward = 0.0f;
+	//float camYaw = 0.0f;
+	//float camPitch = 0.0f;
+	//float speed = 0.0f;
+	//float boost = 0.0f;
+	//float zoom = 0.0f;
 
-	Camera fpsCam;
+	//Camera fpsCam;
 
-	struct World
-	{
-		XMFLOAT4X4 View;
-		XMFLOAT4X4 Projection;
-		XMFLOAT4X4 WorldSpace;
-		XMFLOAT4X4 InvWorld;
-		XMFLOAT4X4 WVP;
 
-		//Shadow matrixs
-		XMFLOAT4X4 lightView;
-		XMFLOAT4X4 lightProjection;
-	};
-	World WorldData;
-
-	ID3D11Buffer* cWorldDataBuffer = nullptr; //constantbuffer!
+	//ID3D11Buffer* cWorldDataBuffer = nullptr; //constantbuffer!
 
 	ID3D11Buffer* testVertexBuffer = nullptr;
 

@@ -66,14 +66,17 @@ void MayaLoader::CreateFileMaps(unsigned int messageFilemapSize){
 
 	mInfoData = MapViewOfFile(hInfoFileMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
 
-	if (hInfoFileMap == NULL){
+	if (hInfoFileMap == NULL)
+	{
 		cout << "Couldn't create infofilemap\n";
 	}
 	//FilemapInfo fmInfo;
-	if (GetLastError() == ERROR_ALREADY_EXISTS){
+	if (GetLastError() == ERROR_ALREADY_EXISTS)
+	{
 		cout << "Infofilemap exists, you get an handle to it!\n";
 	}
-	else{ //first, sätter de första värdena på filemapinfon
+	else //first, sätter de första värdena på filemapinfon
+	{ 
 		cout << "Creating new infofilemap\n";
 
 
@@ -138,23 +141,20 @@ void MayaLoader::DrawScene(){
 }
 
 void MayaLoader::TryReadAMessage(){
-	//bool canMoveOne = false; //kan jag flyttade vidare denna consumer i minnet eller måste jag vänta på producern?
-
 	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo)); //hämta filemapinfo datan om jag har fått mutexInfo till den
 
-	if (thisApplication_filemap_MemoryOffset != fileMapInfo.head_ByteOffset){ //sålänge consumern inte har hunnit till headern
+	if (localTail != fileMapInfo.head_ByteOffset){ //sålänge consumern inte har hunnit till headern
 		//KAN LÄSA!!
-		if ((thisApplication_filemap_MemoryOffset + sizeof(MessageHeader)) <= mSize){ //headern ligger på denna sidan!
+		if ((localTail + sizeof(MessageHeader)) <= mSize){ //headern ligger på denna sidan!
 			headerDidFit = true;
-			memcpy(&messageHeader, (unsigned char*)mMessageData + thisApplication_filemap_MemoryOffset, sizeof(MessageHeader)); //läs headern som vanligt
+			memcpy(&messageHeader, (unsigned char*)mMessageData + localTail, sizeof(MessageHeader)); //läs headern som vanligt
 		}
 		else{ //headern ligger på andra sidan, headern får inte plats
 			headerDidFit = false;
 			memcpy(&messageHeader, (unsigned char*)mMessageData, sizeof(MessageHeader)); //läs headern i början på filen
-			thisApplication_filemap_MemoryOffset = 0; //flytta över hela meddelandet till andra sidan
+			localTail = 0; //flytta över hela meddelandet till andra sidan
 		}
-		//enum NodeTypes { TTransform, TMesh, TCamera, TLight, TMaterial };
-			
+		
 		switch (messageHeader.nodeType){
 			case 0:
 				printf("Skumt ID");
@@ -182,79 +182,82 @@ void MayaLoader::TryReadAMessage(){
 
 }
 
-void MayaLoader::ReadTransform(int i){
+void MayaLoader::ReadTransform(int i)
+{
 	//LÄS MEDDELANDE OCH HEADER
 	//får bara headern plats eller får oxå meddelandet plats?
 	if (headerDidFit == true){ //headern ligger som vanligt, alltså där man är, headern får plats
 		transformMessage = (TransformMessage*)malloc(transformMessage_MaxSize);
 		if (messageHeader.msgConfig == 1){ //meddelandet får däremot inte plats -> meddelandet är skickat till andra sidan
 			memcpy(transformMessage, (unsigned char*)mMessageData, messageHeader.byteSize); //läser i början på filen utan nån offset
-			thisApplication_filemap_MemoryOffset = messageHeader.byteSize + messageHeader.bytePadding;
+			localTail = messageHeader.byteSize + messageHeader.bytePadding;
 		}
 		else{ //meddelandet får plats!!
-			memcpy(transformMessage, (unsigned char*)mMessageData + thisApplication_filemap_MemoryOffset + sizeof(MessageHeader), messageHeader.byteSize);
-			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal + thisApplication_filemap_MemoryOffset;
+			memcpy(transformMessage, (unsigned char*)mMessageData + localTail + sizeof(MessageHeader), messageHeader.byteSize);
+			localTail = messageHeader.byteTotal + localTail;
 		}
 		
 	}
 	else{ //headern ligger på andra sidan, headern får inte plats
-		//messageFile.message = (char*)malloc(messageFile.header.byteSize - sizeof(MessageHeader)); //allokera minne till den lokala variablen att hålla meddelandet
-
-		if ((thisApplication_filemap_MemoryOffset + messageHeader.byteSize) > mSize){ //meddelandet får inte plats innan filemapen tar slut -> meddelandet är skickat till andra sidan
+		if ((localTail + messageHeader.byteSize) > mSize){ //meddelandet får inte plats innan filemapen tar slut -> meddelandet är skickat till andra sidan
 			cout << "Filemap too small, a message might be to big for the entire filemap";
 		}
 		else{ //annars bara läs den rakt av från där denna redan är placerad
 			transformMessage = (TransformMessage*)malloc(transformMessage_MaxSize);
 			memcpy(transformMessage, (unsigned char*)mMessageData + sizeof(MessageHeader), messageHeader.byteSize);
-			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal;
+			localTail = messageHeader.byteTotal;
 		}
 		
 	}
 
-	if (i == 1){
+	if (i == 1)
+	{
 		TransformAdded(messageHeader, transformMessage);
 	}
-	else if (i == 2){
+	else if (i == 2)
+	{
 		TransformChange(messageHeader, transformMessage); //tar hand om den aktualla meshen
 	}
-	else if (i == 3){
+	else if (i == 3)
+	{
 		TransformDeleted(messageHeader);
 	}
 
 
 	//flytta tailen
 	while (mutexInfo.Lock(1000) == false) Sleep(10);
-	cout << "Move tail!!!!!" << thisApplication_filemap_MemoryOffset << "\n";
+	cout << "Move tail!!!!!" << localTail << "\n";
 	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo));
-	fileMapInfo.tail_ByteOffset = thisApplication_filemap_MemoryOffset;
+	fileMapInfo.tail_ByteOffset = localTail;
 	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo));
 	mutexInfo.Unlock();
 
 
 }
-void MayaLoader::ReadMaterial(int i){
+void MayaLoader::ReadMaterial(int i)
+{
 	if (headerDidFit == true){ //headern ligger som vanligt, alltså där man är, headern får plats
 		materialMessage = (MaterialMessage*)malloc(materialMessage_MaxSize);
 		if (messageHeader.msgConfig == 1) { //meddelandet får däremot inte plats -> meddelandet är skickat till andra sidan
 			memcpy(materialMessage, (unsigned char*)mMessageData, messageHeader.byteSize); //läser i början på filen utan nån offset
-			thisApplication_filemap_MemoryOffset = messageHeader.byteSize + messageHeader.bytePadding;
+			localTail = messageHeader.byteSize + messageHeader.bytePadding;
 		}
 		else { //meddelandet får plats!!
-			memcpy(materialMessage, (unsigned char*)mMessageData + thisApplication_filemap_MemoryOffset + sizeof(MessageHeader), messageHeader.byteSize);
-			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal + thisApplication_filemap_MemoryOffset;
+			memcpy(materialMessage, (unsigned char*)mMessageData + localTail + sizeof(MessageHeader), messageHeader.byteSize);
+			localTail = messageHeader.byteTotal + localTail;
 		}
 
 	}
 	else { //headern ligger på andra sidan, headern får inte plats
 		   //messageFile.message = (char*)malloc(messageFile.header.byteSize - sizeof(MessageHeader)); //allokera minne till den lokala variablen att hålla meddelandet
 
-		if ((thisApplication_filemap_MemoryOffset + messageHeader.byteSize) > mSize) { //meddelandet får inte plats innan filemapen tar slut -> meddelandet är skickat till andra sidan
+		if ((localTail + messageHeader.byteSize) > mSize) { //meddelandet får inte plats innan filemapen tar slut -> meddelandet är skickat till andra sidan
 			cout << "Filemap too small, a message might be to big for the entire filemap";
 		}
 		else { //annars bara läs den rakt av från där denna redan är placerad
 			materialMessage = (MaterialMessage*)malloc(materialMessage_MaxSize);
 			memcpy(materialMessage, (unsigned char*)mMessageData + sizeof(MessageHeader), messageHeader.byteSize);
-			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal;
+			localTail = messageHeader.byteTotal;
 		}
 
 	}
@@ -272,41 +275,41 @@ void MayaLoader::ReadMaterial(int i){
 
 	//flytta tailen
 	while (mutexInfo.Lock(1000) == false) Sleep(10);
-	cout << "Move tail!!!!!" << thisApplication_filemap_MemoryOffset << "\n";
+	cout << "Move tail!!!!!" << localTail << "\n";
 	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo));
-	fileMapInfo.tail_ByteOffset = thisApplication_filemap_MemoryOffset;
+	fileMapInfo.tail_ByteOffset = localTail;
 	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo));
 	mutexInfo.Unlock();
 
 }
-void MayaLoader::ReadMesh(int i){
+void MayaLoader::ReadMesh(int i)
+{
 	//LÄS MEDDELANDE OCH HEADER
 	//får bara headern plats eller får oxå meddelandet plats?
 	if (headerDidFit == true) { //headern ligger som vanligt, alltså där man är, headern får plats
 		meshMessage = (MeshMessage*)malloc(meshMessage_MaxSize);
 		if (messageHeader.msgConfig == 1) { //meddelandet får däremot inte plats -> meddelandet är skickat till andra sidan
-			//memcpy(meshMessage, (unsigned char*)mMessageData, messageHeader.byteSize); //läser i början på filen utan nån offset
-			ReadMeshData(0); //?? parameter värdena här?
-			thisApplication_filemap_MemoryOffset = messageHeader.byteSize + messageHeader.bytePadding;
+			ReadMeshData(0);
+			localTail = messageHeader.byteSize + messageHeader.bytePadding;
 		}
 		else { //meddelandet får plats!!
-			ReadMeshData(thisApplication_filemap_MemoryOffset + sizeof(MessageHeader));
-			//memcpy(meshMessage, (unsigned char*)mMessageData + thisApplication_filemap_MemoryOffset + sizeof(MessageHeader), messageHeader.byteSize);
-			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal + thisApplication_filemap_MemoryOffset;
+			ReadMeshData(localTail + sizeof(MessageHeader));
+			localTail = messageHeader.byteTotal + localTail;
 		}
 
 	}
 	else { //headern ligger på andra sidan, headern får inte plats
 		   //messageFile.message = (char*)malloc(messageFile.header.byteSize - sizeof(MessageHeader)); //allokera minne till den lokala variablen att hålla meddelandet
 
-		if ((thisApplication_filemap_MemoryOffset + messageHeader.byteSize) > mSize) { //meddelandet får inte plats innan filemapen tar slut -> meddelandet är skickat till andra sidan
+		if ((localTail + messageHeader.byteSize) > mSize) //meddelandet får inte plats innan filemapen tar slut -> meddelandet är skickat till andra sidan
+		{ 
 			cout << "Filemap too small, a message might be to big for the entire filemap";
 		}
-		else { //annars bara läs den rakt av från där denna redan är placerad
+		else //annars bara läs den rakt av från där denna redan är placerad
+		{
 			meshMessage = (MeshMessage*)malloc(meshMessage_MaxSize);
 			ReadMeshData(sizeof(MessageHeader));
-			//memcpy(meshMessage, (unsigned char*)mMessageData + sizeof(MessageHeader), messageHeader.byteSize);
-			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal;
+			localTail = messageHeader.byteTotal;
 		}
 
 	}
@@ -319,9 +322,9 @@ void MayaLoader::ReadMesh(int i){
 	}
 	//flytta tailen
 	while (mutexInfo.Lock(1000) == false) Sleep(10);
-	cout << "Move tail!!!!!" << thisApplication_filemap_MemoryOffset << "\n";
+	cout << "Move tail!!!!!" << localTail << "\n";
 	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo));
-	fileMapInfo.tail_ByteOffset = thisApplication_filemap_MemoryOffset;
+	fileMapInfo.tail_ByteOffset = localTail;
 	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo));
 	mutexInfo.Unlock();
 
@@ -368,24 +371,24 @@ void MayaLoader::ReadLight(int i){
 		lightMessage = (LightMessage*)malloc(lightMessage_MaxSize);
 		if (messageHeader.msgConfig == 1) { //meddelandet får däremot inte plats -> meddelandet är skickat till andra sidan
 			memcpy(lightMessage, (unsigned char*)mMessageData, messageHeader.byteSize); //läser i början på filen utan nån offset
-			thisApplication_filemap_MemoryOffset = messageHeader.byteSize + messageHeader.bytePadding;
+			localTail = messageHeader.byteSize + messageHeader.bytePadding;
 		}
 		else { //meddelandet får plats!!
-			memcpy(lightMessage, (unsigned char*)mMessageData + thisApplication_filemap_MemoryOffset + sizeof(MessageHeader), messageHeader.byteSize);
-			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal + thisApplication_filemap_MemoryOffset;
+			memcpy(lightMessage, (unsigned char*)mMessageData + localTail + sizeof(MessageHeader), messageHeader.byteSize);
+			localTail = messageHeader.byteTotal + localTail;
 		}
 
 	}
 	else { //headern ligger på andra sidan, headern får inte plats
 		   //messageFile.message = (char*)malloc(messageFile.header.byteSize - sizeof(MessageHeader)); //allokera minne till den lokala variablen att hålla meddelandet
 
-		if ((thisApplication_filemap_MemoryOffset + messageHeader.byteSize) > mSize) { //meddelandet får inte plats innan filemapen tar slut -> meddelandet är skickat till andra sidan
+		if ((localTail + messageHeader.byteSize) > mSize) { //meddelandet får inte plats innan filemapen tar slut -> meddelandet är skickat till andra sidan
 			cout << "Filemap too small, a message might be to big for the entire filemap";
 		}
 		else { //annars bara läs den rakt av från där denna redan är placerad
 			lightMessage = (LightMessage*)malloc(lightMessage_MaxSize);
 			memcpy(lightMessage, (unsigned char*)mMessageData + sizeof(MessageHeader), messageHeader.byteSize);
-			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal;
+			localTail = messageHeader.byteTotal;
 		}
 
 	}
@@ -399,9 +402,9 @@ void MayaLoader::ReadLight(int i){
 	
 	//flytta tailen
 	while (mutexInfo.Lock(1000) == false) Sleep(10);
-	cout << "Move tail!!!!!" << thisApplication_filemap_MemoryOffset << "\n";
+	cout << "Move tail!!!!!" << localTail << "\n";
 	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo));
-	fileMapInfo.tail_ByteOffset = thisApplication_filemap_MemoryOffset;
+	fileMapInfo.tail_ByteOffset = localTail;
 	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo));
 	mutexInfo.Unlock();
 
@@ -411,24 +414,24 @@ void MayaLoader::ReadCamera(int i){
 		cameraMessage = (CameraMessage*)malloc(cameraMessage_MaxSize);
 		if (messageHeader.msgConfig == 1) { //meddelandet får däremot inte plats -> meddelandet är skickat till andra sidan
 			memcpy(cameraMessage, (unsigned char*)mMessageData, messageHeader.byteSize); //läser i början på filen utan nån offset
-			thisApplication_filemap_MemoryOffset = messageHeader.byteSize + messageHeader.bytePadding;
+			localTail = messageHeader.byteSize + messageHeader.bytePadding;
 		}
 		else { //meddelandet får plats!!
-			memcpy(cameraMessage, (unsigned char*)mMessageData + thisApplication_filemap_MemoryOffset + sizeof(MessageHeader), messageHeader.byteSize);
-			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal + thisApplication_filemap_MemoryOffset;
+			memcpy(cameraMessage, (unsigned char*)mMessageData + localTail + sizeof(MessageHeader), messageHeader.byteSize);
+			localTail = messageHeader.byteTotal + localTail;
 		}
 
 	}
 	else { //headern ligger på andra sidan, headern får inte plats
 		   //messageFile.message = (char*)malloc(messageFile.header.byteSize - sizeof(MessageHeader)); //allokera minne till den lokala variablen att hålla meddelandet
 
-		if ((thisApplication_filemap_MemoryOffset + messageHeader.byteSize) > mSize) { //meddelandet får inte plats innan filemapen tar slut -> meddelandet är skickat till andra sidan
+		if ((localTail + messageHeader.byteSize) > mSize) { //meddelandet får inte plats innan filemapen tar slut -> meddelandet är skickat till andra sidan
 			cout << "Filemap too small, a message might be to big for the entire filemap";
 		}
 		else { //annars bara läs den rakt av från där denna redan är placerad
 			cameraMessage = (CameraMessage*)malloc(cameraMessage_MaxSize);
 			memcpy(cameraMessage, (unsigned char*)mMessageData + sizeof(MessageHeader), messageHeader.byteSize);
-			thisApplication_filemap_MemoryOffset = messageHeader.byteTotal;
+			localTail = messageHeader.byteTotal;
 		}
 
 	}
@@ -442,9 +445,9 @@ void MayaLoader::ReadCamera(int i){
 
 	//flytta tailen
 	while (mutexInfo.Lock(1000) == false) Sleep(10);
-	cout << "Move tail!!!!!" << thisApplication_filemap_MemoryOffset << "\n";
+	cout << "Move tail!!!!!" << localTail << "\n";
 	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo));
-	fileMapInfo.tail_ByteOffset = thisApplication_filemap_MemoryOffset;
+	fileMapInfo.tail_ByteOffset = localTail;
 	memcpy((unsigned char*)mInfoData, &fileMapInfo, sizeof(FilemapInfo));
 	mutexInfo.Unlock();
 
@@ -762,7 +765,7 @@ void MayaLoader::CameraAdded(MessageHeader mh, CameraMessage *mm)
 		tempCamera->cameraData = mm->cameraData;
 		tempCamera->UpdateCBuffer(screenWidth, screenHeight);
 
-		currentCameraTransform = cameraTransform;
+		currentCameraTransform = cameraTransform; //denna är temporär, ska bara ske vid CameraSwitch funktionen
 
 		allCameraTransforms.push_back(cameraTransform);
 	}

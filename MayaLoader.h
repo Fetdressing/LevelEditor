@@ -87,7 +87,7 @@ private:
 	LPVOID mInfoData = nullptr;
 	unsigned int mInfoSize = 1 << 6;
 
-	size_t thisApplication_filemap_MemoryOffset = 0; //hur långt ifrån starten i bytes den är på filemapen med meddelanden
+	size_t localTail = 0; //hur långt ifrån starten i bytes den är på filemapen med meddelanden
 	int delay = 10; //hur länge den ska sleepa mellan varje läsnings försök
 
 	struct MessageHeader{

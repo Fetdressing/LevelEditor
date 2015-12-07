@@ -38,9 +38,6 @@ public:
 	void ReadLight(int i);
 	void ReadMaterial(int i);
 	void ReadCamera(int i);
-	
-	//för tester
-	void TryWriteAMessage();
 
 private:
 	//externa grejer
@@ -49,15 +46,15 @@ private:
 	UINT screenWidth, screenHeight;
 
 	//*camera*********camera*
-	void UpdateCameraValues();
+	bool UpdateCameraValues(); //returnerar ifall en kamera finns, om den inte finns så vill man nog inte rendera alls
 	struct CameraCBufferData
 	{
-		XMFLOAT4X4 View;
-		XMFLOAT4X4 Projection;
+		XMFLOAT4X4 view;
+		XMFLOAT4X4 projection;
 		
 	};
-	CameraCBufferData cameraCBufferData;
-	ID3D11Buffer* cCameraConstantBuffer = nullptr;
+	CameraCBufferData defaultCameraCBufferData;
+	ID3D11Buffer* cDefaultCameraConstantBuffer = nullptr;
 	//*camera*********camera*
 
 	FileHandler *fileHandler = nullptr;
@@ -168,6 +165,8 @@ private:
 	vector<Transform*> allMeshTransforms;
 	vector<Transform*> allLightTransforms;
 	vector<Transform*> allCameraTransforms;
+
+	Transform* currentCameraTransform = nullptr;
 
 	void MeshChange(MessageHeader mh, MeshMessage *mm); //lägger till ett nytt objekt om det inte redan finns eller updaterar en gammal, tar hand om den aktualla meshen
 	void MeshAdded(MessageHeader mh, MeshMessage *mm);

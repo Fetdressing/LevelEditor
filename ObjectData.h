@@ -152,8 +152,11 @@ struct TransformData{
 };
 
 struct CameraData{
-	float fieldOfView; //osvosv
-	
+	int			isOrtho;
+	float		target[3];
+	float		upVector[3];
+	float		rightVector[3];
+	float		hAngle; //hor-FOV
 };
 
 struct MeshData{

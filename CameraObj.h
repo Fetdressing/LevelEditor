@@ -10,8 +10,8 @@ class Transform; //forward declaration, den ska bara känna till att det finns en
 
 class CameraObj{
 	struct CameraCBufferData {
-		CameraData cData;
-		TransformData tData;
+		XMFLOAT4X4 view;
+		XMFLOAT4X4 projection;
 	};
 
 public:
@@ -25,6 +25,8 @@ public:
 	CameraCBufferData cameraCBufferData;
 	ID3D11Buffer *cameraCbuffer = nullptr; //här ligger den storade cameradatan
 
+	XMMATRIX view;
+	XMMATRIX projection;
 
 	CameraObj(ID3D11Device *gDevice, ID3D11DeviceContext *gDevC) {
 		this->gDevice = gDevice;
@@ -36,7 +38,7 @@ public:
 		cameraCbuffer->Release();
 	}
 
-	void UpdateCBuffer();
+	void UpdateCBuffer(UINT screenWidth, UINT screenHeight);
 	void CreateCBuffer();
 
 	void EmptyVariables() {

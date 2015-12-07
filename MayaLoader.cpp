@@ -89,8 +89,11 @@ void MayaLoader::InitVariables() {
 	cameraBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	cameraBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	cameraBufferDesc.ByteWidth = sizeof(CameraCBufferData);
-	gDevice->CreateBuffer(&cameraBufferDesc, NULL, &cCameraConstantBuffer);
+	gDevice->CreateBuffer(&cameraBufferDesc, NULL, &cDefaultCameraConstantBuffer);
 
+	XMStoreFloat4x4(&defaultCameraCBufferData.view, XMMatrixTranspose(XMMatrixIdentity()));
+	XMStoreFloat4x4(&defaultCameraCBufferData.projection, XMMatrixTranspose(XMMatrixIdentity()));
+	gDeviceContext->UpdateSubresource(cDefaultCameraConstantBuffer, 0, NULL, &defaultCameraCBufferData, 0, 0); //default buffer
 	//fpsCam.SetLens(0.25f*3.14f, screenWidth / screenHeight, 1.0f, 1000.0f);
 }
 
@@ -118,7 +121,8 @@ void MayaLoader::DrawScene(){
 	//set rätt constantbuffers, ljus, kamera och material stuff!
 	UpdateCameraValues(); //updaterar oxå camera cbuffern
 
-	for (int i = 0; i < allMeshTransforms.size(); i++){
+	for (int i = 0; i < allMeshTransforms.size(); i++)
+	{
 		gDeviceContext->IASetVertexBuffers(0, 1, &allMeshTransforms[i]->mesh->vertexBuffer, &vertexSize2, &offset2);
 		try{
 			gDeviceContext->PSSetConstantBuffers(1, 0, &allMeshTransforms[i]->mesh->material->materialCbuffer); //materialID är satt till 0 i början, dvs default material
@@ -446,7 +450,8 @@ void MayaLoader::ReadCamera(int i){
 
 }
 
-void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){ //material måste alltid komma före meshes!!
+void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
+{ //material måste alltid komma före meshes!!
 	char* meshName = mm->objectName;
 	char* transformName = mm->transformName;
 	Transform *meshTransform = nullptr; //hitta den
@@ -488,7 +493,8 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm){ //material måste 
 	}
 	
 }
-void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm){ //MÅSTE HA TRANSFORMEN FÖRST, SEN SKAPA ETT MESH OBJEKT I TRANSFORMEN
+void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm)
+{ //MÅSTE HA TRANSFORMEN FÖRST, SEN SKAPA ETT MESH OBJEKT I TRANSFORMEN
 	char* meshName = mm->objectName;
 	char* transformName = mm->transformName;
 	Transform *meshTransform = nullptr; //hitta den
@@ -530,7 +536,8 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm){ //MÅSTE HA TRANS
 	}
 }
 
-void MayaLoader::TransformAdded(MessageHeader mh, TransformMessage *mm){
+void MayaLoader::TransformAdded(MessageHeader mh, TransformMessage *mm)
+{
 	Transform *transform = new Transform(gDevice, gDeviceContext); //hitta den
 
 	transform->name = mm->objectName;
@@ -558,7 +565,8 @@ void MayaLoader::TransformAdded(MessageHeader mh, TransformMessage *mm){
 		allLightTransforms);
 	//test!!!!
 }
-void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm){
+void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm)
+{
 	char* transformName = mm->objectName;
 	Transform *transform = nullptr;
 
@@ -621,7 +629,8 @@ void MayaLoader::TransformDeleted(MessageHeader mh){ //ta bort från alla vektore
 	//}
 }
 
-void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm){
+void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm)
+{
 	//char* materialName = mm->objectName;
 
 	Material *tempMat; //pekar på den mesh som redan finns storad eller så blir det en helt ny
@@ -634,7 +643,8 @@ void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm){
 	tempMat->UpdateCBuffer(); //lägger in de nya värdena i cbuffern
 	materials.push_back(tempMat);
 }
-void MayaLoader::MaterialChange(MessageHeader mh, MaterialMessage *mm){
+void MayaLoader::MaterialChange(MessageHeader mh, MaterialMessage *mm)
+{
 	char* materialName = mm->objectName;
 
 	Material *tempMat = nullptr;
@@ -652,7 +662,8 @@ void MayaLoader::MaterialChange(MessageHeader mh, MaterialMessage *mm){
 	tempMat->UpdateCBuffer();
 	
 }
-void MayaLoader::MaterialDeleted(MessageHeader mh){
+void MayaLoader::MaterialDeleted(MessageHeader mh)
+{
 	//char* materialName = mh.objectName;
 
 	//for (int i = 0; i < materials.size(); i++){
@@ -664,7 +675,8 @@ void MayaLoader::MaterialDeleted(MessageHeader mh){
 	//}
 }
 
-void MayaLoader::LightAdded(MessageHeader mh, LightMessage *mm){
+void MayaLoader::LightAdded(MessageHeader mh, LightMessage *mm)
+{
 	//char *lightName = mh.objectName;
 	char* transformName = mm->transformName;
 	Transform *lightTransform = nullptr; //hitta den
@@ -694,7 +706,8 @@ void MayaLoader::LightAdded(MessageHeader mh, LightMessage *mm){
 		allLightTransforms.push_back(lightTransform); //lägger den i lightTransformsen
 	}
 }
-void MayaLoader::LightChange(MessageHeader mh, LightMessage *mm){
+void MayaLoader::LightChange(MessageHeader mh, LightMessage *mm)
+{
 	
 	char* transformName = mm->transformName;
 	Transform *lightTransform = nullptr; //hitta den
@@ -720,36 +733,42 @@ void MayaLoader::LightChange(MessageHeader mh, LightMessage *mm){
 	}
 }
 
-void MayaLoader::CameraAdded(MessageHeader mh, CameraMessage *mm){
+void MayaLoader::CameraAdded(MessageHeader mh, CameraMessage *mm)
+{
 	char* transformName = mm->transformName;
 	Transform *cameraTransform = nullptr; //hitta den
 	CameraObj *tempCamera = nullptr;
 
-	for (int i = 0; i < allTransforms.size(); i++){
+	for (int i = 0; i < allTransforms.size(); i++)
+	{
 		if (strcmp(transformName, allTransforms[i]->name) == 0){
 			cameraTransform = allTransforms[i];
 			break;
 		}
 	}
-	if (cameraTransform == nullptr){
+	if (cameraTransform == nullptr)
+	{
 		printf("Hittade inte transformen");
 	}
 	else
 	{
+		cameraTransform->camera = new CameraObj(gDevice, gDeviceContext);
 		tempCamera = cameraTransform->camera;
-		tempCamera = new CameraObj(gDevice, gDeviceContext);
 
-		tempCamera->transform = cameraTransform;
 		tempCamera->CreateCBuffer();
 		
 		tempCamera->name = mm->objectName;
+		tempCamera->transform = cameraTransform;
 		tempCamera->cameraData = mm->cameraData;
-		tempCamera->UpdateCBuffer();
+		tempCamera->UpdateCBuffer(screenWidth, screenHeight);
+
+		currentCameraTransform = cameraTransform;
 
 		allCameraTransforms.push_back(cameraTransform);
 	}
 }
-void MayaLoader::CameraChange(MessageHeader mh, CameraMessage *mm){
+void MayaLoader::CameraChange(MessageHeader mh, CameraMessage *mm)
+{
 	char* transformName = mm->transformName;
 	Transform *cameraTransform = nullptr; //hitta den för att hitta vilken camera den syftar på
 	CameraObj *tempCamera = nullptr;
@@ -765,20 +784,28 @@ void MayaLoader::CameraChange(MessageHeader mh, CameraMessage *mm){
 	}
 	else
 	{
-		tempCamera = cameraTransform->camera;
 		tempCamera->EmptyVariables();
 	
 		//tempCamera->transform = cameraTransform; //ge kameran reference till transformen, bara vid starten? den byter väl inte transform?
 
 		tempCamera->name = mm->objectName;
+		tempCamera = cameraTransform->camera;
 		tempCamera->cameraData = mm->cameraData;
-		tempCamera->UpdateCBuffer();
+		tempCamera->UpdateCBuffer(screenWidth, screenHeight);
 	}
 }
 
-void MayaLoader::UpdateCameraValues() {
+bool MayaLoader::UpdateCameraValues()
+{
+	if (currentCameraTransform != nullptr)
+	{
+		currentCameraTransform->camera->UpdateCBuffer(screenWidth, screenHeight);
 
+		//gDeviceContext->UpdateSubresource(cCameraConstantBuffer, 0, NULL, &cameraCBufferData, 0, 0);
+		gDeviceContext->VSSetConstantBuffers(10, 1, &currentCameraTransform->camera->cameraCbuffer);
 
-	gDeviceContext->UpdateSubresource(cCameraConstantBuffer, 0, NULL, &cameraCBufferData, 0, 0);
-	gDeviceContext->VSSetConstantBuffers(10, 1, &cCameraConstantBuffer);
+		return true;
+	}
+	gDeviceContext->VSSetConstantBuffers(10, 1, &cDefaultCameraConstantBuffer); //kör på default identitesmatriser annars
+	return false;
 }

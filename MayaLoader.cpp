@@ -794,6 +794,17 @@ void MayaLoader::CameraChange(MessageHeader mh, CameraMessage *mm)
 		tempCamera->UpdateCBuffer(screenWidth, screenHeight);
 	}
 }
+void MayaLoader::CameraSwitch(MessageHeader mh, CameraMessage *mm) 
+{
+	char* newActiveCameraTransformName = mm->transformName;
+
+	for (int i = 0; i < allCameraTransforms.size(); i++) {
+		if (strcmp(newActiveCameraTransformName, allCameraTransforms[i]->name) == 0) {
+			currentCameraTransform = allCameraTransforms[i];
+			break;
+		}
+	}
+}
 
 bool MayaLoader::UpdateCameraValues()
 {

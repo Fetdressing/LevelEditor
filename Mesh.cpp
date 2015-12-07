@@ -41,23 +41,40 @@ void Mesh::CreateIndices(){
 }
 
 void Mesh::CreateVertices(){
-	nrVertices = meshData->nrI;
+	nrVertices = meshData->nrPos;
 	if (vertices != nullptr)
 		free(vertices);
 
-	vertices = new Vertex[nrVertices];
+	vertices = new Vertex[nrIndecies];
 	Vertex tempV;
 
-	for (int i = 0; i < nrVertices; i++){
-		int posI = meshData->indexPositions[i];
-		int norI = meshData->indexNormals[i];
-		int uvI = meshData->indexUVs[i];
+	//for (int i = 0; i < nrIndecies; i++){
+	//	
+	//	tempV.pos = meshData->positions[indecies[i].posI];
+	//	tempV.nor = meshData->normals[indecies[i].norI];
+	//	tempV.uv = meshData->uvs[indecies[i].uvI];
 
-		tempV.pos = meshData->positions[posI];
-		tempV.nor = meshData->normals[norI];
-		tempV.uv = meshData->uvs[uvI];
+	//	vertices[i] = tempV;
+	//}
+
+	for (int i = 0; i < nrIndecies; i = i + 3) {
+		tempV.pos = meshData->positions[indecies[i+2].posI];
+		tempV.nor = meshData->normals[indecies[i+2].norI];
+		tempV.uv = meshData->uvs[indecies[i+2].uvI];
 
 		vertices[i] = tempV;
+
+		tempV.pos = meshData->positions[indecies[i+1].posI];
+		tempV.nor = meshData->normals[indecies[i+1].norI];
+		tempV.uv = meshData->uvs[indecies[i+1].uvI];
+
+		vertices[i + 1] = tempV;
+
+		tempV.pos = meshData->positions[indecies[i].posI];
+		tempV.nor = meshData->normals[indecies[i].norI];
+		tempV.uv = meshData->uvs[indecies[i].uvI];
+
+		vertices[i + 2] = tempV;
 	}
 }
 
@@ -67,7 +84,7 @@ void Mesh::CreateVertexBuffer(){ //får skapa vertexarrayen oxå!!!!! hämta all da
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
 	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	bufferDesc.ByteWidth = sizeof(Vertex) * nrVertices;
+	bufferDesc.ByteWidth = sizeof(Vertex) * nrIndecies;
 	bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 	D3D11_SUBRESOURCE_DATA data;
@@ -108,7 +125,7 @@ void Mesh::RemapVertexBuffer(){
 
 	gDeviceContext->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	//	Update the vertex buffer here.
-	memcpy(mappedResource.pData, vertices, sizeof(Vertex) * nrVertices);
+	memcpy(mappedResource.pData, vertices, sizeof(Vertex) * nrIndecies);
 	//	Reenable GPU access to the vertex buffer data.
 	gDeviceContext->Unmap(vertexBuffer, 0);
 }

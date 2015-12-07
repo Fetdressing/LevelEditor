@@ -184,5 +184,6 @@ private:
 
 	void CameraAdded(MessageHeader mh, CameraMessage *mm);
 	void CameraChange(MessageHeader mh, CameraMessage *mm);
+	void CameraSwitch(MessageHeader mh, CameraMessage *mm);
 
 };

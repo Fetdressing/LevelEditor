@@ -41,6 +41,9 @@ VS_OUT main(VS_IN input)
 	//inputpos = mul(inputpos, Projection);
 
 	//inputpos = mul(inputpos, World);
+	//inputpos = mul(inputpos, View);
+	//inputpos = mul(inputpos, Projection);
+
 	output.Pos = inputpos;
 	output.Tex = input.Tex;
 	output.normals = float4(input.normals, 1.0f);

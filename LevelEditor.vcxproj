@@ -101,12 +101,9 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Joakim\Documents\DirectXTK\Inc;C:\Users\Simon\Downloads\Stuff\Important Stuff\Important Stuff\DirectXToolkit\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Simon\Downloads\Stuff\Important Stuff\Important Stuff\DirectXToolkit\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
     </ClCompile>
-    <Link>
-      <AdditionalLibraryDirectories>C:\Users\Joakim\Documents\DirectXTK\Inc;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Cam.h" />

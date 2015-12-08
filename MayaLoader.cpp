@@ -138,9 +138,9 @@ void MayaLoader::DrawScene(){
 		//transformdata ligger på plats 0, material på 1, osv
 		//set transformcbufferns värden, updatesubresource
 		allMeshTransforms[i]->UpdateCBuffer(); //slå först ihop med parentens värden innan vi updaterar cbuffern
-		//gDeviceContext->Draw(allMeshTransforms[i]->mesh->nrVertices, 0);
+		gDeviceContext->Draw(allMeshTransforms[i]->mesh->nrIndecies, 0);
 		
-		gDeviceContext->DrawIndexed(currMesh->nrIndecies, 0, 0);
+		//gDeviceContext->DrawIndexed(currMesh->nrIndecies, 0, 0);
 	}
 }
 

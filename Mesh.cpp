@@ -32,11 +32,28 @@ void Mesh::CreateIndices(){
 
 	indecies = new Index[nrIndecies];
 	Index tempI;
-	for (int i = 0; i < nrIndecies; i++){
+	//for (int i = 0; i < nrIndecies; i++){
+	//	tempI.posI = meshData->indexPositions[i];
+	//	tempI.norI = meshData->indexNormals[i];
+	//	tempI.uvI = meshData->indexUVs[i];
+	//	indecies[i] = tempI;
+	//}
+
+	for (int i = 0; i < nrIndecies; i = i + 3) {
+		tempI.posI = meshData->indexPositions[i+2];
+		tempI.norI = meshData->indexNormals[i+2];
+		tempI.uvI = meshData->indexUVs[i+2];
+		indecies[i] = tempI;
+
+		tempI.posI = meshData->indexPositions[i+1];
+		tempI.norI = meshData->indexNormals[i+1];
+		tempI.uvI = meshData->indexUVs[i+1];
+		indecies[i+1] = tempI;
+
 		tempI.posI = meshData->indexPositions[i];
 		tempI.norI = meshData->indexNormals[i];
 		tempI.uvI = meshData->indexUVs[i];
-		indecies[i] = tempI;
+		indecies[i+2] = tempI;
 	}
 }
 
@@ -45,16 +62,17 @@ void Mesh::CreateVertices(){
 	if (vertices != nullptr)
 		free(vertices);
 
-	vertices = new Vertex[nrIndecies];
+	vertices = new Vertex[nrVertices];
 	Vertex tempV;
 
-	for (int i = 0; i < nrVertices; i++) 
+	for (int i = 0; i < nrVertices; i++)
 	{
 		tempV.pos = meshData->positions[i];
 		tempV.nor = meshData->normals[i];
 		tempV.uv = meshData->uvs[i];
-	}
 
+		vertices[i] = tempV;
+	}
 	//for (int i = 0; i < nrIndecies; i++){
 	//	
 	//	tempV.pos = meshData->positions[indecies[i].posI];

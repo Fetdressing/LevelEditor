@@ -139,7 +139,7 @@ void Main::Render(){
 	gDeviceContext->IASetInputLayout(defaultInputLayout);
 	//gDeviceContext->IASetVertexBuffers(0, 1, &testVertexBuffer, &vertexSize2, &offset2);
 	
-	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	gDeviceContext->VSSetShader(defaultVS, nullptr, 0);
 	gDeviceContext->GSSetShader(nullptr, nullptr, 0);
 	gDeviceContext->HSSetShader(nullptr, nullptr, 0);

@@ -48,6 +48,13 @@ void Mesh::CreateVertices(){
 	vertices = new Vertex[nrIndecies];
 	Vertex tempV;
 
+	for (int i = 0; i < nrVertices; i++) 
+	{
+		tempV.pos = meshData->positions[i];
+		tempV.nor = meshData->normals[i];
+		tempV.uv = meshData->uvs[i];
+	}
+
 	//for (int i = 0; i < nrIndecies; i++){
 	//	
 	//	tempV.pos = meshData->positions[indecies[i].posI];
@@ -57,25 +64,25 @@ void Mesh::CreateVertices(){
 	//	vertices[i] = tempV;
 	//}
 
-	for (int i = 0; i < nrIndecies; i = i + 3) {
-		tempV.pos = meshData->positions[indecies[i+2].posI];
-		tempV.nor = meshData->normals[indecies[i+2].norI];
-		tempV.uv = meshData->uvs[indecies[i+2].uvI];
+	//for (int i = 0; i < nrIndecies; i = i + 3) {
+	//	tempV.pos = meshData->positions[indecies[i+2].posI];
+	//	tempV.nor = meshData->normals[indecies[i+2].norI];
+	//	tempV.uv = meshData->uvs[indecies[i+2].uvI];
 
-		vertices[i] = tempV;
+	//	vertices[i] = tempV;
 
-		tempV.pos = meshData->positions[indecies[i+1].posI];
-		tempV.nor = meshData->normals[indecies[i+1].norI];
-		tempV.uv = meshData->uvs[indecies[i+1].uvI];
+	//	tempV.pos = meshData->positions[indecies[i+1].posI];
+	//	tempV.nor = meshData->normals[indecies[i+1].norI];
+	//	tempV.uv = meshData->uvs[indecies[i+1].uvI];
 
-		vertices[i + 1] = tempV;
+	//	vertices[i + 1] = tempV;
 
-		tempV.pos = meshData->positions[indecies[i].posI];
-		tempV.nor = meshData->normals[indecies[i].norI];
-		tempV.uv = meshData->uvs[indecies[i].uvI];
+	//	tempV.pos = meshData->positions[indecies[i].posI];
+	//	tempV.nor = meshData->normals[indecies[i].norI];
+	//	tempV.uv = meshData->uvs[indecies[i].uvI];
 
-		vertices[i + 2] = tempV;
-	}
+	//	vertices[i + 2] = tempV;
+	//}
 }
 
 void Mesh::CreateVertexBuffer(){ //får skapa vertexarrayen oxå!!!!! hämta all data från meshData

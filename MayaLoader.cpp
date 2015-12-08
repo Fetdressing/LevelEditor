@@ -39,7 +39,7 @@ void MayaLoader::CreateFileMaps(unsigned int messageFilemapSize){
 		PAGE_READWRITE,
 		(DWORD)0,
 		mSize,
-		(LPCWSTR) "messageFileMap");
+		(LPCWSTR) "Global\\messageFileMap");
 
 	mMessageData = MapViewOfFile(hMessageFileMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
 
@@ -62,7 +62,7 @@ void MayaLoader::CreateFileMaps(unsigned int messageFilemapSize){
 		PAGE_READWRITE,
 		(DWORD)0,
 		mInfoSize,
-		(LPCWSTR) "infoFileMap");
+		(LPCWSTR) "Global\\infoFileMap");
 
 	mInfoData = MapViewOfFile(hInfoFileMap, FILE_MAP_ALL_ACCESS, 0, 0, 0);
 
@@ -126,7 +126,9 @@ void MayaLoader::DrawScene(){
 
 	for (int i = 0; i < allMeshTransforms.size(); i++)
 	{
+		Mesh *currMesh = allMeshTransforms[i]->mesh;
 		gDeviceContext->IASetVertexBuffers(0, 1, &allMeshTransforms[i]->mesh->vertexBuffer, &vertexSize2, &offset2);
+		gDeviceContext->IASetIndexBuffer(currMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 		try{
 			gDeviceContext->PSSetConstantBuffers(1, 0, &allMeshTransforms[i]->mesh->material->materialCbuffer); //materialID är satt till 0 i början, dvs default material
 		}
@@ -136,7 +138,9 @@ void MayaLoader::DrawScene(){
 		//transformdata ligger på plats 0, material på 1, osv
 		//set transformcbufferns värden, updatesubresource
 		allMeshTransforms[i]->UpdateCBuffer(); //slå först ihop med parentens värden innan vi updaterar cbuffern
-		gDeviceContext->Draw(allMeshTransforms[i]->mesh->nrVertices, 0);
+		//gDeviceContext->Draw(allMeshTransforms[i]->mesh->nrVertices, 0);
+		
+		gDeviceContext->DrawIndexed(currMesh->nrIndecies, 0, 0);
 	}
 }
 
@@ -329,7 +333,8 @@ void MayaLoader::ReadMesh(int i)
 	mutexInfo.Unlock();
 
 }
-void MayaLoader::ReadMeshData(size_t offSetStart){
+void MayaLoader::ReadMeshData(size_t offSetStart)
+{
 	meshMessage->meshData = new MeshData();
 
 	memcpy(meshMessage->objectName, (unsigned char*)mMessageData + offSetStart, sizeof(meshMessage->objectName));
@@ -366,7 +371,8 @@ void MayaLoader::ReadMeshData(size_t offSetStart){
 	memcpy(meshMessage->meshData->trianglesPerFace, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->triangleCount);
 
 }
-void MayaLoader::ReadLight(int i){
+void MayaLoader::ReadLight(int i)
+{
 	if (headerDidFit == true){ //headern ligger som vanligt, alltså där man är, headern får plats
 		lightMessage = (LightMessage*)malloc(lightMessage_MaxSize);
 		if (messageHeader.msgConfig == 1) { //meddelandet får däremot inte plats -> meddelandet är skickat till andra sidan
@@ -696,8 +702,8 @@ void MayaLoader::LightAdded(MessageHeader mh, LightMessage *mm)
 	}
 	else
 	{
+		lightTransform->light = new Light(gDevice, gDeviceContext);
 		tempLight = lightTransform->light;
-		tempLight = new Light(gDevice, gDeviceContext);
 
 		tempLight->transform = lightTransform;
 		tempLight->CreateCBuffer();

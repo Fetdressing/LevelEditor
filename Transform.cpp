@@ -16,6 +16,11 @@ void Transform::UpdateCBuffer()
 	tempPosition = XMMatrixTranslation(transformData.pos.x, transformData.pos.y, transformData.pos.z);
 
 	tempWorld = tempScale * tempRotation * tempPosition;
+	if (parent != nullptr)
+	{
+		XMMATRIX parentWorld = XMLoadFloat4x4(&parent->transformCBufferData.world);
+		tempWorld = tempWorld * parentWorld;
+	}
 
 	XMStoreFloat4x4(&transformCBufferData.world, XMMatrixTranspose(tempWorld));
 	//transformdata ligger på plats 0, material på 1, osv

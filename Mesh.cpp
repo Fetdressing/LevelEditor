@@ -62,10 +62,10 @@ void Mesh::CreateVertices(){
 	if (vertices != nullptr)
 		free(vertices);
 
-	vertices = new Vertex[nrVertices];
+	vertices = new Vertex[nrIndecies];
 	Vertex tempV;
 
-	for (int i = 0; i < nrVertices; i++)
+	for (int i = 0; i < nrIndecies; i++)
 	{
 		tempV.pos = meshData->positions[i];
 		tempV.nor = meshData->normals[i];

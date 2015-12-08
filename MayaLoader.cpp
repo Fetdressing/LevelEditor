@@ -127,7 +127,7 @@ void MayaLoader::DrawScene(){
 	for (int i = 0; i < allMeshTransforms.size(); i++)
 	{
 		Mesh *currMesh = allMeshTransforms[i]->mesh;
-		gDeviceContext->IASetVertexBuffers(0, 1, &allMeshTransforms[i]->mesh->vertexBuffer, &vertexSize2, &offset2);
+		gDeviceContext->IASetVertexBuffers(0, 1, &currMesh->vertexBuffer, &vertexSize2, &offset2);
 		gDeviceContext->IASetIndexBuffer(currMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 		try{
 			gDeviceContext->PSSetConstantBuffers(1, 0, &allMeshTransforms[i]->mesh->material->materialCbuffer); //materialID är satt till 0 i början, dvs default material

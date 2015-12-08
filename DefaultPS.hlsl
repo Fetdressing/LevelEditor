@@ -6,8 +6,8 @@ SamplerState sampAni: register(s0);
 struct VS_OUT
 {
 	float4 Pos : SV_POSITION;
-	float2 Tex : TEXCOORD;
 	float4 normals : NORMAL;
+	float2 Tex : TEXCOORD;
 };
 
 float4 main(VS_OUT input) : SV_Target

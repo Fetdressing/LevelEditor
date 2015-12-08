@@ -60,11 +60,11 @@ void FileHandler::SaveTransforms(int nrTransforms, vector<Transform*> &allTransf
 		ofs.write(parentName, sizeof(char) * parentNameSize);
 		ofs.write(transformName, sizeof(char) * transformNameSize);
 
-		if (transformNameSize == 0) //den är dynamiskt allokerad!
+		if (transformNameSize > 0) //den är dynamiskt allokerad!
 		{
 			delete(transformName);
 		}
-		if (parentNameSize == 0) //den är dynamiskt allokerad!
+		if (parentNameSize > 0) //den är dynamiskt allokerad!
 		{
 			delete(parentName);
 		}
@@ -90,11 +90,11 @@ void FileHandler::SaveMeshes(int nrMeshes, vector<Transform*> &allMeshTransforms
 		ofs.write(transformName, sizeof(char) * transformNameSize);
 		ofs.write(meshName, sizeof(char) * meshNameSize);
 
-		if (transformNameSize == 0) //den är dynamiskt allokerad!
+		if (transformNameSize > 0) //den är dynamiskt allokerad!
 		{
 			delete(transformName);
 		}
-		if (meshNameSize == 0) //den är dynamiskt allokerad!
+		if (meshNameSize > 0) //den är dynamiskt allokerad!
 		{
 			delete(meshName);
 		}
@@ -108,7 +108,7 @@ void FileHandler::SaveMeshes(int nrMeshes, vector<Transform*> &allMeshTransforms
 		ofs.write((char*)&materialNameSize, sizeof(int));
 		ofs.write(materialName, sizeof(char) * materialNameSize);
 
-		if (materialNameSize == 0) //den är dynamiskt allokerad!
+		if (materialNameSize > 0) //den är dynamiskt allokerad!
 		{
 			delete(materialName);
 		}
@@ -141,7 +141,7 @@ void FileHandler::SaveMaterials(int nrMats, vector<Material*> &materials)
 		ofs.write((char*)&materialNameSize, sizeof(int));
 		ofs.write(materialName, sizeof(char) * materialNameSize);
 
-		if (materialNameSize == 0) //den är dynamiskt allokerad!
+		if (materialNameSize > 0) //den är dynamiskt allokerad!
 		{
 			delete(materialName);
 		}
@@ -161,11 +161,11 @@ void FileHandler::SaveLights(int nrLights, vector<Transform*> &allLightTransform
 		ofs.write(transformName, sizeof(char) * transformNameSize);
 		ofs.write(lightName, sizeof(char) * lightNameSize);
 
-		if (transformNameSize == 0) //den är dynamiskt allokerad!
+		if (transformNameSize > 0) //den är dynamiskt allokerad!
 		{
 			delete(transformName);
 		}
-		if (lightNameSize == 0) //den är dynamiskt allokerad!
+		if (lightNameSize > 0) //den är dynamiskt allokerad!
 		{
 			delete(lightName);
 		}
@@ -198,8 +198,8 @@ int FileHandler::CorrectName(char *&referenceName) { //kör tills nollbyten och b
 			tempName[i] = referenceName[i];
 		}
 
-		//delete(referenceName); haha arrayen som den pekar på är statisk är ju fan statisk!
-		referenceName = new char[nameSize];
+		//delete(referenceName); haha arrayen som den pekar på är ju fan statisk!
+		//referenceName = new char[nameSize];
 		referenceName = tempName;
 		return nameSize;
 	}

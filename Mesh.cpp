@@ -31,29 +31,36 @@ void Mesh::CreateIndices(){
 		free(indecies);
 
 	indecies = new Index[nrIndecies];
+	indexList = new UINT[nrIndecies]; //listan som görs en indexbuffer av
 	Index tempI;
-	//for (int i = 0; i < nrIndecies; i++){
-	//	tempI.posI = meshData->indexPositions[i];
-	//	tempI.norI = meshData->indexNormals[i];
-	//	tempI.uvI = meshData->indexUVs[i];
-	//	indecies[i] = tempI;
-	//}
-
-	for (int i = 0; i < nrIndecies; i = i + 3) {
-		tempI.posI = meshData->indexPositions[i+2];
-		tempI.norI = meshData->indexNormals[i+2];
-		tempI.uvI = meshData->indexUVs[i+2];
-		indecies[i] = tempI;
-
-		tempI.posI = meshData->indexPositions[i+1];
-		tempI.norI = meshData->indexNormals[i+1];
-		tempI.uvI = meshData->indexUVs[i+1];
-		indecies[i+1] = tempI;
-
+	for (int i = 0; i < nrIndecies; i++){
 		tempI.posI = meshData->indexPositions[i];
 		tempI.norI = meshData->indexNormals[i];
 		tempI.uvI = meshData->indexUVs[i];
-		indecies[i+2] = tempI;
+		indecies[i] = tempI;
+	}
+
+	//for (int i = 0; i < nrIndecies; i = i + 3) 
+	//{
+	//	tempI.posI = meshData->indexPositions[i+2];
+	//	tempI.norI = meshData->indexNormals[i+2];
+	//	tempI.uvI = meshData->indexUVs[i+2];
+	//	indecies[i] = tempI;
+
+	//	tempI.posI = meshData->indexPositions[i+1];
+	//	tempI.norI = meshData->indexNormals[i+1];
+	//	tempI.uvI = meshData->indexUVs[i+1];
+	//	indecies[i+1] = tempI;
+
+	//	tempI.posI = meshData->indexPositions[i];
+	//	tempI.norI = meshData->indexNormals[i];
+	//	tempI.uvI = meshData->indexUVs[i];
+	//	indecies[i+2] = tempI;
+	//}
+
+	for (int i = 0; i < nrIndecies; i++) 
+	{
+		indexList[i] = indecies[i].posI;
 	}
 }
 
@@ -62,17 +69,17 @@ void Mesh::CreateVertices(){
 	if (vertices != nullptr)
 		free(vertices);
 
-	vertices = new Vertex[nrVertices];
+	vertices = new Vertex[nrIndecies];
 	Vertex tempV;
 
-	for (int i = 0; i < nrVertices; i++)
-	{
-		tempV.pos = meshData->positions[i];
-		tempV.nor = meshData->normals[i];
-		tempV.uv = meshData->uvs[i];
+	//for (int i = 0; i < nrVertices; i++)
+	//{
+	//	tempV.pos = meshData->positions[i];
+	//	tempV.nor = meshData->normals[i];
+	//	tempV.uv = meshData->uvs[i];
 
-		vertices[i] = tempV;
-	}
+	//	vertices[i] = tempV;
+	//}
 	//for (int i = 0; i < nrIndecies; i++){
 	//	
 	//	tempV.pos = meshData->positions[indecies[i].posI];
@@ -82,25 +89,25 @@ void Mesh::CreateVertices(){
 	//	vertices[i] = tempV;
 	//}
 
-	//for (int i = 0; i < nrIndecies; i = i + 3) {
-	//	tempV.pos = meshData->positions[indecies[i+2].posI];
-	//	tempV.nor = meshData->normals[indecies[i+2].norI];
-	//	tempV.uv = meshData->uvs[indecies[i+2].uvI];
+	for (int i = 0; i < nrIndecies; i = i + 3) {
+		tempV.pos = meshData->positions[indecies[i+2].posI];
+		tempV.nor = meshData->normals[indecies[i+2].norI];
+		tempV.uv = meshData->uvs[indecies[i+2].uvI];
 
-	//	vertices[i] = tempV;
+		vertices[i] = tempV;
 
-	//	tempV.pos = meshData->positions[indecies[i+1].posI];
-	//	tempV.nor = meshData->normals[indecies[i+1].norI];
-	//	tempV.uv = meshData->uvs[indecies[i+1].uvI];
+		tempV.pos = meshData->positions[indecies[i+1].posI];
+		tempV.nor = meshData->normals[indecies[i+1].norI];
+		tempV.uv = meshData->uvs[indecies[i+1].uvI];
 
-	//	vertices[i + 1] = tempV;
+		vertices[i + 1] = tempV;
 
-	//	tempV.pos = meshData->positions[indecies[i].posI];
-	//	tempV.nor = meshData->normals[indecies[i].norI];
-	//	tempV.uv = meshData->uvs[indecies[i].uvI];
+		tempV.pos = meshData->positions[indecies[i].posI];
+		tempV.nor = meshData->normals[indecies[i].norI];
+		tempV.uv = meshData->uvs[indecies[i].uvI];
 
-	//	vertices[i + 2] = tempV;
-	//}
+		vertices[i + 2] = tempV;
+	}
 }
 
 void Mesh::CreateVertexBuffer(){ //får skapa vertexarrayen oxå!!!!! hämta all data från meshData
@@ -125,21 +132,19 @@ void Mesh::CreateIndexBuffer(){
 	// Fill in a buffer description.
 	D3D11_BUFFER_DESC bufferDesc;
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.ByteWidth = sizeof(Index) * nrIndecies;
+	bufferDesc.ByteWidth = sizeof(UINT) * nrIndecies;
 	bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	bufferDesc.CPUAccessFlags = 0;
 	bufferDesc.MiscFlags = 0;
 
 	// Define the resource data.
 	D3D11_SUBRESOURCE_DATA InitData;
-	InitData.pSysMem = indecies;
+	InitData.pSysMem = indexList;
 	InitData.SysMemPitch = 0;
 	InitData.SysMemSlicePitch = 0;
 
 	// Create the buffer with the device.
 	hr = gDevice->CreateBuffer(&bufferDesc, &InitData, &indexBuffer);
-	
-
 }
 
 void Mesh::RemapVertexBuffer(){

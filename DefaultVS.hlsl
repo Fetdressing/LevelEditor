@@ -13,7 +13,7 @@ cbuffer World : register (b0)
 struct VS_IN
 {
 	float3 Pos : POSITION;
-	float3 normals : NORMAL;
+	float3 Normals : NORMAL;
 	float2 Tex : TEXCOORD;
 
 };
@@ -21,7 +21,7 @@ struct VS_IN
 struct VS_OUT
 {
 	float4 Pos : SV_POSITION;
-	float4 normals : NORMAL;
+	float4 Normals : NORMAL;
 	float2 Tex : TEXCOORD;
 };
 
@@ -40,12 +40,12 @@ VS_OUT main(VS_IN input)
 	//inputpos = mul(inputpos, View);
 	//inputpos = mul(inputpos, Projection);
 
-	//inputpos = mul(inputpos, World);
-	//inputpos = mul(inputpos, View);
-	//inputpos = mul(inputpos, Projection);
+	inputpos = mul(inputpos, World);
+	inputpos = mul(inputpos, View);
+	inputpos = mul(inputpos, Projection);
 
 	output.Pos = inputpos;
-	output.normals = float4(input.normals, 1.0f);
+	output.Normals = float4(input.Normals, 1.0f);
 	output.Tex = input.Tex;
 
 	return output;

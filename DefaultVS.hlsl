@@ -40,9 +40,9 @@ VS_OUT main(VS_IN input)
 	//inputpos = mul(inputpos, View);
 	//inputpos = mul(inputpos, Projection);
 
-	inputpos = mul(inputpos, World);
-	inputpos = mul(inputpos, View);
-	inputpos = mul(inputpos, Projection);
+	//inputpos = mul(inputpos, World);
+	//inputpos = mul(inputpos, View);
+	//inputpos = mul(inputpos, Projection);
 
 	output.Pos = inputpos;
 	output.Normals = float4(input.Normals, 1.0f);

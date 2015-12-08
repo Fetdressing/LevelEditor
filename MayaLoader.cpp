@@ -459,6 +459,101 @@ void MayaLoader::ReadCamera(int i){
 
 }
 
+void MayaLoader::TransformAdded(MessageHeader mh, TransformMessage *mm)
+{
+	Transform *transform = new Transform(gDevice, gDeviceContext); //hitta den
+
+	transform->transformDataP = mm; //referens för att den skall kunna tömma datan här, den är mallocad så
+	transform->name = mm->objectName;
+	transform->parentName = mm->parentName;
+	transform->transformData = mm->transformData;
+
+	if (transform->parentName[0] != 0) { //namnet är inte tomt -> den har en parent, så hitta den
+		for (int i = 0; i < allTransforms.size(); i++) {
+			if (strcmp(transform->parentName, allTransforms[i]->name) == 0) {
+				transform->parent = allTransforms[i];
+				break;
+			}
+		}
+	}
+
+	allTransforms.push_back(transform);
+
+	//test!!!!
+	//fileHandler = new FileHandler();
+	//const char* skitName = "Hej" + 0;
+	//fileHandler->SaveScene(MAX_NAME_SIZE, (char*)skitName,
+	//	materials,
+	//	allTransforms,
+	//	allMeshTransforms,
+	//	allLightTransforms);
+	//test!!!!
+}
+void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm)
+{
+	char* transformName = mm->objectName;
+	Transform *transform = nullptr;
+
+	for (int i = 0; i < allTransforms.size(); i++) {
+		if (strcmp(transformName, allTransforms[i]->name) == 0) {
+			transform = allTransforms[i];
+			break;
+		}
+	}
+
+	if (transform != nullptr)
+	{
+		transform->EmptyVariables();
+		transform->transformDataP = mm;
+
+		transform->name = transformName;
+		transform->parentName = mm->parentName;
+		transform->transformData = mm->transformData;
+
+		if (transform->parentName[0] != '0') { //namnet är inte tomt -> den har en parent, så hitta den
+			for (int i = 0; i < allTransforms.size(); i++) {
+				if (strcmp(transform->parentName, allTransforms[i]->name) == 0) {
+					transform->parent = allTransforms[i];
+					break;
+				}
+			}
+		}
+	}
+
+}
+void MayaLoader::TransformDeleted(MessageHeader mh) { //ta bort från alla vektorer!!! inte bara allTransforms!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//char* objName = messageHeader.objectName;
+
+	//for (int i = 0; i < allTransforms.size(); i++){
+	//	if (strcmp(objName, allTransforms[i]->name) == 0){
+	//		delete allTransforms[i];
+	//		allTransforms.erase(allTransforms.begin() + i); //rätt index?
+	//		break;
+	//	}
+	//}
+
+	//for (int i = 0; i < allMeshTransforms.size(); i++){
+	//	if (strcmp(objName, allMeshTransforms[i]->name) == 0){
+	//		allMeshTransforms.erase(allMeshTransforms.begin() + i); //rätt index?
+	//		return;
+	//	}
+	//}
+
+	//for (int i = 0; i < allLightTransforms.size(); i++){
+	//	if (strcmp(objName, allLightTransforms[i]->name) == 0){
+	//		allLightTransforms.erase(allLightTransforms.begin() + i); //rätt index?
+	//		return;
+	//	}
+	//}
+
+	//for (int i = 0; i < allCameraTransforms.size(); i++){
+	//	if (strcmp(objName, allCameraTransforms[i]->name) == 0){
+	//		allCameraTransforms.erase(allCameraTransforms.begin() + i); //rätt index?
+	//		return;
+	//	}
+	//}
+}
+
 void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 { //material måste alltid komma före meshes!!
 	char* meshName = mm->objectName;
@@ -481,6 +576,7 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 		meshTransform->mesh = new Mesh(gDevice, gDeviceContext);
 		activeMesh = meshTransform->mesh;
 
+		activeMesh->meshDataP = mm; //endast för att kunna ta bort gamla värden properly
 		activeMesh->name = mm->objectName;
 		activeMesh->transformName = mm->transformName;
 		activeMesh->materialName = mm->materialName;
@@ -521,20 +617,21 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm)
 	else
 	{
 		activeMesh = meshTransform->mesh;
-		activeMesh->EmptyBuffers(); //ska denna göras? man remappar ju dem -> kolla upp!!
+		//activeMesh->EmptyBuffers(); //ska denna göras? man remappar ju dem -> kolla upp!!
 		activeMesh->EmptyVariables(); //viktigt att göra dessa, annars kommer variablerna gå lost utan referens!!
 
+		activeMesh->meshDataP = mm; //endast för att kunna ta bort gamla värden properly
 		activeMesh->name = mm->objectName;
 		activeMesh->materialName = mm->materialName;
 		activeMesh->meshData = mm->meshData;
 
 		activeMesh->material = materials[0]; //default material
-		for (int i = 0; i < materials.size(); i++) {
-			if (strcmp(mm->materialName, materials[i]->name) == 0) {
-				activeMesh->material = materials[i];
-				break;
-			}
-		}
+		//for (int i = 0; i < materials.size(); i++) {
+		//	if (strcmp(mm->materialName, materials[i]->name) == 0) {
+		//		activeMesh->material = materials[i];
+		//		break;
+		//	}
+		//}
 		//activeMesh->meshData.nrVerts = mh.nrVerts;
 		//activeMesh->meshData.nrIndecies = mh.nrIndecies;
 
@@ -543,99 +640,6 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm)
 
 		activeMesh->RemapVertexBuffer();
 	}
-}
-
-void MayaLoader::TransformAdded(MessageHeader mh, TransformMessage *mm)
-{
-	Transform *transform = new Transform(gDevice, gDeviceContext); //hitta den
-
-	transform->name = mm->objectName;
-	transform->parentName = mm->parentName;
-	transform->transformData = mm->transformData;
-
-	if (transform->parentName[0] != 0){ //namnet är inte tomt -> den har en parent, så hitta den
-		for (int i = 0; i < allTransforms.size(); i++) {
-			if (strcmp(transform->parentName, allTransforms[i]->name) == 0) {
-				transform->parent = allTransforms[i];
-				break;
-			}
-		}
-	}	
-
-	allTransforms.push_back(transform);
-
-	//test!!!!
-	fileHandler = new FileHandler();
-	const char* skitName = "Hej" + 0;
-	fileHandler->SaveScene(MAX_NAME_SIZE, (char*)skitName,
-		materials,
-		allTransforms,
-		allMeshTransforms,
-		allLightTransforms);
-	//test!!!!
-}
-void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm)
-{
-	char* transformName = mm->objectName;
-	Transform *transform = nullptr;
-
-	for (int i = 0; i < allTransforms.size(); i++){
-		if (strcmp(transformName, allTransforms[i]->name) == 0){
-			transform = allTransforms[i];
-			break;
-		}
-	}
-
-	if (transform != nullptr)
-	{
-		transform->EmptyVariables();
-
-		transform->name = transformName;
-		transform->parentName = mm->parentName;
-		transform->transformData = mm->transformData;
-
-		if (transform->parentName[0] != '0') { //namnet är inte tomt -> den har en parent, så hitta den
-			for (int i = 0; i < allTransforms.size(); i++) {
-				if (strcmp(transform->parentName, allTransforms[i]->name) == 0) {
-					transform->parent = allTransforms[i];
-					break;
-				}
-			}
-		}
-	}
-
-}
-void MayaLoader::TransformDeleted(MessageHeader mh){ //ta bort från alla vektorer!!! inte bara allTransforms!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//char* objName = messageHeader.objectName;
-
-	//for (int i = 0; i < allTransforms.size(); i++){
-	//	if (strcmp(objName, allTransforms[i]->name) == 0){
-	//		delete allTransforms[i];
-	//		allTransforms.erase(allTransforms.begin() + i); //rätt index?
-	//		break;
-	//	}
-	//}
-
-	//for (int i = 0; i < allMeshTransforms.size(); i++){
-	//	if (strcmp(objName, allMeshTransforms[i]->name) == 0){
-	//		allMeshTransforms.erase(allMeshTransforms.begin() + i); //rätt index?
-	//		return;
-	//	}
-	//}
-
-	//for (int i = 0; i < allLightTransforms.size(); i++){
-	//	if (strcmp(objName, allLightTransforms[i]->name) == 0){
-	//		allLightTransforms.erase(allLightTransforms.begin() + i); //rätt index?
-	//		return;
-	//	}
-	//}
-
-	//for (int i = 0; i < allCameraTransforms.size(); i++){
-	//	if (strcmp(objName, allCameraTransforms[i]->name) == 0){
-	//		allCameraTransforms.erase(allCameraTransforms.begin() + i); //rätt index?
-	//		return;
-	//	}
-	//}
 }
 
 void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm)

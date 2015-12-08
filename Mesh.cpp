@@ -8,10 +8,13 @@ void Mesh::CreateBuffers(){
 }
 
 void Mesh::EmptyVariables(){
-	delete(name);
-	if(materialName != nullptr)
-		delete(materialName);
+	//free(name); //LOOOL namnen är fukkin statiska biatch?! :P INTE NU LÄNGRE! malloc?
+	//if(materialName != nullptr)
+	//	free(materialName);
+	//free(meshData); //free coz malloc?
+	free(meshDataP);
 	delete(meshData);
+
 }
 
 void Mesh::EmptyBuffers() {
@@ -29,7 +32,9 @@ void Mesh::EmptyBuffers() {
 void Mesh::CreateIndices(){
 	nrIndecies = meshData->nrI;
 	if (indecies != nullptr)
-		free(indecies);
+		delete(indecies);
+	if (indexList != nullptr)
+		delete(indexList);
 
 	indecies = new Index[nrIndecies];
 	indexList = new UINT[nrIndecies]; //listan som görs en indexbuffer av
@@ -68,7 +73,7 @@ void Mesh::CreateIndices(){
 void Mesh::CreateVertices(){
 	nrVertices = meshData->nrNor;
 	if (vertices != nullptr)
-		free(vertices);
+		delete(vertices);
 
 	vertices = new Vertex[nrIndecies];
 	Vertex tempV;

@@ -14,8 +14,7 @@ class Transform{
 		XMFLOAT4X4 world;
 	};
 public:
-	//char* name;
-	//Transform transformData;
+	void *transformDataP = nullptr; ///pointer to the current values, används endast för att ta bort all gammal data i ett svep
 	char *name;
 	char *parentName;
 	TransformData transformData;
@@ -39,15 +38,14 @@ public:
 	{}
 	~Transform()
 	{ //kanske deleta saker som mesh, men möjligt vi skickar separata deletes för dem, detsamma gäller children
-		delete(name);
+		//delete(name);
+		free(transformDataP);
 	}
 	void UpdateCBuffer();
 	void CreateTransformCBuffer();
 
 	void EmptyVariables(){
-		delete(name);
-		delete(parentName);
-		transformCBuffer->Release();
+		free(transformDataP);
 	}
 private:
 	ID3D11Device* gDevice = nullptr;

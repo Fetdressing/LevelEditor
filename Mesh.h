@@ -29,6 +29,7 @@ using namespace DirectX::SimpleMath;
 
 class Mesh{
 public:
+	void *meshDataP = nullptr; //pointer to the current values, används endast för att ta bort all gammal data i ett svep
 	char* name; //det riktiga namnet finns i Transformen
 	char* transformName;
 	char* materialName;
@@ -58,10 +59,13 @@ public:
 		vertexBuffer->Release();
 		indexBuffer->Release();
 
-		delete(name);
+	/*	delete(name);
+		delete(meshData);*/
+		free(meshDataP);
+		delete(meshData); //ta bort denna oxå coz den är en pekare i meshDataP
+
 		delete(vertices);
 		delete(indecies);
-		delete(meshData);
 	}
 	void CreateBuffers();
 	void EmptyVariables(); //används när meshen behöver bygga om värden (namn)

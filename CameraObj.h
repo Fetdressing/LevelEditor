@@ -25,8 +25,8 @@ public:
 	CameraCBufferData cameraCBufferData;
 	ID3D11Buffer *cameraCbuffer = nullptr; //här ligger den storade cameradatan
 
-	XMMATRIX view;
-	XMMATRIX projection;
+	//XMFLOAT4X4 mview;
+	//XMFLOAT4X4 mprojection;
 
 	CameraObj(ID3D11Device *gDevice, ID3D11DeviceContext *gDevC) {
 		this->gDevice = gDevice;

@@ -58,14 +58,14 @@ void Mesh::CreateIndices(){
 }
 
 void Mesh::CreateVertices(){
-	nrVertices = meshData->nrPos;
+	nrVertices = meshData->nrNor;
 	if (vertices != nullptr)
 		free(vertices);
 
-	vertices = new Vertex[nrIndecies];
+	vertices = new Vertex[nrVertices];
 	Vertex tempV;
 
-	for (int i = 0; i < nrIndecies; i++)
+	for (int i = 0; i < nrVertices; i++)
 	{
 		tempV.pos = meshData->positions[i];
 		tempV.nor = meshData->normals[i];

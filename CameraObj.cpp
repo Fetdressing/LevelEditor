@@ -10,8 +10,8 @@ void CameraObj::UpdateCBuffer(UINT screenWidth, UINT screenHeight)
 	XMVECTOR rot = XMVector3Rotate(XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f), rotTemp); //+ positionen eller nått sånt, se denna
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-	view = XMMatrixLookAtRH(pos, rot, up);
-	projection = XMMatrixPerspectiveFovRH(
+	XMMATRIX view = XMMatrixLookAtRH(pos, rot, up);
+	XMMATRIX projection = XMMatrixPerspectiveFovRH(
 		cameraData.hAngle,
 		screenWidth/screenHeight, //aspect ratio?
 		1.0f,

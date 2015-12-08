@@ -32,7 +32,6 @@ public:
 	char* name; //det riktiga namnet finns i Transformen
 	char* transformName;
 	char* materialName;
-	//XMMATRIX pos, rot, scale, world;
 	MeshData *meshData; //pekare till denna för att den har massa egna pekare nu, förstör objektet när det ska vara nya värden!
 
 

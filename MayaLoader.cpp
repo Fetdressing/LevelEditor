@@ -164,7 +164,7 @@ void MayaLoader::TryReadAMessage(){
 				printf("Skumt ID");
 				break;
 			case 1:
-			ReadMesh(messageHeader.messageType);
+				ReadMesh(messageHeader.messageType);
 				break;
 			case 2:				
 				ReadTransform(messageHeader.messageType);

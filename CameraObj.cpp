@@ -5,19 +5,48 @@ void CameraObj::UpdateCBuffer(UINT screenWidth, UINT screenHeight)
 {
 	TransformData tDataTemp = transform->transformData;
 
-	XMVECTOR pos = XMVectorSet(tDataTemp.pos.x, tDataTemp.pos.y, tDataTemp.pos.z, 1.0f);
-	XMVECTOR rotTemp = XMVectorSet(tDataTemp.rot.x, tDataTemp.rot.y, tDataTemp.rot.z, tDataTemp.rot.w);
-	XMVECTOR rot = XMVector3Rotate(XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f), rotTemp); //+ positionen eller nått sånt, se denna
-	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	//XMVECTOR pos = XMVectorSet(tDataTemp.pos.x, tDataTemp.pos.y, tDataTemp.pos.z, 1.0f);
+	//XMVECTOR rotTemp = XMVectorSet(tDataTemp.rot.x, tDataTemp.rot.y, tDataTemp.rot.z, tDataTemp.rot.w);
+	
 
-	XMMATRIX view = XMMatrixLookAtRH(pos, rot, up);
-	XMMATRIX projection = XMMatrixPerspectiveFovRH(
+	////Load the stuff
+	//XMFLOAT4 rotQuad = XMFLOAT4(tDataTemp.rot.x, tDataTemp.rot.y, tDataTemp.rot.z, tDataTemp.rot.w); //använd denna sen
+	XMFLOAT4 rotQuad = XMFLOAT4(0, 0, -1, 0); //hårkodad
+	XMVECTOR rotQuadVec = XMLoadFloat4(&rotQuad);
+	rotQuadVec = XMVector4Normalize(rotQuadVec);
+	//XMFLOAT3 pos = XMFLOAT3(tDataTemp.pos.x, tDataTemp.pos.y, tDataTemp.pos.z);
+	XMFLOAT3 pos = XMFLOAT3(0, 0, 200);//hårkodad
+	XMVECTOR posVec = XMLoadFloat3(&pos);
+
+	////Load standard vectors
+	XMFLOAT3 startUp = XMFLOAT3(0, 1, 0);
+	XMVECTOR startUpVec = XMLoadFloat3(&startUp);
+	XMFLOAT3 startTar = XMFLOAT3(0, 0, -1);
+	XMVECTOR startTarVec = XMLoadFloat3(&startTar);
+
+	XMMATRIX rotMatrix = XMMatrixRotationQuaternion(rotQuadVec);
+	startUpVec = XMVector3Transform(startUpVec, rotMatrix);
+	startTarVec = XMVector3Transform(startTarVec, rotMatrix);
+
+	XMFLOAT3 derpTar;
+	XMStoreFloat3(&derpTar, startTarVec);
+
+
+
+	XMMATRIX cameraMat = XMMatrixLookToLH(posVec, startTarVec, startUpVec);
+
+
+	//XMVECTOR rot = XMVector3Rotate(XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f), rotTemp); //+ positionen eller nått sånt, se denna
+	//XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	//XMMATRIX view = XMMatrixLookAtRH(pos, rot, up);
+	XMMATRIX projection = XMMatrixPerspectiveFovLH(
 		cameraData.hAngle,
 		screenWidth/screenHeight, //aspect ratio?
 		1.0f,
 		4000
 		);
-
+	XMMATRIX view = cameraMat;
 	XMStoreFloat4x4(&cameraCBufferData.view, XMMatrixTranspose(view));
 	XMStoreFloat4x4(&cameraCBufferData.projection, XMMatrixTranspose(projection));
 	

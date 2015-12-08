@@ -15,7 +15,7 @@ void Transform::UpdateCBuffer()
 	tempRotation = XMMatrixRotationQuaternion(rotationQuat);
 	tempPosition = XMMatrixTranslation(transformData.pos.x, transformData.pos.y, transformData.pos.z);
 
-	tempWorld = tempScale * tempRotation * tempPosition;
+	tempWorld = tempRotation * tempScale * tempPosition;
 	if (parent != nullptr)
 	{
 		XMMATRIX parentWorld = XMLoadFloat4x4(&parent->transformCBufferData.world);

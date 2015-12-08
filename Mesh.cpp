@@ -9,7 +9,8 @@ void Mesh::CreateBuffers(){
 
 void Mesh::EmptyVariables(){
 	delete(name);
-	delete(materialName);
+	if(materialName != nullptr)
+		delete(materialName);
 	delete(meshData);
 }
 
@@ -58,7 +59,7 @@ void Mesh::CreateIndices(){
 	//	indecies[i+2] = tempI;
 	//}
 
-	for (int i = 0; i < nrIndecies; i++) 
+	for (int i = 0; i < nrIndecies; i++)
 	{
 		indexList[i] = indecies[i].posI;
 	}

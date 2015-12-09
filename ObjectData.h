@@ -131,12 +131,12 @@ struct Vertex{
 	}
 	
 };
-struct Index{
+struct IndexV{
 	int posI, norI, uvI;
 
-	Index(){}
-	~Index(){}
-	Index(int p, int n, int u){
+	IndexV(){}
+	~IndexV(){}
+	IndexV(int p, int n, int u){
 		posI = p;
 		norI = n;
 		uvI = u;

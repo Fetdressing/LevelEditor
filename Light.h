@@ -11,12 +11,13 @@ class Transform; //forward declaration, den ska bara känna till att det finns en
 class Light{
 	struct LightCBufferData {
 		LightData lData;
-		TransformData tData;
+		TransformData tData; //behöver vara här coz vi vill ha allt ljusstuff i en constant buffer, så hämta värdet från transformen
 	};
 public:
 	ID3D11Device * gDevice = nullptr;
 	ID3D11DeviceContext * gDeviceContext = nullptr;
 
+	void *lightDataP = nullptr;
 	char *name;
 	LightData lightData;
 
@@ -30,7 +31,7 @@ public:
 		
 	}
 	~Light(){
-		delete(name);
+		free(lightDataP);
 		lightCbuffer->Release();
 	}
 
@@ -38,7 +39,8 @@ public:
 	void CreateCBuffer();
 
 	void EmptyVariables() {
-		delete(name);
+		free(lightDataP);
+		//delete[] (name);
 		//cameraCbuffer->Release(); //inte säkert jag vill detta, kanske remapa istället! updatesubresource
 	}
 };

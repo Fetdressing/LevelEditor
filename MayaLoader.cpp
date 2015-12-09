@@ -337,9 +337,14 @@ void MayaLoader::ReadMeshData(size_t offSetStart)
 {
 	meshMessage->meshData = new MeshData();
 
+	UINT offset = 0;
+	memcpy(&meshMessage->materialID, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int));
+	offset += sizeof(int);
 	memcpy(meshMessage->objectName, (unsigned char*)mMessageData + offSetStart, sizeof(meshMessage->objectName));
-	UINT offset = (sizeof(char) * 100);
+	offset += (sizeof(char) * 100);
 	memcpy(meshMessage->transformName, (unsigned char*)mMessageData + offSetStart + offset, sizeof(meshMessage->transformName));
+	offset += (sizeof(char) * 100);
+	memcpy(meshMessage->materialName, (unsigned char*)mMessageData + offSetStart + offset, sizeof(meshMessage->materialName));
 	offset += (sizeof(char) * 100);
 	memcpy(meshMessage->meshData, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * 5);
 	offset += sizeof(int) * 5; //7
@@ -617,10 +622,11 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm)
 	else
 	{
 		activeMesh = meshTransform->mesh;
-		//activeMesh->EmptyBuffers(); //ska denna göras? man remappar ju dem -> kolla upp!!
+		int oldNrVerts = activeMesh->meshData->nrI; //så att man vet ifall man kan remappa eller behöver bygga om vertexbuffern
+		
 		activeMesh->EmptyVariables(); //viktigt att göra dessa, annars kommer variablerna gå lost utan referens!!
-
 		activeMesh->meshDataP = mm; //endast för att kunna ta bort gamla värden properly
+
 		activeMesh->name = mm->objectName;
 		activeMesh->materialName = mm->materialName;
 		activeMesh->meshData = mm->meshData;
@@ -632,13 +638,16 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm)
 		//		break;
 		//	}
 		//}
-		//activeMesh->meshData.nrVerts = mh.nrVerts;
-		//activeMesh->meshData.nrIndecies = mh.nrIndecies;
-
-		//activeMesh->meshData.vertices = mm->meshData.vertices;
-		//activeMesh->meshData.indecies = mm->meshData.indecies;
-
-		activeMesh->RemapVertexBuffer();
+		
+		if (activeMesh->meshData->nrI == oldNrVerts)
+		{
+			activeMesh->RemapVertexBuffer();
+		}
+		else
+		{
+			activeMesh->EmptyBuffers();
+			activeMesh->CreateBuffers();
+		}
 	}
 }
 
@@ -648,10 +657,12 @@ void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm)
 
 	Material *tempMat; //pekar på den mesh som redan finns storad eller så blir det en helt ny
 	tempMat = new Material(gDevice, gDeviceContext);
+	tempMat->materialDataP = mm;
+
 	tempMat->CreateCBuffer();
 	tempMat->name = mm->objectName;
-	tempMat->materialData.diffuse = mm->materialData.diffuse;
-	tempMat->materialData.specular = mm->materialData.specular;	
+	tempMat->materialData = mm->materialData;
+	//tempMat->materialData.specular = mm->materialData.specular;	
 
 	tempMat->UpdateCBuffer(); //lägger in de nya värdena i cbuffern
 	materials.push_back(tempMat);
@@ -669,9 +680,11 @@ void MayaLoader::MaterialChange(MessageHeader mh, MaterialMessage *mm)
 		}
 	}
 	tempMat->EmptyVariables(); //viktigt så att vi inte tappar referens till något som vi ska ta bort
+	tempMat->materialDataP = mm;
+
 	tempMat->name = mm->objectName;
-	tempMat->materialData.diffuse = mm->materialData.diffuse;
-	tempMat->materialData.specular = mm->materialData.specular;
+	tempMat->materialData = mm->materialData;
+	
 	tempMat->UpdateCBuffer();
 	
 }
@@ -690,7 +703,6 @@ void MayaLoader::MaterialDeleted(MessageHeader mh)
 
 void MayaLoader::LightAdded(MessageHeader mh, LightMessage *mm)
 {
-	//char *lightName = mh.objectName;
 	char* transformName = mm->transformName;
 	Transform *lightTransform = nullptr; //hitta den
 	Light *tempLight = nullptr;
@@ -708,6 +720,7 @@ void MayaLoader::LightAdded(MessageHeader mh, LightMessage *mm)
 	{
 		lightTransform->light = new Light(gDevice, gDeviceContext);
 		tempLight = lightTransform->light;
+		tempLight->lightDataP = mm; //för att kunna deallokera messaget (mm) det är mallocat
 
 		tempLight->transform = lightTransform;
 		tempLight->CreateCBuffer();
@@ -738,7 +751,9 @@ void MayaLoader::LightChange(MessageHeader mh, LightMessage *mm)
 	else
 	{
 		tempLight = lightTransform->light;
+
 		tempLight->EmptyVariables();
+		tempLight->lightDataP = mm; //för att kunna deallokera messaget (mm) det är mallocat
 
 		tempLight->name = mm->objectName;
 		tempLight->lightData = mm->lightdata;
@@ -767,6 +782,8 @@ void MayaLoader::CameraAdded(MessageHeader mh, CameraMessage *mm)
 	{
 		cameraTransform->camera = new CameraObj(gDevice, gDeviceContext);
 		tempCamera = cameraTransform->camera;
+
+		tempCamera->cameraDataP = mm;
 
 		tempCamera->CreateCBuffer();
 		
@@ -798,7 +815,7 @@ void MayaLoader::CameraChange(MessageHeader mh, CameraMessage *mm)
 	else
 	{
 		tempCamera->EmptyVariables();
-	
+		tempCamera->cameraDataP = mm;
 		//tempCamera->transform = cameraTransform; //ge kameran reference till transformen, bara vid starten? den byter väl inte transform?
 
 		tempCamera->name = mm->objectName;

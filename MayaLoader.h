@@ -126,9 +126,11 @@ private:
 		CameraData cameraData;
 	};
 	struct MeshMessage{
+		int meshID; //kolla ifall denna meshen ska instance draw:as!
 		char objectName[MAX_NAME_SIZE];
 		char transformName[MAX_NAME_SIZE];
 		char materialName[MAX_NAME_SIZE];
+		int materialID;
 		MeshData *meshData;
 	};
 	struct MaterialMessage{ //namnet på den ligger i headern sen

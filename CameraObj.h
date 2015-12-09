@@ -18,6 +18,7 @@ public:
 	ID3D11Device * gDevice = nullptr;
 	ID3D11DeviceContext * gDeviceContext = nullptr;
 
+	void *cameraDataP = nullptr;
 	char *name;
 	CameraData cameraData;
 
@@ -34,7 +35,7 @@ public:
 		//CreateCameraCBuffer();
 	}
 	~CameraObj(){
-		delete(name);
+		free(cameraDataP);
 		cameraCbuffer->Release();
 	}
 
@@ -42,7 +43,7 @@ public:
 	void CreateCBuffer();
 
 	void EmptyVariables() {
-		delete(name);
+		free(cameraDataP);
 		//cameraCbuffer->Release(); //inte säkert jag vill detta, kanske remapa istället! updatesubresource
 	}
 };

@@ -32,13 +32,15 @@ void Mesh::EmptyBuffers() {
 void Mesh::CreateIndices(){
 	nrIndecies = meshData->nrI;
 	if (indecies != nullptr)
-		delete(indecies);
+		delete[] indecies;
 	if (indexList != nullptr)
-		delete(indexList);
+		delete[] indexList;
 
-	indecies = new Index[nrIndecies];
+	indecies = new IndexV[nrIndecies];
 	indexList = new UINT[nrIndecies]; //listan som görs en indexbuffer av
-	Index tempI;
+
+
+	IndexV tempI;
 	for (int i = 0; i < nrIndecies; i++){
 		tempI.posI = meshData->indexPositions[i];
 		tempI.norI = meshData->indexNormals[i];
@@ -73,7 +75,7 @@ void Mesh::CreateIndices(){
 void Mesh::CreateVertices(){
 	nrVertices = meshData->nrNor;
 	if (vertices != nullptr)
-		delete(vertices);
+		delete[] vertices;
 
 	vertices = new Vertex[nrIndecies];
 	Vertex tempV;

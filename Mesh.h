@@ -35,12 +35,11 @@ public:
 	char* materialName;
 	MeshData *meshData; //pekare till denna för att den har massa egna pekare nu, förstör objektet när det ska vara nya värden!
 
-
 	int nrVertices;
 	int nrIndecies;
 
 	Vertex *vertices = nullptr; //dessa kan inte ligga i meshData då 
-	Index *indecies = nullptr;
+	IndexV *indecies = nullptr;
 	UINT *indexList = nullptr; //denna som ska skapas en indexbuffer av, man vill ha id för vilken vertis som ska användas och inte vilken pos, nor och uv
 	ID3D11Buffer *vertexBuffer = nullptr;
 	ID3D11Buffer *indexBuffer = nullptr;

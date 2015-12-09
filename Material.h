@@ -8,6 +8,7 @@ public:
 	ID3D11Device * gDevice = nullptr;
 	ID3D11DeviceContext * gDeviceContext = nullptr;
 
+	void *materialDataP = nullptr; //pointer to the current values, för att ta bort messaget som varit mallocat
 	char *name;
 	MaterialData materialData;
 	ID3D11Buffer *materialCbuffer = nullptr; //här ligger den storade materialdatan
@@ -31,8 +32,9 @@ public:
 		
 	}
 	~Material(){
-		delete(name);
+		//delete(name); den är statiskt allokerad
 		materialCbuffer->Release();
+		free(materialDataP);
 
 		diffuseTexture->Release();
 		diffuseTextureView->Release();
@@ -68,7 +70,7 @@ public:
 	}
 
 	void EmptyVariables(){
-		delete(name);
+		free(materialDataP);
 		//materialCbuffer->Release(); //inte säkert jag vill detta, kanske remapa istället! updatesubresource??
 	}
 

@@ -43,8 +43,7 @@ public:
 	UINT *indexList = nullptr; //denna som ska skapas en indexbuffer av, man vill ha id för vilken vertis som ska användas och inte vilken pos, nor och uv
 	ID3D11Buffer *vertexBuffer = nullptr;
 	ID3D11Buffer *indexBuffer = nullptr;
-	//std::vector<Vertex> vertices;
-	
+	//std::vector<Vertex> vertices;	
 	
 	Material* material = nullptr;
 	//int materialID = 0;;

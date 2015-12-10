@@ -129,11 +129,14 @@ void MayaLoader::DrawScene(){
 		Mesh *currMesh = allMeshTransforms[i]->mesh;
 		gDeviceContext->IASetVertexBuffers(0, 1, &currMesh->vertexBuffer, &vertexSize2, &offset2);
 		gDeviceContext->IASetIndexBuffer(currMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-		try{
-			gDeviceContext->PSSetConstantBuffers(1, 0, &allMeshTransforms[i]->mesh->material->materialCbuffer); //materialID är satt till 0 i början, dvs default material
+
+		if (allMeshTransforms[i]->mesh->material != nullptr)
+		{
+			gDeviceContext->PSSetConstantBuffers(1, 0, &allMeshTransforms[i]->mesh->material->materialCbuffer);
 		}
-		catch (...){ //gick inte assigna det materialet (inte skapat ännu förmodligen), använd default istället
-			gDeviceContext->PSSetConstantBuffers(1, 0, &materials[0]->materialCbuffer); //defaultmat
+		else
+		{
+			gDeviceContext->PSSetConstantBuffers(1, 0, &materials[0]->materialCbuffer);
 		}
 		//transformdata ligger på plats 0, material på 1, osv
 		//set transformcbufferns värden, updatesubresource
@@ -345,7 +348,7 @@ void MayaLoader::ReadMesh(int i)
 	mutexInfo.Unlock();
 
 }
-void MayaLoader::ReadMeshData(size_t offSetStart)
+void MayaLoader::ReadMeshData(size_t offSetStart) //läser vertis data och liknande, all data som är dynamisk
 {
 	meshMessage->meshData = new MeshData();
 

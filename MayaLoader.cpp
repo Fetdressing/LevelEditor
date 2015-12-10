@@ -224,7 +224,11 @@ void MayaLoader::ReadTransform(int i)
 	}
 	else if (i == 3)
 	{
-		TransformDeleted(messageHeader);
+		TransformDeleted(messageHeader, transformMessage);
+	}
+	else if (i == 4)
+	{
+		TransformRenamed(messageHeader, transformMessage);
 	}
 
 
@@ -275,6 +279,10 @@ void MayaLoader::ReadMaterial(int i)
 	else if (i == 3){
 		MaterialDeleted(messageHeader);
 	}
+	else if (i == 4)
+	{
+		MaterialRenamed(messageHeader, materialMessage);
+	}
 
 
 	//flytta tailen
@@ -323,6 +331,10 @@ void MayaLoader::ReadMesh(int i)
 	}
 	else if (i == 2){
 		MeshChange(messageHeader, meshMessage); //tar hand om den aktualla meshen
+	}
+	else if (i == 4)
+	{
+		MeshRenamed(messageHeader, meshMessage);
 	}
 	//flytta tailen
 	while (mutexInfo.Lock(1000) == false) Sleep(10);
@@ -414,6 +426,10 @@ void MayaLoader::ReadLight(int i)
 	else if (i == 2){
 		LightChange(messageHeader, lightMessage); //tar hand om den aktualla meshen
 	}
+	else if (i == 4)
+	{
+		LightRenamed(messageHeader, lightMessage);
+	}
 	
 	//flytta tailen
 	while (mutexInfo.Lock(1000) == false) Sleep(10);
@@ -451,11 +467,21 @@ void MayaLoader::ReadCamera(int i){
 
 	}
 
-	if (i == 1){
+	if (i == 1)
+	{
 		CameraAdded(messageHeader, cameraMessage);
 	}
-	else if (i == 2){
+	else if (i == 2)
+	{
 		CameraChange(messageHeader, cameraMessage); //tar hand om den aktualla meshen
+	}
+	else if (i == 4)
+	{
+		CameraRenamed(messageHeader, cameraMessage);
+	}
+	else if (i == 5)
+	{
+		CameraSwitch(messageHeader, cameraMessage);
 	}
 
 	//flytta tailen
@@ -530,37 +556,39 @@ void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm)
 	}
 
 }
-void MayaLoader::TransformDeleted(MessageHeader mh) { //ta bort från alla vektorer!!! inte bara allTransforms!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//char* objName = messageHeader.objectName;
+void MayaLoader::TransformDeleted(MessageHeader mh, TransformMessage *mm) //ta bort från alla vektorer!!! inte bara allTransforms!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+{
+	char* objName = mm->objectName;
 
-	//for (int i = 0; i < allTransforms.size(); i++){
-	//	if (strcmp(objName, allTransforms[i]->name) == 0){
-	//		delete allTransforms[i];
-	//		allTransforms.erase(allTransforms.begin() + i); //rätt index?
-	//		break;
-	//	}
-	//}
+	for (int i = 0; i < allTransforms.size(); i++){
+		if (strcmp(objName, allTransforms[i]->name) == 0){
+			delete allTransforms[i];
+			allTransforms.erase(allTransforms.begin() + i); //rätt index?
+			break;
+		}
+	}
+	for (int i = 0; i < allMeshTransforms.size(); i++){ //ta oxå bort den från alla vektorer
+		if (strcmp(objName, allMeshTransforms[i]->name) == 0){
+			allMeshTransforms.erase(allMeshTransforms.begin() + i);
+			return;
+		}
+	}
+	for (int i = 0; i < allLightTransforms.size(); i++){
+		if (strcmp(objName, allLightTransforms[i]->name) == 0){
+			allLightTransforms.erase(allLightTransforms.begin() + i);
+			return;
+		}
+	}
+	for (int i = 0; i < allCameraTransforms.size(); i++){
+		if (strcmp(objName, allCameraTransforms[i]->name) == 0){
+			allCameraTransforms.erase(allCameraTransforms.begin() + i);
+			return;
+		}
+	}
+}
+void MayaLoader::TransformRenamed(MessageHeader mh, TransformMessage *mm)
+{
 
-	//for (int i = 0; i < allMeshTransforms.size(); i++){
-	//	if (strcmp(objName, allMeshTransforms[i]->name) == 0){
-	//		allMeshTransforms.erase(allMeshTransforms.begin() + i); //rätt index?
-	//		return;
-	//	}
-	//}
-
-	//for (int i = 0; i < allLightTransforms.size(); i++){
-	//	if (strcmp(objName, allLightTransforms[i]->name) == 0){
-	//		allLightTransforms.erase(allLightTransforms.begin() + i); //rätt index?
-	//		return;
-	//	}
-	//}
-
-	//for (int i = 0; i < allCameraTransforms.size(); i++){
-	//	if (strcmp(objName, allCameraTransforms[i]->name) == 0){
-	//		allCameraTransforms.erase(allCameraTransforms.begin() + i); //rätt index?
-	//		return;
-	//	}
-	//}
 }
 
 void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
@@ -592,15 +620,17 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 		activeMesh->meshData = mm->meshData;
 
 		activeMesh->material = materials[0]; //default material
-		//if (activeMesh->material->name != nullptr)
-		//{
-		//	for (int i = 0; i < materials.size(); i++) {
-		//		if (strcmp(mm->materialName, materials[i]->name) == 0) {
-		//			activeMesh->material = materials[i];
-		//			break;
-		//		}
-		//	}
-		//}
+		if (activeMesh->material->name != nullptr)
+		{
+			for (int i = 0; i < materials.size(); i++)
+			{
+				if (strcmp(mm->materialName, materials[i]->name) == 0) 
+				{
+					activeMesh->material = materials[i];
+					break;
+				}
+			}
+		}
 
 		activeMesh->CreateBuffers();
 		allMeshTransforms.push_back(meshTransform); //skickar in denna transform i allMeshTransforms oxå!! så den kommer vara refererad i båda vektorerna
@@ -635,13 +665,13 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm)
 		activeMesh->materialName = mm->materialName;
 		activeMesh->meshData = mm->meshData;
 
-		activeMesh->material = materials[0]; //default material
-		//for (int i = 0; i < materials.size(); i++) {
-		//	if (strcmp(mm->materialName, materials[i]->name) == 0) {
-		//		activeMesh->material = materials[i];
-		//		break;
-		//	}
-		//}
+		//activeMesh->material = materials[0]; //default material, den har redan ett material här
+		for (int i = 0; i < materials.size(); i++) {
+			if (strcmp(mm->materialName, materials[i]->name) == 0) {
+				activeMesh->material = materials[i];
+				break;
+			}
+		}
 		
 		if (activeMesh->meshData->nrI == oldNrVerts)
 		{
@@ -653,6 +683,10 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm)
 			activeMesh->CreateBuffers();
 		}
 	}
+}
+void MayaLoader::MeshRenamed(MessageHeader mh, MeshMessage *mm)
+{
+
 }
 
 void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm)
@@ -666,8 +700,7 @@ void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm)
 	tempMat->CreateCBuffer();
 	tempMat->name = mm->objectName;
 	tempMat->materialData = mm->materialData;
-	//tempMat->materialData.specular = mm->materialData.specular;	
-
+	
 	tempMat->UpdateCBuffer(); //lägger in de nya värdena i cbuffern
 	materials.push_back(tempMat);
 }
@@ -703,6 +736,10 @@ void MayaLoader::MaterialDeleted(MessageHeader mh)
 	//		break;
 	//	}
 	//}
+}
+void MayaLoader::MaterialRenamed(MessageHeader mh, MaterialMessage *mm)
+{
+
 }
 
 void MayaLoader::LightAdded(MessageHeader mh, LightMessage *mm)
@@ -763,6 +800,10 @@ void MayaLoader::LightChange(MessageHeader mh, LightMessage *mm)
 		tempLight->lightData = mm->lightdata;
 		tempLight->UpdateCBuffer();
 	}
+}
+void MayaLoader::LightRenamed(MessageHeader mh, LightMessage *mm)
+{
+
 }
 
 void MayaLoader::CameraAdded(MessageHeader mh, CameraMessage *mm)
@@ -827,6 +868,10 @@ void MayaLoader::CameraChange(MessageHeader mh, CameraMessage *mm)
 		tempCamera->cameraData = mm->cameraData;
 		tempCamera->UpdateCBuffer(screenWidth, screenHeight);
 	}
+}
+void MayaLoader::CameraRenamed(MessageHeader mh, CameraMessage *mm)
+{
+
 }
 void MayaLoader::CameraSwitch(MessageHeader mh, CameraMessage *mm) 
 {

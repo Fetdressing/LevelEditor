@@ -10,12 +10,12 @@ void CameraObj::UpdateCBuffer(UINT screenWidth, UINT screenHeight)
 	
 
 	////Load the stuff
-	//XMFLOAT4 rotQuad = XMFLOAT4(tDataTemp.rot.x, tDataTemp.rot.y, tDataTemp.rot.z, tDataTemp.rot.w); //använd denna sen
-	XMFLOAT4 rotQuad = XMFLOAT4(0, 0, -1, 0); //hårkodad
+	XMFLOAT4 rotQuad = XMFLOAT4(tDataTemp.rot.x, tDataTemp.rot.y, tDataTemp.rot.z, tDataTemp.rot.w); //använd denna sen
+	//XMFLOAT4 rotQuad = XMFLOAT4(0, 0, -1, 0); //hårkodad
 	XMVECTOR rotQuadVec = XMLoadFloat4(&rotQuad);
 	rotQuadVec = XMVector4Normalize(rotQuadVec);
-	//XMFLOAT3 pos = XMFLOAT3(tDataTemp.pos.x, tDataTemp.pos.y, tDataTemp.pos.z);
-	XMFLOAT3 pos = XMFLOAT3(0, 0, 200);//hårkodad
+	XMFLOAT3 pos = XMFLOAT3(tDataTemp.pos.x, tDataTemp.pos.y, tDataTemp.pos.z);
+	//XMFLOAT3 pos = XMFLOAT3(0, 0, 200);//hårkodad
 	XMVECTOR posVec = XMLoadFloat3(&pos);
 
 	////Load standard vectors

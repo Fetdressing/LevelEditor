@@ -3,14 +3,33 @@
 #define MATERIAL_H
 #endif
 
+#include "ObjectData.h"
+
 class Material{
 public:
+	struct MaterialCBufferData {
+		float diffuse;
+		float color[3];
+		float ambColor[3];
+		float specColor[3];
+		float specCosine;
+		float specEccentricity;
+		float specRollOff;
+		float padding[3];
+
+		MaterialCBufferData()
+		{
+			padding[0] = padding[1] = padding[2] = 0;
+		}
+	};
+	
 	ID3D11Device * gDevice = nullptr;
 	ID3D11DeviceContext * gDeviceContext = nullptr;
 
 	void *materialDataP = nullptr; //pointer to the current values, för att ta bort messaget som varit mallocat
 	char *name;
 	MaterialData materialData;
+	MaterialCBufferData materialCBufferData;
 	ID3D11Buffer *materialCbuffer = nullptr; //här ligger den storade materialdatan
 
 	//char *textureName;
@@ -46,28 +65,8 @@ public:
 		emissionTextureView->Release();
 	}
 	//skapa constantbuffer här???
-	void UpdateCBuffer(){
-		//updatesubresource med den nya materialData
-		gDeviceContext->UpdateSubresource(materialCbuffer, 0, NULL, &materialData, 0, 0);
-	}
-	void CreateCBuffer(){
-		D3D11_BUFFER_DESC cbDesc = { 0 };
-		cbDesc.ByteWidth = sizeof(MaterialData); //kolla så den är 16 byte alligned sen!!
-		cbDesc.Usage = D3D11_USAGE_DYNAMIC;
-		cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		cbDesc.MiscFlags = 0;
-		cbDesc.StructureByteStride = 0;
-
-		// Fill in the subresource data.
-		D3D11_SUBRESOURCE_DATA InitData;
-		InitData.pSysMem = &materialData; //ger den startvärde, default, använd updatesubresource sen
-		InitData.SysMemPitch = 0;
-		InitData.SysMemSlicePitch = 0;
-
-		// Create the buffer.
-		gDevice->CreateBuffer(&cbDesc, &InitData, &materialCbuffer);
-	}
+	void UpdateCBuffer();
+	void CreateCBuffer();
 
 	void EmptyVariables(){
 		free(materialDataP);

@@ -172,20 +172,26 @@ private:
 
 	void MeshChange(MessageHeader mh, MeshMessage *mm); //lägger till ett nytt objekt om det inte redan finns eller updaterar en gammal, tar hand om den aktualla meshen
 	void MeshAdded(MessageHeader mh, MeshMessage *mm);
+	void MeshRenamed(MessageHeader mh, MeshMessage *mm);
 
-	void TransformChange(MessageHeader mh, TransformMessage *mm);
 	void TransformAdded(MessageHeader mh, TransformMessage *mm);
-	void TransformDeleted(MessageHeader mh);
+	void TransformChange(MessageHeader mh, TransformMessage *mm);
+	void TransformDeleted(MessageHeader mh, TransformMessage *mm);
+	void TransformRenamed(MessageHeader mh, TransformMessage *mm);
 
 	void MaterialAdded(MessageHeader mh, MaterialMessage *mm);
 	void MaterialChange(MessageHeader mh, MaterialMessage *mm);
 	void MaterialDeleted(MessageHeader mh);
+	void MaterialRenamed(MessageHeader mh, MaterialMessage *mm);
 
 	void LightAdded(MessageHeader mh, LightMessage *mm);
 	void LightChange(MessageHeader mh, LightMessage *mm);
+	void LightRenamed(MessageHeader mh, LightMessage *mm);
 
 	void CameraAdded(MessageHeader mh, CameraMessage *mm);
 	void CameraChange(MessageHeader mh, CameraMessage *mm);
-	void CameraSwitch(MessageHeader mh, CameraMessage *mm);
+	//ingen delete coz på transformen
+	void CameraRenamed(MessageHeader mh, CameraMessage *mm);
+	void CameraSwitch(MessageHeader mh, CameraMessage *mm); //5
 
 };

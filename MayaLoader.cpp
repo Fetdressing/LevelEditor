@@ -338,16 +338,20 @@ void MayaLoader::ReadMeshData(size_t offSetStart)
 	meshMessage->meshData = new MeshData();
 
 	UINT offset = 0;
+
+	memcpy(meshMessage->objectName, (unsigned char*)mMessageData + offSetStart, sizeof(char) * MAX_NAME_SIZE);
+	offset += (sizeof(char) * MAX_NAME_SIZE);
+	memcpy(meshMessage->transformName, (unsigned char*)mMessageData + offSetStart + offset, sizeof(char) * MAX_NAME_SIZE);
+	offset += (sizeof(char) * MAX_NAME_SIZE);
+	memcpy(meshMessage->materialName, (unsigned char*)mMessageData + offSetStart + offset, sizeof(char) * MAX_NAME_SIZE);
+	offset += (sizeof(char) * MAX_NAME_SIZE);
+
+	memcpy(&meshMessage->meshID, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int));
+	offset += sizeof(int);
 	memcpy(&meshMessage->materialID, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int));
 	offset += sizeof(int);
-	memcpy(meshMessage->objectName, (unsigned char*)mMessageData + offSetStart, sizeof(meshMessage->objectName));
-	offset += (sizeof(char) * 100);
-	memcpy(meshMessage->transformName, (unsigned char*)mMessageData + offSetStart + offset, sizeof(meshMessage->transformName));
-	offset += (sizeof(char) * 100);
-	memcpy(meshMessage->materialName, (unsigned char*)mMessageData + offSetStart + offset, sizeof(meshMessage->materialName));
-	offset += (sizeof(char) * 100);
 	memcpy(meshMessage->meshData, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * 5);
-	offset += sizeof(int) * 5; //7
+	offset += sizeof(int) * 5;
 
 	//allokera minne till att variabler!
 	meshMessage->meshData->positions = new Float3[meshMessage->meshData->nrPos];

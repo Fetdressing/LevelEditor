@@ -1,5 +1,5 @@
 //VERTEX SHADER
-cbuffer Camera : register (b10)
+cbuffer Camera : register (b3)
 {
 	matrix View;
 	matrix Projection;	
@@ -9,6 +9,11 @@ cbuffer World : register (b0)
 {
 	matrix World;
 };
+
+//cbuffer Material : register(b1)
+//{
+//
+//};
 
 struct VS_IN
 {
@@ -40,7 +45,7 @@ VS_OUT main(VS_IN input)
 	//inputpos = mul(inputpos, View);
 	//inputpos = mul(inputpos, Projection);
 
-	//inputpos = mul(inputpos, World);
+	inputpos = mul(inputpos, World);
 	//inputpos = mul(inputpos, View);
 	//inputpos = mul(inputpos, Projection);
 

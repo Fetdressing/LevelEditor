@@ -902,3 +902,33 @@ bool MayaLoader::UpdateCameraValues()
 	gDeviceContext->VSSetConstantBuffers(10, 1, &cDefaultCameraConstantBuffer); //kör på default identitesmatriser annars
 	return false;
 }
+
+void MayaLoader::CreateLightCBufferArray()
+{
+	D3D11_BUFFER_DESC cbDesc = { 0 };
+	cbDesc.ByteWidth = sizeof(lightCBufferDataArray); ///ska nog inte vara arrayen utan varje enskillt element, använd sedan shaderresourceview och store:a flera av denna buffern
+	cbDesc.Usage = D3D11_USAGE_DEFAULT;
+	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cbDesc.MiscFlags = 0;
+	cbDesc.StructureByteStride = 0;
+
+	//// Fill in the subresource data.
+	//D3D11_SUBRESOURCE_DATA InitData;
+	//InitData.pSysMem = &lightCBufferData; //ger den startvärde, default, använd updatesubresource sen
+	//InitData.SysMemPitch = 0;
+	//InitData.SysMemSlicePitch = 0;
+
+	// Create the buffer.
+	gDevice->CreateBuffer(&cbDesc, 0, &lightCbufferArray);
+}
+void MayaLoader::UpdateLightCBufferArray()
+{
+	for (int i = 0; i < allLightTransforms.size(); i++)
+	{
+		lightCBufferDataArray.lightDatas[i] = allLightTransforms[i]->light->lightCBufferData;
+	}
+
+	gDeviceContext->UpdateSubresource(lightCbufferArray, 0, NULL, &lightCBufferDataArray, 0, 0);
+	gDeviceContext->PSSetConstantBuffers(2, 1, &lightCbufferArray); //kör på default identitesmatriser annars?
+}

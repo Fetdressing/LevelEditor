@@ -10,7 +10,8 @@
 #include "Light.h"
 
 class Transform{
-	struct TransformCBufferData{
+	struct TransformCBufferData
+	{
 		XMFLOAT4X4 world;
 	};
 public:

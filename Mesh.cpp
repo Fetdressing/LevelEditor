@@ -1,5 +1,6 @@
 #include "Mesh.h"
-void Mesh::CreateBuffers(){
+void Mesh::CreateBuffers()
+{
 	CreateIndices();
 	CreateVertices();
 
@@ -7,26 +8,22 @@ void Mesh::CreateBuffers(){
 	CreateIndexBuffer();
 }
 
-void Mesh::EmptyVariables(){
+void Mesh::EmptyVariables()
+{
 	//free(name); //LOOOL namnen är fukkin statiska biatch?! :P INTE NU LÄNGRE! malloc?
 	free(meshDataP);
 	delete(meshData); //meshData ligger i meshDataP, behövs detta??
 
 }
 
-void Mesh::EmptyBuffers() {
+void Mesh::EmptyBuffers() 
+{
 	vertexBuffer->Release();
 	indexBuffer->Release();
 }
-//
-//void Mesh::EmptyBuffersAndArrays(){
-//	delete(meshData);
-//
-//	vertexBuffer->Release();
-//	indexBuffer->Release();
-//}
 
-void Mesh::CreateIndices(){
+void Mesh::CreateIndices()
+{
 	nrIndecies = meshData->nrI;
 	if (indecies != nullptr)
 		delete[] indecies;
@@ -69,7 +66,8 @@ void Mesh::CreateIndices(){
 	}
 }
 
-void Mesh::CreateVertices(){
+void Mesh::CreateVertices()
+{
 	nrVertices = meshData->nrNor;
 	if (vertices != nullptr)
 		delete[] vertices;
@@ -135,7 +133,8 @@ void Mesh::CreateVertices(){
 	
 }
 
-void Mesh::CreateVertexBuffer(){ //får skapa vertexarrayen oxå!!!!! hämta all data från meshData
+void Mesh::CreateVertexBuffer() //får skapa vertexarrayen oxå!!!!! hämta all data från meshData
+{
 	// VertexBuffer description
 	D3D11_BUFFER_DESC bufferDesc = { 0 };
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
@@ -152,8 +151,8 @@ void Mesh::CreateVertexBuffer(){ //får skapa vertexarrayen oxå!!!!! hämta all da
 
 }
 
-void Mesh::CreateIndexBuffer(){
-
+void Mesh::CreateIndexBuffer()
+{
 	// Fill in a buffer description.
 	D3D11_BUFFER_DESC bufferDesc;
 	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -172,7 +171,8 @@ void Mesh::CreateIndexBuffer(){
 	hr = gDevice->CreateBuffer(&bufferDesc, &InitData, &indexBuffer);
 }
 
-void Mesh::RemapVertexBuffer(){
+void Mesh::RemapVertexBuffer()
+{
 	CreateIndices(); //antar jag behöver dessa här!!
 	CreateVertices();
 	D3D11_MAPPED_SUBRESOURCE mappedResource;

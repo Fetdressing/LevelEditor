@@ -16,6 +16,11 @@ cbuffer Material : register(b1)
 
 };
 
+cbuffer Lights : register(b2)
+{
+
+}
+
 struct VS_OUT
 {
 	float4 Pos : SV_POSITION;

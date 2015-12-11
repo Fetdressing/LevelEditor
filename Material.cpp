@@ -1,6 +1,7 @@
 #include "Material.h"
 
-void Material::UpdateCBuffer() {
+void Material::UpdateCBuffer() 
+{
 	//updatesubresource med den nya materialData
 	//hämtar all data som behövs från materialData och store:ar den in constantbufferstructen
 	materialCBufferData.diffuse = materialData.diffuse;

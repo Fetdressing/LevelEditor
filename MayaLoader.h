@@ -57,6 +57,17 @@ private:
 	ID3D11Buffer* cDefaultCameraConstantBuffer = nullptr;
 	//*camera*********camera*
 
+	//*light**********light**
+	struct LightCBufferDataArray
+	{
+		LightCBufferData lightDatas[5];
+	};
+	LightCBufferDataArray lightCBufferDataArray;
+	ID3D11Buffer *lightCbufferArray = nullptr;
+	void CreateLightCBufferArray();
+	void UpdateLightCBufferArray();
+	//*light**********light**
+
 	FileHandler *fileHandler = nullptr;
 	//lokala-isch grejer
 	//data om filemapen

@@ -24,14 +24,6 @@ using namespace DirectX::SimpleMath;
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
-//struct Scene {
-//	vector<Material*> materials;
-//	vector<Transform*> allTransforms;
-//	vector<Transform*> allMeshTransforms;
-//	vector<Transform*> allLightTransforms;
-//	vector<Transform*> allCameraTransforms;
-//};
-
 struct Float2{
 	float u, v;
 	Float2(){}
@@ -213,3 +205,14 @@ struct LightData{
 	//offset stuff
 
 };
+
+struct LightCBufferData { //ett ljus
+	Float4 color;
+	Float4 direction;
+	Float4 range;
+	Float4 radius;
+
+	Float3 position;
+	float dropOff;
+};
+

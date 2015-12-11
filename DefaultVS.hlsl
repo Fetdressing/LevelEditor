@@ -2,7 +2,8 @@
 cbuffer Camera : register (b10)
 {
 	matrix View;
-	matrix Projection;	
+	matrix Projection;
+	float4 CameraPosition;
 };
 
 cbuffer World : register (b0)
@@ -13,7 +14,7 @@ cbuffer World : register (b0)
 struct VS_IN
 {
 	float3 Pos : POSITION;
-	float3 Normals : NORMAL;
+	float3 Normal : NORMAL;
 	float2 Tex : TEXCOORD;
 
 };
@@ -21,8 +22,9 @@ struct VS_IN
 struct VS_OUT
 {
 	float4 Pos : SV_POSITION;
-	float4 Normals : NORMAL;
+	float4 Normal : NORMAL;
 	float2 Tex : TEXCOORD;
+	float3 ViewDirection : POSITION;
 };
 
 //-----------------------------------------------------------------------------------------
@@ -34,13 +36,18 @@ VS_OUT main(VS_IN input)
 
 	float4 inputpos = float4(input.Pos, 1.0f);
 
-	inputpos = mul(inputpos, World);
-	inputpos = mul(inputpos, View);
+	float4 worldPosition = mul(inputpos, World);
+	inputpos = mul(worldPosition, View);
 	inputpos = mul(inputpos, Projection);
 
 	output.Pos = inputpos;
-	output.Normals = float4(input.Normals, 1.0f);
+	output.Normal = float4(input.Normal, 1.0f);
 	output.Tex = input.Tex;
+
+	// Determine the viewing direction based on the position of the camera and the position of the vertex in the world.
+	output.ViewDirection = CameraPosition.xyz - worldPosition.xyz;
+	// Normalize the viewing direction vector.
+	output.ViewDirection = normalize(output.ViewDirection);
 
 	return output;
 }

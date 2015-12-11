@@ -35,6 +35,10 @@ public:
 
 	void *materialDataP = nullptr; //pointer to the current values, för att ta bort messaget som varit mallocat
 	char *name;
+	char *textureName;
+	char *normalMapName;
+	char *specularMapName;
+	char *emissionMapName;
 	char dummyName[100]; //dummy variable som används som default namn, behöver inte deallokeras
 	MaterialData materialData;
 	MaterialCBufferData materialCBufferData;
@@ -58,6 +62,10 @@ public:
 		this->gDeviceContext = gDevC;
 
 		name = dummyName; //sätter den till dummy namnet bara för att ha ett default
+		textureName = dummyName;
+		normalMapName = dummyName;
+		specularMapName = dummyName;
+		emissionMapName = dummyName;
 	}
 	~Material(){
 		//delete(name); den är statiskt allokerad
@@ -76,6 +84,7 @@ public:
 	//skapa constantbuffer här???
 	void UpdateCBuffer();
 	void CreateCBuffer();
+	void CreateTexture(char* filePath, ID3D11Resource *texture, ID3D11ShaderResourceView *textureView);
 
 	void EmptyVariables(){
 		free(materialDataP);

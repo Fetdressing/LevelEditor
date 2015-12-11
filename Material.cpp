@@ -1,4 +1,5 @@
 #include "Material.h"
+#include "WICTextureLoader.h"
 
 void Material::UpdateCBuffer() 
 {
@@ -42,4 +43,11 @@ void Material::CreateCBuffer()
 
 	// Create the buffer.
 	gDevice->CreateBuffer(&cbDesc, &InitData, &materialCbuffer);
+}
+
+void Material::CreateTexture(char* filePath, ID3D11Resource *texture, ID3D11ShaderResourceView *textureView)
+{
+	CoInitialize(NULL);
+	
+	//HRESULT br = CreateWICTextureFromFile(gDevice, filePath.c_str(), nullptr, &texture);
 }

@@ -49,6 +49,10 @@ void CameraObj::UpdateCBuffer(UINT screenWidth, UINT screenHeight)
 	XMMATRIX view = cameraMat;
 	XMStoreFloat4x4(&cameraCBufferData.view, XMMatrixTranspose(view));
 	XMStoreFloat4x4(&cameraCBufferData.projection, XMMatrixTranspose(projection));
+	cameraCBufferData.cameraPos[0] = transform->transformData.pos.x;
+	cameraCBufferData.cameraPos[1] = transform->transformData.pos.y;
+	cameraCBufferData.cameraPos[2] = transform->transformData.pos.z;
+	cameraCBufferData.cameraPos[3] = 1;
 	
 	gDeviceContext->UpdateSubresource(cameraCbuffer, 0, NULL, &cameraCBufferData, 0, 0);
 }

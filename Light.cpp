@@ -3,12 +3,15 @@
 
 void Light::UpdateCBuffer() {
 	//updatesubresource med den nya materialData
-	lightCBufferData.color = lightData.color;
-	lightCBufferData.direction = lightData.direction;
-	lightCBufferData.radius = lightData.radius;
-	lightCBufferData.range = lightData.range;
+	lightCBufferData.type = lightData.type;
+	lightCBufferData.colorDiffuse = lightData.colorDiffuse;
+	lightCBufferData.coneAngle = lightData.coneAngle;
+	lightCBufferData.decayType = lightData.decayType;
+	lightCBufferData.intensity = lightData.intensity;
+	lightCBufferData.penumAgle = lightData.penumAgle;
+	lightCBufferData.direction = lightData.direction;	
 	lightCBufferData.dropOff = lightData.dropOff;
-	lightCBufferData.position = transform->transformData.pos;
+	
 	//gDeviceContext->UpdateSubresource(lightCbuffer, 0, NULL, &lightCBufferData, 0, 0); //ska kanske inte göras här utan i en arrayconstant buffer av lightcbufferdatas
 }
 

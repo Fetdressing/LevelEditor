@@ -12,6 +12,7 @@ class CameraObj{
 	struct CameraCBufferData {
 		XMFLOAT4X4 view;
 		XMFLOAT4X4 projection;
+		float cameraPos[4];
 	};
 
 public:

@@ -98,6 +98,8 @@ void MayaLoader::InitVariables() {
 	XMStoreFloat4x4(&defaultCameraCBufferData.projection, XMMatrixTranspose(XMMatrixIdentity()));
 	gDeviceContext->UpdateSubresource(cDefaultCameraConstantBuffer, 0, NULL, &defaultCameraCBufferData, 0, 0); //default buffer
 	//fpsCam.SetLens(0.25f*3.14f, screenWidth / screenHeight, 1.0f, 1000.0f);
+
+	CreateLightCBufferArray();
 }
 
 void MayaLoader::SetFilemapInfoValues(size_t headPlacement, size_t tailPlacement, size_t nonAccessMemoryPlacement, size_t messageFileMapTotalSize){
@@ -433,7 +435,7 @@ void MayaLoader::ReadLight(int i)
 	{
 		LightRenamed(messageHeader, lightMessage);
 	}
-	
+	UpdateLightCBufferArray(); //updaterar constant buffern för ljus
 	//flytta tailen
 	while (mutexInfo.Lock(1000) == false) Sleep(10);
 	cout << "Move tail!!!!!" << localTail << "\n";
@@ -767,7 +769,6 @@ void MayaLoader::LightAdded(MessageHeader mh, LightMessage *mm)
 		tempLight->lightDataP = mm; //för att kunna deallokera messaget (mm) det är mallocat
 
 		tempLight->transform = lightTransform;
-		tempLight->CreateCBuffer();
 
 		tempLight->name = mm->objectName;
 		tempLight->lightData = mm->lightdata;
@@ -906,7 +907,7 @@ bool MayaLoader::UpdateCameraValues()
 void MayaLoader::CreateLightCBufferArray()
 {
 	D3D11_BUFFER_DESC cbDesc = { 0 };
-	cbDesc.ByteWidth = sizeof(lightCBufferDataArray); ///ska nog inte vara arrayen utan varje enskillt element, använd sedan shaderresourceview och store:a flera av denna buffern
+	cbDesc.ByteWidth = sizeof(LightCBufferDataArray); ///ska nog inte vara arrayen utan varje enskillt element, använd sedan shaderresourceview och store:a flera av denna buffern
 	cbDesc.Usage = D3D11_USAGE_DEFAULT;
 	cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	//cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -920,14 +921,18 @@ void MayaLoader::CreateLightCBufferArray()
 	//InitData.SysMemSlicePitch = 0;
 
 	// Create the buffer.
-	gDevice->CreateBuffer(&cbDesc, 0, &lightCbufferArray);
+	gDevice->CreateBuffer(&cbDesc, NULL, &lightCbufferArray);
 }
 void MayaLoader::UpdateLightCBufferArray()
 {
+	int nrLights = 0;
 	for (int i = 0; i < allLightTransforms.size(); i++)
 	{
 		lightCBufferDataArray.lightDatas[i] = allLightTransforms[i]->light->lightCBufferData;
+		nrLights++;
 	}
+	lightCBufferDataArray.NumLights = nrLights;
+	lightCBufferDataArray.pad[0] = { 0 };
 
 	gDeviceContext->UpdateSubresource(lightCbufferArray, 0, NULL, &lightCBufferDataArray, 0, 0);
 	gDeviceContext->PSSetConstantBuffers(2, 1, &lightCbufferArray); //kör på default identitesmatriser annars?

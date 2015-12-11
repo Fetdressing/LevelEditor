@@ -77,7 +77,8 @@ void FileHandler::SaveTransforms(int nrTransforms, vector<Transform*> &allTransf
 
 void FileHandler::SaveMeshes(int nrMeshes, vector<Transform*> &allMeshTransforms)
 {
-	for (int i = 0; i < nrMeshes; i++) {
+	for (int i = 0; i < nrMeshes; i++) 
+	{
 
 		//headerSTART****
 		char* transformName = allMeshTransforms[i]->mesh->transformName; //hade nog egentligen kunnat använda transformnamnet då det är samma, men consistency u know

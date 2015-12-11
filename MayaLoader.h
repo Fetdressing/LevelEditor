@@ -18,6 +18,7 @@
 
 using namespace std;
 const int MAX_NAME_SIZE = 100;
+const UINT MAX_NR_LIGHTS = 128;
 class MayaLoader{
 	
 public:	
@@ -60,7 +61,9 @@ private:
 	//*light**********light**
 	struct LightCBufferDataArray
 	{
-		LightCBufferData lightDatas[5];
+		LightCBufferData lightDatas[MAX_NR_LIGHTS];
+		UINT NumLights;
+		float pad[3];
 	};
 	LightCBufferDataArray lightCBufferDataArray;
 	ID3D11Buffer *lightCbufferArray = nullptr;
@@ -157,7 +160,6 @@ private:
 		//ljusvärden
 		char objectName[MAX_NAME_SIZE];
 		char transformName[MAX_NAME_SIZE];
-		int lightType;
 		LightData lightdata;
 	};
 

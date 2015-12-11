@@ -197,22 +197,25 @@ struct MaterialData{
 };
 
 struct LightData{
-	Float4 color;
-	Float4 direction;
-	Float4 range;
-	Float4 radius;
+	int type; //0 = def, 1 = dir, 2 = spot, 3 = point
+	int decayType; //0 = none, 1 = linear, 2 = quadratic (l/d**v)
+	float intensity;
+	Float3 colorDiffuse;
+	Float3 direction;
 	float dropOff;
-	//offset stuff
+	float coneAngle;
+	float penumAgle;
 
 };
 
 struct LightCBufferData { //ett ljus
-	Float4 color;
-	Float4 direction;
-	Float4 range;
-	Float4 radius;
-
-	Float3 position;
+	UINT type; //0 = def, 1 = dir, 2 = spot, 3 = point
+	UINT decayType; //0 = none, 1 = linear, 2 = quadratic (l/d**v)
+	float intensity;
+	Float3 colorDiffuse;
+	Float3 direction;
 	float dropOff;
+	float coneAngle;
+	float penumAgle;
 };
 

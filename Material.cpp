@@ -2,6 +2,7 @@
 
 void Material::UpdateCBuffer() {
 	//updatesubresource med den nya materialData
+	//hämtar all data som behövs från materialData och store:ar den in constantbufferstructen
 	materialCBufferData.diffuse = materialData.diffuse;
 	for (int i = 0; i < 3; i++)
 	{
@@ -20,7 +21,7 @@ void Material::UpdateCBuffer() {
 	materialCBufferData.specRollOff = materialData.specRollOff;
 
 	gDeviceContext->UpdateSubresource(materialCbuffer, 0, NULL, &materialCBufferData, 0, 0);
-	gDeviceContext->VSSetConstantBuffers(1, 1, &materialCbuffer);
+	//gDeviceContext->PSSetConstantBuffers(1, 1, &materialCbuffer); sätts i render
 }
 void Material::CreateCBuffer()
 {

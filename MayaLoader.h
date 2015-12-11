@@ -136,9 +136,10 @@ private:
 	struct MaterialMessage{ //namnet på den ligger i headern sen
 		char objectName[MAX_NAME_SIZE];
 		char textureName[MAX_NAME_SIZE];
-		char normalMapName[MAX_NAME_SIZE];
+		int materialType;
+		/*	char normalMapName[MAX_NAME_SIZE];
 		char specularMapName[MAX_NAME_SIZE];
-		char emissionMapName[MAX_NAME_SIZE];
+		char emissionMapName[MAX_NAME_SIZE];*/
 		MaterialData materialData;
 	};
 	struct LightMessage{
@@ -158,7 +159,7 @@ private:
 	size_t transformMessage_MaxSize = 512;
 	size_t cameraMessage_MaxSize = 512;
 	size_t meshMessage_MaxSize = 1024 * 1024 * 4; //kan ju fan inte hårdkodas! (maxstorlek de e luuuugnt)
-	size_t materialMessage_MaxSize = 512;
+	size_t materialMessage_MaxSize = 2048;
 	size_t lightMessage_MaxSize = 512;
 
 	//vector<GameObject*> gameObjects;

@@ -9,11 +9,8 @@ void Mesh::CreateBuffers(){
 
 void Mesh::EmptyVariables(){
 	//free(name); //LOOOL namnen är fukkin statiska biatch?! :P INTE NU LÄNGRE! malloc?
-	//if(materialName != nullptr)
-	//	free(materialName);
-	//free(meshData); //free coz malloc?
 	free(meshDataP);
-	delete(meshData);
+	delete(meshData); //meshData ligger i meshDataP, behövs detta??
 
 }
 

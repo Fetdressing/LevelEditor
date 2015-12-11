@@ -202,7 +202,6 @@ struct MaterialData{
 	float specCosine;
 	float specEccentricity;
 	float specRollOff;
-	char diffuseTexturePath[100];
 };
 
 struct LightData{

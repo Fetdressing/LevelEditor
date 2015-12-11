@@ -132,11 +132,11 @@ void MayaLoader::DrawScene(){
 
 		if (allMeshTransforms[i]->mesh->material != nullptr)
 		{
-			gDeviceContext->PSSetConstantBuffers(1, 0, &allMeshTransforms[i]->mesh->material->materialCbuffer);
+			gDeviceContext->PSSetConstantBuffers(1, 1, &allMeshTransforms[i]->mesh->material->materialCbuffer);
 		}
 		else
 		{
-			gDeviceContext->PSSetConstantBuffers(1, 0, &materials[0]->materialCbuffer);
+			gDeviceContext->PSSetConstantBuffers(1, 1, &materials[0]->materialCbuffer);
 		}
 		//transformdata ligger på plats 0, material på 1, osv
 		//set transformcbufferns värden, updatesubresource

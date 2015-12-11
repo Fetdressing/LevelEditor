@@ -10,11 +10,6 @@ cbuffer World : register (b0)
 	matrix World;
 };
 
-cbuffer Material : register(b1)
-{
-
-};
-
 struct VS_IN
 {
 	float3 Pos : POSITION;

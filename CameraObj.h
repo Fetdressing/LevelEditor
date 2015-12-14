@@ -3,12 +3,12 @@
 #define CAMERA_H
 #endif
 
-#include "ObjectData.h"
+#include "Entity.h"
 //#include "Transform.h"
 
 class Transform; //forward declaration, den ska bara känna till att det finns en class som heter Transform, denna pekar på transform och transform pekar på denna
 
-class CameraObj{
+class CameraObj : public Entity{
 	struct CameraCBufferData {
 		XMFLOAT4X4 view;
 		XMFLOAT4X4 projection;

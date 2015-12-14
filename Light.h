@@ -3,12 +3,12 @@
 #define LIGHT_H
 #endif
 
-#include "ObjectData.h"
+#include "Entity.h"
 //#include "Transform.h"
 
 class Transform; //forward declaration, den ska bara känna till att det finns en class som heter Transform, denna pekar på transform och transform pekar på denna
 
-class Light{
+class Light : public Entity{
 	
 public:
 	ID3D11Device * gDevice = nullptr;

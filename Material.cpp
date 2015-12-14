@@ -48,6 +48,8 @@ void Material::CreateCBuffer()
 void Material::CreateTexture(char* filePath, ID3D11Resource *texture, ID3D11ShaderResourceView *textureView)
 {
 	CoInitialize(NULL);
-	
-	//HRESULT br = CreateWICTextureFromFile(gDevice, filePath.c_str(), nullptr, &texture);
+	//
+	//std::string tempString(filePath);
+	//const wchar_t *filePathWchar = L"sedws";
+	//HRESULT br = CreateWICTextureFromFile(gDevice, gDeviceContext, filePathWchar, nullptr, &textureView, 0);
 }

@@ -24,6 +24,8 @@ using namespace DirectX::SimpleMath;
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
+const int MAX_NAME_SIZE = 100;
+
 struct Float2{
 	float u, v;
 	Float2(){}
@@ -219,3 +221,8 @@ struct LightCBufferData { //ett ljus
 	float penumAgle;
 };
 
+struct NameMessage //ligger här coz reasons
+{
+	char name1[MAX_NAME_SIZE]; //det nya namnet vid namechange
+	char name2[MAX_NAME_SIZE];
+};

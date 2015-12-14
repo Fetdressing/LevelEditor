@@ -17,7 +17,7 @@
 #include "Cam.h"
 
 using namespace std;
-const int MAX_NAME_SIZE = 100;
+//const int MAX_NAME_SIZE = 100; la den i ObjectData så att alla kan komma åt den
 const UINT MAX_NR_LIGHTS = 128;
 class MayaLoader{
 	
@@ -39,6 +39,7 @@ public:
 	void ReadLight(int i);
 	void ReadMaterial(int i);
 	void ReadCamera(int i);
+	void ReadName(); //mallocen måste deallokeras oxå!!
 
 private:
 	//externa grejer
@@ -162,18 +163,25 @@ private:
 		char transformName[MAX_NAME_SIZE];
 		LightData lightdata;
 	};
+	//struct NameMessage // ligger i ObjectData nu för easyness
+	//{
+	//	char name1[MAX_NAME_SIZE]; //det nya namnet vid namechange
+	//	char name2[MAX_NAME_SIZE];
+	//};
 
 	TransformMessage *transformMessage = nullptr;
 	CameraMessage *cameraMessage = nullptr;
 	MeshMessage *meshMessage = nullptr;
 	MaterialMessage *materialMessage = nullptr;
 	LightMessage *lightMessage = nullptr;
+	NameMessage *nameMessage = nullptr;
 
 	size_t transformMessage_MaxSize = 512;
 	size_t cameraMessage_MaxSize = 512;
 	size_t meshMessage_MaxSize = 1024 * 1024 * 4; //kan ju fan inte hårdkodas! (maxstorlek de e luuuugnt)
 	size_t materialMessage_MaxSize = 2048;
 	size_t lightMessage_MaxSize = 512;
+	size_t nameMessage_MaxSize = 256;
 
 	//vector<GameObject*> gameObjects;
 	vector<Material*> materials;
@@ -186,26 +194,26 @@ private:
 
 	void MeshChange(MessageHeader mh, MeshMessage *mm); //lägger till ett nytt objekt om det inte redan finns eller updaterar en gammal, tar hand om den aktualla meshen
 	void MeshAdded(MessageHeader mh, MeshMessage *mm);
-	void MeshRenamed(MessageHeader mh, MeshMessage *mm);
+	void MeshRenamed(MessageHeader mh, NameMessage *mm);
 
 	void TransformAdded(MessageHeader mh, TransformMessage *mm);
 	void TransformChange(MessageHeader mh, TransformMessage *mm);
-	void TransformDeleted(MessageHeader mh, TransformMessage *mm);
-	void TransformRenamed(MessageHeader mh, TransformMessage *mm);
+	void TransformDeleted(MessageHeader mh, NameMessage *mm);
+	void TransformRenamed(MessageHeader mh, NameMessage *mm);
 
 	void MaterialAdded(MessageHeader mh, MaterialMessage *mm);
 	void MaterialChange(MessageHeader mh, MaterialMessage *mm);
-	void MaterialDeleted(MessageHeader mh);
-	void MaterialRenamed(MessageHeader mh, MaterialMessage *mm);
+	void MaterialDeleted(MessageHeader mh, NameMessage *mm);
+	void MaterialRenamed(MessageHeader mh, NameMessage *mm);
 
 	void LightAdded(MessageHeader mh, LightMessage *mm);
 	void LightChange(MessageHeader mh, LightMessage *mm);
-	void LightRenamed(MessageHeader mh, LightMessage *mm);
+	void LightRenamed(MessageHeader mh, NameMessage *mm);
 
 	void CameraAdded(MessageHeader mh, CameraMessage *mm);
 	void CameraChange(MessageHeader mh, CameraMessage *mm);
 	//ingen delete coz på transformen
-	void CameraRenamed(MessageHeader mh, CameraMessage *mm);
+	void CameraRenamed(MessageHeader mh, NameMessage *mm);
 	void CameraSwitch(MessageHeader mh, CameraMessage *mm); //5
 
 };

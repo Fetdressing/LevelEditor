@@ -41,6 +41,7 @@ Main::Main(HINSTANCE hInstance, UINT scrW, UINT scrH){
 	this->screenHeight = scrH;
 	pMain = this;
 
+	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	Init();
 }
 

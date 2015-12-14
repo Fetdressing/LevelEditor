@@ -3,9 +3,9 @@
 #define MATERIAL_H
 #endif
 
-#include "ObjectData.h"
+#include "Entity.h"
 
-class Material{
+class Material : public Entity{
 public:
 	struct MaterialCBufferData {
 		float diffuse;
@@ -35,7 +35,7 @@ public:
 
 	void *materialDataP = nullptr; //pointer to the current values, för att ta bort messaget som varit mallocat
 	char *name;
-	char *textureName;
+	char *textureName; //store filpathsen, även om jag har texturen så kommer vi behöva pathsen för fileformatet sen!
 	char *normalMapName;
 	char *specularMapName;
 	char *emissionMapName;

@@ -24,10 +24,10 @@ using namespace DirectX::SimpleMath;
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
-#include "ObjectData.h"
+#include "Entity.h"
 #include "Material.h"
 
-class Mesh{
+class Mesh : public Entity{
 public:
 	void *meshDataP = nullptr; //pointer to the current values, används endast för att ta bort all gammal data i ett svep
 	char* name; //det riktiga namnet finns i Transformen

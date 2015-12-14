@@ -13,7 +13,7 @@ void FileHandler::SaveScene(int maxNameSize, char* sceneName,
 	vector<Transform*> &allMeshTransforms,
 	vector<Transform*> &allLightTransforms)
 {
-	max_Name_Size = maxNameSize;
+	//max_Name_Size = maxNameSize;
 	int sceneNameSize = CorrectName(sceneName);
 	int nrMats = materials.size();
 	int nrTransforms = allTransforms.size();
@@ -187,7 +187,7 @@ int FileHandler::CorrectName(char *&referenceName) { //kör tills nollbyten och b
 	int nameSize = 0;
 	if (referenceName != nullptr)
 	{
-		for (int i = 0; i < max_Name_Size; i++) {
+		for (int i = 0; i < MAX_NAME_SIZE; i++) {
 			if (referenceName[i] == 0) { //nullterminator!!!!!!!!!!!
 				break;
 			}

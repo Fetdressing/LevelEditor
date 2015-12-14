@@ -51,9 +51,13 @@ float4 main(VS_OUT input) : SV_Target
 	float4 reflection = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	float4 diffuseColor = float4(color[0], color[1], color[2], 1.0f);
-	diffuseColor[0] *= diffuse * lights[0].intensity;
-	diffuseColor[1] *= diffuse * lights[0].intensity;
-	diffuseColor[2] *= diffuse * lights[0].intensity;
+
+	diffuseColor[0] *= diffuse;
+	diffuseColor[1] *= diffuse;
+	diffuseColor[2] *= diffuse;
+	//diffuseColor[0] *= diffuse * lights[0].intensity;
+	//diffuseColor[1] *= diffuse * lights[0].intensity;
+	//diffuseColor[2] *= diffuse * lights[0].intensity;
 
 	//for (int i = 0; i < NumLights; i++)
 	//{

@@ -4,12 +4,12 @@
 #endif
 
 
-#include "ObjectData.h"
+#include "Entity.h"
 #include "Mesh.h"
 #include "CameraObj.h"
 #include "Light.h"
 
-class Transform{
+class Transform : public Entity{
 	struct TransformCBufferData
 	{
 		XMFLOAT4X4 world;
@@ -17,7 +17,7 @@ class Transform{
 public:
 	void *transformDataP = nullptr; ///pointer to the current values, används endast för att ta bort all gammal data i ett svep
 	char *name;
-	char *parentName;
+	char *parentName; //när jag laddar till fil så ladda namnet från parent variabeln istället, annars finns det risk att parentNamnet är ändrat med Renamed grejen
 	TransformData transformData;
 
 	Transform *parent = nullptr; //använd parenten och hämta dess transformation

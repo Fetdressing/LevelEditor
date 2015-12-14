@@ -108,6 +108,7 @@
   <ItemGroup>
     <ClInclude Include="Cam.h" />
     <ClInclude Include="CameraObj.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="FileHandler.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Mesh.h" />

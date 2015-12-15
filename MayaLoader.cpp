@@ -10,23 +10,19 @@ MayaLoader::MayaLoader(ID3D11Device* gd, ID3D11DeviceContext* gdc, UINT screenWi
 	CreateFileMaps(1024 * 1024 * 10);
 	InitVariables();
 	
+	fileHandler = new FileHandler();
 	Material *defaultMaterial = new Material(gDevice, gDeviceContext);
 	materials.push_back(defaultMaterial); //lägg till default material, viktigt den ligger på första platsen
 
 }
 MayaLoader::~MayaLoader(){
-	
+	delete (fileHandler);
+
 	UnmapViewOfFile((LPCVOID)mMessageData);
 	CloseHandle(hMessageFileMap);
 
 	UnmapViewOfFile((LPCVOID)mInfoData);
 	CloseHandle(hInfoFileMap);
-	
-	//free(transformMessage); //görs av transformens destruktor
-	//free(meshMessage);
-	//free(cameraMessage);
-	//free(lightMessage);
-	//free(materialMessage);
 
 }
 
@@ -712,6 +708,7 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 		activeMesh->name = mm->objectName;
 		activeMesh->transformName = mm->transformName;
 		activeMesh->materialName = mm->materialName;
+		activeMesh->meshID = mm->meshID; //för instancing
 		activeMesh->meshData = mm->meshData;
 
 		activeMesh->material = materials[0]; //default material
@@ -758,6 +755,7 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm)
 
 		activeMesh->name = mm->objectName;
 		activeMesh->materialName = mm->materialName;
+		activeMesh->meshID = mm->meshID; //för instancing
 		activeMesh->meshData = mm->meshData;
 
 		//activeMesh->material = materials[0]; //default material, den har redan ett material här
@@ -810,6 +808,10 @@ void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm)
 	tempMat->CreateCBuffer();
 	tempMat->name = mm->objectName;
 	tempMat->materialData = mm->materialData;
+
+	//ladda in alla texturer
+	tempMat->textureName = mm->textureName;
+	tempMat->CreateTexture(tempMat->textureName, tempMat->diffuseTexture, tempMat->diffuseTextureView);
 	
 	tempMat->UpdateCBuffer(); //lägger in de nya värdena i cbuffern
 	materials.push_back(tempMat);
@@ -831,21 +833,30 @@ void MayaLoader::MaterialChange(MessageHeader mh, MaterialMessage *mm)
 
 	tempMat->name = mm->objectName;
 	tempMat->materialData = mm->materialData;
+
+	//ladda in alla texturer
+	tempMat->textureName = mm->textureName;
+	tempMat->CreateTexture(tempMat->textureName, tempMat->diffuseTexture, tempMat->diffuseTextureView);
 	
 	tempMat->UpdateCBuffer();
 	
 }
 void MayaLoader::MaterialDeleted(MessageHeader mh, NameMessage *mm)
 {
-	//char* materialName = mh.objectName;
+	char* objName = mm->name1;
+	int tempIndex;
 
-	//for (int i = 0; i < materials.size(); i++){
-	//	if (strcmp(materialName, materials[i]->name) == 0){
-	//		delete materials[i];
-	//		materials.erase(materials.begin() + i); //rätt index?
-	//		break;
-	//	}
-	//}
+	for (int i = 0; i < materials.size(); i++)
+	{
+		if (strcmp(objName, materials[i]->name) == 0)
+		{
+			tempIndex = i;
+			materials.erase(materials.begin() + i); //rätt index?
+			break;
+		}
+	}
+	delete materials[tempIndex];
+	free(mm);
 }
 void MayaLoader::MaterialRenamed(MessageHeader mh, NameMessage *mm)
 {
@@ -1080,4 +1091,14 @@ void MayaLoader::UpdateLightCBufferArray()
 
 	gDeviceContext->UpdateSubresource(lightCbufferArray, 0, NULL, &lightCBufferDataArray, 0, 0);
 	gDeviceContext->PSSetConstantBuffers(2, 1, &lightCbufferArray); //kör på default identitesmatriser annars?
+}
+
+void MayaLoader::SaveScene()
+{
+	const char* skitName = "Test" + 0;
+	fileHandler->SaveScene(MAX_NAME_SIZE, (char*)skitName,
+		materials,
+		allTransforms,
+		allMeshTransforms,
+		allLightTransforms);
 }

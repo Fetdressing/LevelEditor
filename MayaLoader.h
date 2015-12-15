@@ -26,6 +26,7 @@ public:
 	MayaLoader();
 	~MayaLoader();
 	void DrawScene();
+	void SaveScene();
 
 	//void StartSyncing(); //startar hela processen
 	void CreateFileMaps(unsigned int messageFilemapSize);

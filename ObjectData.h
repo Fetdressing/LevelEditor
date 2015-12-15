@@ -15,11 +15,10 @@
 #include <sstream>
 #include <vector>
 #include <memory>
-#include <SimpleMath.h>
-#include <string>
+//#include <SimpleMath.h>
 
 using namespace DirectX;
-using namespace DirectX::SimpleMath;
+//using namespace DirectX::SimpleMath;
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
@@ -226,3 +225,32 @@ struct NameMessage //ligger här coz reasons
 	char name1[MAX_NAME_SIZE]; //det nya namnet vid namechange
 	char name2[MAX_NAME_SIZE];
 };
+
+static int CorrectName(char *&referenceName) { //kör tills nollbyten och biter av resterande chars
+	char *tempName = nullptr;//tänk på att de sparade namnen kommer ha färre tecken än de som laddas in från maya, men den skapar en ny char array så den skriver inte över gamla variabler
+	int nameSize = 0;
+	if (referenceName != nullptr && referenceName[0] != 0)
+	{
+		for (int i = 0; i < MAX_NAME_SIZE; i++) 
+		{
+			if (referenceName[i] == 0) { //nullterminator!!!!!!!!!!!
+				break;
+			}
+			nameSize++; //här ??
+		}
+
+		tempName = new char[nameSize];
+		for (int i = 0; i < nameSize; i++) {
+			tempName[i] = referenceName[i];
+		}
+
+		//delete(referenceName); haha arrayen som den pekar på är ju fan statisk!
+		//referenceName = new char[nameSize];
+		referenceName = tempName;
+		return nameSize;
+	}
+	else
+	{
+		return 0;
+	}
+}

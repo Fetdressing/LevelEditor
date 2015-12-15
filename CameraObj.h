@@ -1,6 +1,6 @@
 #pragma once
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef CAMERAOBJ_H
+#define CAMERAOBJ_H
 #endif
 
 #include "Entity.h"

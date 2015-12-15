@@ -16,13 +16,13 @@
 #include <sstream>
 #include <vector>
 #include <memory>
-#include <SimpleMath.h>
+//#include <SimpleMath.h>
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
 
 using namespace DirectX;
-using namespace DirectX::SimpleMath;
+//using namespace DirectX::SimpleMath;
 
 
 

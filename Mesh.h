@@ -15,11 +15,10 @@
 #include <sstream>
 #include <vector>
 #include <memory>
-#include <SimpleMath.h>
-#include <string>
+//#include <SimpleMath.h>
 
 using namespace DirectX;
-using namespace DirectX::SimpleMath;
+//using namespace DirectX::SimpleMath;
 
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "d3dcompiler.lib")
@@ -33,6 +32,7 @@ public:
 	char* name; //det riktiga namnet finns i Transformen
 	char* transformName;
 	char* materialName;
+	int meshID = 0;
 	MeshData *meshData; //pekare till denna för att den har massa egna pekare nu, förstör objektet när det ska vara nya värden!
 
 	int nrVertices;

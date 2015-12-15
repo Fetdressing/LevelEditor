@@ -1,5 +1,5 @@
 #include "Material.h"
-#include "WICTextureLoader.h"
+#include "DDSTextureLoader.h"
 
 void Material::UpdateCBuffer() 
 {
@@ -45,11 +45,31 @@ void Material::CreateCBuffer()
 	gDevice->CreateBuffer(&cbDesc, &InitData, &materialCbuffer);
 }
 
-void Material::CreateTexture(char* filePath, ID3D11Resource *texture, ID3D11ShaderResourceView *textureView)
+void Material::CreateTexture(char* filePath, ID3D11Resource *&texture, ID3D11ShaderResourceView *&textureView)
 {
-	CoInitialize(NULL);
-	//
-	//std::string tempString(filePath);
-	//const wchar_t *filePathWchar = L"sedws";
-	//HRESULT br = CreateWICTextureFromFile(gDevice, gDeviceContext, filePathWchar, nullptr, &textureView, 0);
+	if (filePath != nullptr && filePath[0] != 0)
+	{
+		FILE * fp;
+
+		fp = fopen(filePath, "r");
+
+		CoInitialize(NULL);
+		char *filePathName = filePath; //viktigt så att den inte ändrar den gamla
+		CorrectName(filePathName);
+		// Convert to a wchar_t*
+		size_t origsize = strlen(filePathName) + 1;
+		const size_t newsize = MAX_NAME_SIZE;
+		size_t convertedChars = 0;
+		wchar_t wcstring[newsize];
+		mbstowcs_s(&convertedChars, wcstring, origsize, filePathName, _TRUNCATE);
+		wcscat_s(wcstring, L" (wchar_t *)");
+		//wcout << wcstring << endl;
+
+		/*std::string tempString(filePath);
+		std::wstring tempWString = tempString;
+		const wchar_t *filePathWchar;
+		filePathWchar = tempWString.c_str();*/
+		//HRESULT br = CreateWICTextureFromFile(gDevice, gDeviceContext, filePathWchar, nullptr, &textureView, 0);
+		HRESULT hr = CreateDDSTextureFromFile(gDevice, wcstring, &texture, &textureView, 0, nullptr); //felaktigt filnamn
+	}
 }

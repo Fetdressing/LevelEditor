@@ -16,6 +16,9 @@
     <Filter Include="Header Files\Entity">
       <UniqueIdentifier>{38eb3241-225f-4f37-bba2-371ac3f80004}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External includes">
+      <UniqueIdentifier>{6d5a2b12-8c9b-4b1a-afe9-4053a10b9ee4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -54,6 +57,9 @@
     <ClInclude Include="Entity.h">
       <Filter>Header Files\Entity</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\..\Downloads\Programmering\DDSTextureLoader.h">
+      <Filter>External includes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -82,6 +88,9 @@
     </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Downloads\Programmering\DDSTextureLoader.cpp">
+      <Filter>External includes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

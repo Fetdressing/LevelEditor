@@ -24,6 +24,7 @@ public:
 
 	ofstream ofs; //skriv till fil
 	ifstream ifs; //läs från fil
+	string lastLoadedFileName;
 
 	void SaveScene(int maxNameSize, char* sceneName,
 		vector<Material*> &materials,
@@ -35,7 +36,7 @@ public:
 	void LoadScene(); //scene class??
 
 private:
-	int CorrectName(char *&referenceName); //tänk på att de sparade namnen kommer ha färre tecken än de som laddas in från maya, men den skapar en ny char array så den skriver inte över gamla variabler
+	//int CorrectName(char *&referenceName); //tänk på att de sparade namnen kommer ha färre tecken än de som laddas in från maya, men den skapar en ny char array så den skriver inte över gamla variabler
 
 	void SaveMainHeader(int sceneNameSize, char* sceneName, int nrMats, int nrTransforms, int nrMeshes, int nrLights);
 

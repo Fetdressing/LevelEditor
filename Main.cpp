@@ -14,11 +14,14 @@ LRESULT Main::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		PostQuitMessage(0);
 		return 0;
 
-	case WM_CHAR: //en tangentbordsknapp har tryckts i
-		switch (wParam){
+	case WM_KEYDOWN: //tangentbord knapp
+		switch (wParam) {
 		case VK_ESCAPE:
 			PostQuitMessage(0);
 			return 0;
+		case VK_SPACE:
+			mayaLoader->SaveScene();
+			break;
 		}
 	}
 
@@ -83,7 +86,7 @@ int Main::Run(){
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		else{ //applikationen är fortfarande igång			
+		else{ //applikationen är fortfarande igång
 			Update();
 		}
 	}
@@ -92,36 +95,6 @@ int Main::Run(){
 
 
 void Main::Update(){
-	//camRotationMatrix = XMMatrixRotationRollPitchYaw(camPitch, camYaw, 0);
-
-	//camTarget = XMVector3TransformCoord(DefaultForward, camRotationMatrix);
-	//camTarget = XMVector3Normalize(camTarget);
-
-
-	//camRight = XMVector3TransformCoord(DefaultRight, camRotationMatrix);
-	//camForward = XMVector3TransformCoord(DefaultForward, camRotationMatrix);
-	//camUp = XMVector3Cross(camForward, camRight);
-
-	//camPosition += moveLeftRight*camRight;
-	//camPosition += moveBackForward*camForward;
-
-	//moveLeftRight = 0.0f;
-	//moveBackForward = 0.0f;
-	//camTarget = camPosition + camTarget;
-
-	//fpsCamLook = XMMatrixLookAtLH(camPosition, camTarget, camUp);
-	////Update cam
-	//fpsCam.UpdateViewMatrix();
-	//CamView = fpsCamLook;
-	//CamProjection = fpsCam.Proj();
-
-	////WVP AND OTHERS
-	//XMStoreFloat4x4(&WorldData.View, XMMatrixTranspose(CamView));
-	//XMStoreFloat4x4(&WorldData.Projection, XMMatrixTranspose(CamProjection));
-	//XMStoreFloat4x4(&WorldData.WorldSpace, XMMatrixTranspose(XMMatrixIdentity()));
-	//XMStoreFloat4x4(&WorldData.InvWorld, XMMatrixTranspose(XMMatrixInverse(NULL, XMMatrixIdentity())));
-	//XMStoreFloat4x4(&WorldData.lightView, XMMatrixTranspose(XMMatrixIdentity()));
-	//XMStoreFloat4x4(&WorldData.lightProjection, XMMatrixTranspose(XMMatrixIdentity()));
 
 	mayaLoader->TryReadAMessage();
 	Render();

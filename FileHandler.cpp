@@ -20,8 +20,11 @@ void FileHandler::SaveScene(int maxNameSize, char* sceneName,
 	int nrMeshes = allMeshTransforms.size();
 	int nrLights = allLightTransforms.size();
 
+	std::string fileName(sceneName, sceneNameSize);
+	fileName += ".drm";
+	lastLoadedFileName = fileName;
 
-	ofs.open("test.drm", ofstream::out | ofstream::binary);
+	ofs.open(fileName, ofstream::out | ofstream::binary);
 	if (ofs.is_open() == true) {
 		ofs.clear();
 
@@ -49,7 +52,8 @@ void FileHandler::SaveMainHeader(int sceneNameSize, char* sceneName, int nrMats,
 
 void FileHandler::SaveTransforms(int nrTransforms, vector<Transform*> &allTransforms)
 {
-	for (int i = 0; i < nrTransforms; i++) {
+	for (int i = 0; i < nrTransforms; i++) 
+	{
 		char* parentName = allTransforms[i]->parentName;
 		char* transformName = allTransforms[i]->name;
 		int parentNameSize = CorrectName(parentName); //biter av vid nullterminator och returnerar längden på texten
@@ -116,6 +120,8 @@ void FileHandler::SaveMeshes(int nrMeshes, vector<Transform*> &allMeshTransforms
 		//headerEND****
 
 		//messageSTART****
+		ofs.write((char*)&allMeshTransforms[i]->mesh->meshID, sizeof(int));
+
 		ofs.write((char*)&allMeshTransforms[i]->mesh->meshData->nrPos, sizeof(int));
 		ofs.write((char*)&allMeshTransforms[i]->mesh->meshData->nrNor, sizeof(int));
 		ofs.write((char*)&allMeshTransforms[i]->mesh->meshData->nrUV, sizeof(int));
@@ -124,11 +130,12 @@ void FileHandler::SaveMeshes(int nrMeshes, vector<Transform*> &allMeshTransforms
 
 		ofs.write((char*)allMeshTransforms[i]->mesh->meshData->positions, sizeof(Float3) * allMeshTransforms[i]->mesh->meshData->nrPos); //?? pekare till float3s
 		ofs.write((char*)allMeshTransforms[i]->mesh->meshData->normals, sizeof(Float3) * allMeshTransforms[i]->mesh->meshData->nrNor);
-		ofs.write((char*)allMeshTransforms[i]->mesh->meshData->uvs, sizeof(Float3) * allMeshTransforms[i]->mesh->meshData->nrUV);
+		ofs.write((char*)allMeshTransforms[i]->mesh->meshData->uvs, sizeof(Float2) * allMeshTransforms[i]->mesh->meshData->nrUV);
 
-		ofs.write((char*)allMeshTransforms[i]->mesh->meshData->indexPositions, sizeof(Float3) * allMeshTransforms[i]->mesh->meshData->nrI);
-		ofs.write((char*)allMeshTransforms[i]->mesh->meshData->indexNormals, sizeof(Float3) * allMeshTransforms[i]->mesh->meshData->nrI);
-		ofs.write((char*)allMeshTransforms[i]->mesh->meshData->indexUVs, sizeof(Float3) * allMeshTransforms[i]->mesh->meshData->nrI);
+		ofs.write((char*)allMeshTransforms[i]->mesh->meshData->indexPositions, sizeof(int) * allMeshTransforms[i]->mesh->meshData->nrI);
+		ofs.write((char*)allMeshTransforms[i]->mesh->meshData->indexNormals, sizeof(int) * allMeshTransforms[i]->mesh->meshData->nrI);
+		ofs.write((char*)allMeshTransforms[i]->mesh->meshData->indexUVs, sizeof(int) * allMeshTransforms[i]->mesh->meshData->nrI);
+		ofs.write((char*)allMeshTransforms[i]->mesh->meshData->trianglesPerFace, sizeof(int) * allMeshTransforms[i]->mesh->meshData->triangleCount);
 		//messageEND****
 	}
 }
@@ -146,6 +153,7 @@ void FileHandler::SaveMaterials(int nrMats, vector<Material*> &materials)
 		{
 			delete(materialName);
 		}
+		ofs.write((char*)&materials[i]->materialData, sizeof(MaterialData));
 	}
 }
 
@@ -171,6 +179,7 @@ void FileHandler::SaveLights(int nrLights, vector<Transform*> &allLightTransform
 			delete(lightName);
 		}
 		//lightdata!!
+		ofs.write((char*)&allLightTransforms[i]->light->lightData, sizeof(LightData));
 
 	}
 }
@@ -178,34 +187,49 @@ void FileHandler::SaveLights(int nrLights, vector<Transform*> &allLightTransform
 
 void FileHandler::LoadScene()
 {
-
-}
-
-
-int FileHandler::CorrectName(char *&referenceName) { //kör tills nollbyten och biter av resterande chars
-	char *tempName = nullptr;
-	int nameSize = 0;
-	if (referenceName != nullptr)
+	string testFileName;
+	if (lastLoadedFileName.empty() == false)
 	{
-		for (int i = 0; i < MAX_NAME_SIZE; i++) {
-			if (referenceName[i] == 0) { //nullterminator!!!!!!!!!!!
-				break;
-			}
-			nameSize++; //här ??
-		}
-
-		tempName = new char[nameSize];
-		for (int i = 0; i < nameSize; i++) {
-			tempName[i] = referenceName[i];
-		}
-
-		//delete(referenceName); haha arrayen som den pekar på är ju fan statisk!
-		//referenceName = new char[nameSize];
-		referenceName = tempName;
-		return nameSize;
+		testFileName = lastLoadedFileName;
 	}
 	else
 	{
-		return 0;
+		testFileName = "test.drm";
 	}
+
+	ifs.open(testFileName, ifstream::in | ofstream::binary);
+	if (ifs.is_open() == true)
+	{
+		//testa o läsa lite
+	}
+
 }
+
+
+//int FileHandler::CorrectName(char *&referenceName) { //kör tills nollbyten och biter av resterande chars
+//	char *tempName = nullptr;
+//	int nameSize = 0;
+//	if (referenceName != nullptr)
+//	{
+//		for (int i = 0; i < MAX_NAME_SIZE; i++) {
+//			if (referenceName[i] == 0) { //nullterminator!!!!!!!!!!!
+//				break;
+//			}
+//			nameSize++; //här ??
+//		}
+//
+//		tempName = new char[nameSize];
+//		for (int i = 0; i < nameSize; i++) {
+//			tempName[i] = referenceName[i];
+//		}
+//
+//		//delete(referenceName); haha arrayen som den pekar på är ju fan statisk!
+//		//referenceName = new char[nameSize];
+//		referenceName = tempName;
+//		return nameSize;
+//	}
+//	else
+//	{
+//		return 0;
+//	}
+//}

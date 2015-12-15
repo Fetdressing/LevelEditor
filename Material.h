@@ -84,7 +84,7 @@ public:
 	//skapa constantbuffer här???
 	void UpdateCBuffer();
 	void CreateCBuffer();
-	void CreateTexture(char* filePath, ID3D11Resource *texture, ID3D11ShaderResourceView *textureView);
+	void CreateTexture(char* filePath, ID3D11Resource *&texture, ID3D11ShaderResourceView *&textureView);
 
 	void EmptyVariables(){
 		free(materialDataP);

@@ -115,9 +115,9 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\Downloads\Programmering\DDSTextureLoader.h" />
     <ClInclude Include="Cam.h" />
     <ClInclude Include="CameraObj.h" />
+    <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="FileHandler.h" />
     <ClInclude Include="Transform.h" />
@@ -130,9 +130,9 @@
     <ClInclude Include="Mutex.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\Downloads\Programmering\DDSTextureLoader.cpp" />
     <ClCompile Include="Cam.cpp" />
     <ClCompile Include="CameraObj.cpp" />
+    <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="FileHandler.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Material.cpp" />

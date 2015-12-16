@@ -57,7 +57,7 @@
     <ClInclude Include="Entity.h">
       <Filter>Header Files\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\Downloads\Programmering\DDSTextureLoader.h">
+    <ClInclude Include="DDSTextureLoader.h">
       <Filter>External includes</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,7 +89,7 @@
     <ClCompile Include="Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Downloads\Programmering\DDSTextureLoader.cpp">
+    <ClCompile Include="DDSTextureLoader.cpp">
       <Filter>External includes</Filter>
     </ClCompile>
   </ItemGroup>

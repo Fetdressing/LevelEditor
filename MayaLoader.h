@@ -48,6 +48,8 @@ private:
 	ID3D11DeviceContext* gDeviceContext = nullptr;
 	UINT screenWidth, screenHeight;
 
+	ID3D11SamplerState *wrap_Sampstate;
+	ID3D11SamplerState *clamp_Sampstate;
 	//*camera*********camera*
 	bool UpdateCameraValues(); //returnerar ifall en kamera finns, om den inte finns så vill man nog inte rendera alls
 	struct CameraCBufferData

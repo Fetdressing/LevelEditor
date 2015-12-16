@@ -96,6 +96,27 @@ void MayaLoader::InitVariables() {
 	//fpsCam.SetLens(0.25f*3.14f, screenWidth / screenHeight, 1.0f, 1000.0f);
 
 	CreateLightCBufferArray();
+
+	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(D3D11_SAMPLER_DESC));
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MaxAnisotropy = 16;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	gDevice->CreateSamplerState(&samplerDesc, &wrap_Sampstate);
+
+	D3D11_SAMPLER_DESC samplerDesc2;
+	ZeroMemory(&samplerDesc2, sizeof(D3D11_SAMPLER_DESC));
+	samplerDesc2.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc2.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc2.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc2.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc2.MaxAnisotropy = 16;
+	gDevice->CreateSamplerState(&samplerDesc2, &clamp_Sampstate);
+
 }
 
 void MayaLoader::SetFilemapInfoValues(size_t headPlacement, size_t tailPlacement, size_t nonAccessMemoryPlacement, size_t messageFileMapTotalSize){
@@ -131,6 +152,8 @@ void MayaLoader::DrawScene(){
 		if (allMeshTransforms[i]->mesh->material != nullptr)
 		{
 			gDeviceContext->PSSetConstantBuffers(1, 1, &allMeshTransforms[i]->mesh->material->materialCbuffer);
+			gDeviceContext->PSSetShaderResources(0, 1, &allMeshTransforms[i]->mesh->material->diffuseTextureView);
+			gDeviceContext->PSSetSamplers(0, 1, &wrap_Sampstate);
 		}
 		else
 		{

@@ -93,7 +93,7 @@ float4 main(VS_OUT input) : SV_Target
 	//	// Add the specular component last to the output color.
 	//	diffuseColor = saturate(diffuseColor + specular);
 	//}
-	//float4 diffuse = txDiffuse.Sample(sampAni, input.Tex);
-	return diffuseColor;
+	float4 diffuse = txDiffuse.Sample(sampAni, input.Tex);
+	return diffuse;
 	//return diffuse;
 };

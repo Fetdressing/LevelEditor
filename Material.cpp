@@ -49,7 +49,7 @@ void Material::CreateTexture(char* filePath, ID3D11Resource *&texture, ID3D11Sha
 {
 	if (filePath != nullptr && filePath[0] != 0)
 	{
-		FILE * fp;
+		FILE * fp = nullptr;
 
 		fp = fopen(filePath, "r");
 
@@ -62,7 +62,7 @@ void Material::CreateTexture(char* filePath, ID3D11Resource *&texture, ID3D11Sha
 		size_t convertedChars = 0;
 		wchar_t wcstring[newsize];
 		mbstowcs_s(&convertedChars, wcstring, origsize, filePathName, _TRUNCATE);
-		wcscat_s(wcstring, L" (wchar_t *)");
+		wcscat_s(wcstring, L"");
 		//wcout << wcstring << endl;
 
 		/*std::string tempString(filePath);

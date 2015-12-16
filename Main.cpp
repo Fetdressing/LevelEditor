@@ -38,7 +38,8 @@ Main::Main(){
 	Init();
 }
 
-Main::Main(HINSTANCE hInstance, UINT scrW, UINT scrH){
+Main::Main(HINSTANCE hInstance, UINT scrW, UINT scrH)
+{
 	this->hInstance = hInstance;
 	this->screenWidth = scrW;
 	this->screenHeight = scrH;

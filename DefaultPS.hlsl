@@ -51,10 +51,21 @@ float4 main(VS_OUT input) : SV_Target
 	float4 reflection = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	float4 diffuseColor = float4(color[0], color[1], color[2], 1.0f);
+	float4 diffuseTex = txDiffuse.Sample(sampAni, input.Tex);
 
-	diffuseColor[0] *= diffuse;
+	diffuseTex[0] *= diffuse;
+	diffuseTex[1] *= diffuse;
+	diffuseTex[2] *= diffuse;
+
+	final = diffuseTex;
+
+	final[0] *= diffuseColor[0];
+	final[1] *= diffuseColor[1];
+	final[2] *= diffuseColor[2];
+
+	/*diffuseColor[0] *= diffuse;
 	diffuseColor[1] *= diffuse;
-	diffuseColor[2] *= diffuse;
+	diffuseColor[2] *= diffuse;*/
 	//diffuseColor[0] *= diffuse * lights[0].intensity;
 	//diffuseColor[1] *= diffuse * lights[0].intensity;
 	//diffuseColor[2] *= diffuse * lights[0].intensity;
@@ -93,7 +104,6 @@ float4 main(VS_OUT input) : SV_Target
 	//	// Add the specular component last to the output color.
 	//	diffuseColor = saturate(diffuseColor + specular);
 	//}
-	float4 diffuse = txDiffuse.Sample(sampAni, input.Tex);
-	return diffuse;
+	return final;
 	//return diffuse;
 };

@@ -245,7 +245,8 @@ static int CorrectName(char *&referenceName) { //kör tills nollbyten och biter a
 	{
 		for (int i = 0; i < MAX_NAME_SIZE; i++) 
 		{
-			if (referenceName[i] == 0) { //nullterminator!!!!!!!!!!!
+			if (referenceName[i] == 0) //nullterminator!!!!!!!!!!!
+			{
 				break;
 			}
 			nameSize++; //här ??

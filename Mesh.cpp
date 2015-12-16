@@ -92,7 +92,7 @@ void Mesh::CreateVertices()
 	//	vertices[i] = tempV;
 	//}
 
-	/*for (int i = 0; i < nrIndecies; i = i + 3) {
+	for (int i = 0; i < nrIndecies; i = i + 3) {
 		tempV.pos = meshData->positions[indecies[i].posI];
 		tempV.nor = meshData->normals[indecies[i].norI];
 		tempV.uv = meshData->uvs[indecies[i].uvI];
@@ -110,6 +110,7 @@ void Mesh::CreateVertices()
 		tempV.uv = meshData->uvs[indecies[i+2].uvI];
 
 		vertices[i + 2] = tempV;
+<<<<<<< HEAD
 	}*/
 	for (int i = 0; i < nrIndecies; i = i + 3) {
 		tempV.pos = meshData->positions[indecies[i + 2].posI];
@@ -118,27 +119,46 @@ void Mesh::CreateVertices()
 		tempV.nor.z = tempV.nor.z * -1.0f;
 		tempV.uv = meshData->uvs[indecies[i + 2].uvI];
 		tempV.uv.v = tempV.uv.v - 1.0f;
+=======
+	}
+	//for (int i = 0; i < nrIndecies; i = i + 3) {
+	//	tempV.pos = meshData->positions[indecies[i + 2].posI];
+	//	tempV.nor = meshData->normals[indecies[i + 2].norI];
+	//	tempV.uv = meshData->uvs[indecies[i + 2].uvI];
+>>>>>>> origin/master
 
-		vertices[i] = tempV;
+	//	vertices[i] = tempV;
 
+<<<<<<< HEAD
 		tempV.pos = meshData->positions[indecies[i + 1].posI];
 		tempV.pos.z = tempV.pos.z * -1.0f;
 		tempV.nor = meshData->normals[indecies[i + 1].norI];
 		tempV.nor.z = tempV.nor.z * -1.0f;
 		tempV.uv = meshData->uvs[indecies[i + 1].uvI];
 		tempV.uv.v = tempV.uv.v - 1.0f;
+=======
+	//	tempV.pos = meshData->positions[indecies[i + 1].posI];
+	//	tempV.nor = meshData->normals[indecies[i + 1].norI];
+	//	tempV.uv = meshData->uvs[indecies[i + 1].uvI];
+>>>>>>> origin/master
 
-		vertices[i + 1] = tempV;
+	//	vertices[i + 1] = tempV;
 
+<<<<<<< HEAD
 		tempV.pos = meshData->positions[indecies[i].posI];
 		tempV.pos.z = tempV.pos.z * -1.0f;
 		tempV.nor = meshData->normals[indecies[i].norI];
 		tempV.nor.z = tempV.nor.z * -1.0f;
 		tempV.uv = meshData->uvs[indecies[i].uvI];
 		tempV.uv.v = tempV.uv.v - 1.0f;
+=======
+	//	tempV.pos = meshData->positions[indecies[i].posI];
+	//	tempV.nor = meshData->normals[indecies[i].norI];
+	//	tempV.uv = meshData->uvs[indecies[i].uvI];
+>>>>>>> origin/master
 
-		vertices[i + 2] = tempV;
-	}
+	//	vertices[i + 2] = tempV;
+	//}
 	
 }
 

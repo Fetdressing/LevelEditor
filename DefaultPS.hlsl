@@ -31,7 +31,7 @@ struct Light //viktigt denna ser likadan ut some på CPU sidan
 static const uint MaxLights = 128;
 cbuffer Lights : register(b2)
 {
-	Light lights[MaxLights];
+	Light light[4];
 	uint NumLights;
 	float3 pad;
 }

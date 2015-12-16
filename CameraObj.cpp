@@ -21,7 +21,7 @@ void CameraObj::UpdateCBuffer(UINT screenWidth, UINT screenHeight)
 	////Load standard vectors
 	XMFLOAT3 startUp = XMFLOAT3(0, 1, 0);
 	XMVECTOR startUpVec = XMLoadFloat3(&startUp);
-	XMFLOAT3 startTar = XMFLOAT3(0, 0, -1);
+	XMFLOAT3 startTar = XMFLOAT3(0, 0, 1);
 	XMVECTOR startTarVec = XMLoadFloat3(&startTar);
 
 	XMMATRIX rotMatrix = XMMatrixRotationQuaternion(rotQuadVec);

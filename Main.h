@@ -82,6 +82,8 @@ private:
 	ID3D11InputLayout *defaultInputLayout;
 	ID3D11VertexShader *defaultVS;
 	ID3D11PixelShader *defaultPS;
+	ID3D11VertexShader *basicVS;
+	ID3D11PixelShader *basicPS;
 	
 
 	////Fps camera

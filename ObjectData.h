@@ -211,14 +211,26 @@ struct LightData{
 
 struct LightCBufferData { //ett ljus
 	UINT type; //0 = def, 1 = dir, 2 = spot, 3 = point
-	UINT decayType; //0 = none, 1 = linear, 2 = quadratic (l/d**v)
+	Float3 attenuation; //0 = none, 1 = linear, 2 = quadratic (l/d**v)
 	float intensity;
 	Float3 colorDiffuse;
-	Float3 direction;
-	float dropOff;
 	float coneAngle;
+	Float3 direction;
 	float penumAgle;
+	Float3 position;
 };
+
+//struct LightCBufferData { //ett ljus
+//	UINT type; //0 = def, 1 = dir, 2 = spot, 3 = point
+//	UINT decayType; //0 = none, 1 = linear, 2 = quadratic (l/d**v)
+//	float intensity;
+//	Float3 colorDiffuse;
+//	Float3 direction;
+//	float dropOff;
+//	float coneAngle;
+//	float penumAgle;
+//	//Float3 position;
+//};
 
 struct NameMessage //ligger här coz reasons
 {

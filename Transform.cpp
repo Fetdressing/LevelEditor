@@ -11,6 +11,9 @@ void Transform::UpdateCBuffer()
 
 	tempScale = XMMatrixScaling(transformData.scale.x, transformData.scale.y, transformData.scale.z);
 	//XMMatrixRotationQuaternion använd en quaternion istället! cool stuff, sen bör det funka
+	//transformData.pos.z = transformData.pos.z * -1.0f;
+	//transformData.rot.x = transformData.rot.x * -1.0f;
+	//transformData.rot.y = transformData.rot.y * -1.0f;
 	XMVECTOR rotationQuat = XMVectorSet(transformData.rot.x, transformData.rot.y, transformData.rot.z, transformData.rot.w);
 	tempRotation = XMMatrixRotationQuaternion(rotationQuat);
 	tempPosition = XMMatrixTranslation(transformData.pos.x, transformData.pos.y, transformData.pos.z);

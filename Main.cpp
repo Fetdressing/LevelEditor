@@ -115,11 +115,11 @@ void Main::Render(){
 	//gDeviceContext->IASetVertexBuffers(0, 1, &testVertexBuffer, &vertexSize2, &offset2);
 	
 	gDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	gDeviceContext->VSSetShader(defaultVS, nullptr, 0);
+	gDeviceContext->VSSetShader(basicVS, nullptr, 0);
 	gDeviceContext->GSSetShader(nullptr, nullptr, 0);
 	gDeviceContext->HSSetShader(nullptr, nullptr, 0);
 	gDeviceContext->DSSetShader(nullptr, nullptr, 0);
-	gDeviceContext->PSSetShader(defaultPS, nullptr, 0);
+	gDeviceContext->PSSetShader(basicPS, nullptr, 0);
 	gDeviceContext->PSSetSamplers(0, 1, &wrap_Sampstate);
 	
 	//gDeviceContext->Draw(4, 0);
@@ -408,6 +408,16 @@ void Main::CreateShaders(){
 	ShaderTest = CompileShader(L"DefaultPS.hlsl", "main", "ps_5_0", &pPS);
 	ShaderTest = gDevice->CreatePixelShader(pPS->GetBufferPointer(), pPS->GetBufferSize(), nullptr, &defaultPS);
 
+	//create vertex shaders
+	pVS = nullptr;
+	ShaderTest = CompileShader(L"BasicVertexShader.hlsl", "VS_main", "vs_5_0", &pVS);
+	shaderCreationTest = gDevice->CreateVertexShader(pVS->GetBufferPointer(), pVS->GetBufferSize(), nullptr, &basicVS);
+
+	//create pixel shader
+	pPS = nullptr;
+	ShaderTest = CompileShader(L"BasicPixelShader.hlsl", "PS_main", "ps_5_0", &pPS);
+	ShaderTest = gDevice->CreatePixelShader(pPS->GetBufferPointer(), pPS->GetBufferSize(), nullptr, &basicPS);
+
 	// INPUT LAYOUT MÅSTE VARA ANPASSAD TILL VERTEX SHADER
 
 	//create input layout (verified using vertex shader)
@@ -432,9 +442,9 @@ HRESULT Main::CompileShader(_In_ LPCWSTR srcFile, _In_ LPCSTR entryPoint, _In_ L
 	*blob = nullptr;
 
 	UINT flags = D3DCOMPILE_ENABLE_STRICTNESS;
-#if defined( DEBUG ) || defined( _DEBUG )
+//#if defined( DEBUG ) || defined( _DEBUG )
 	flags |= D3DCOMPILE_DEBUG;
-#endif
+//#endif
 
 	const D3D_SHADER_MACRO defines[] =
 	{

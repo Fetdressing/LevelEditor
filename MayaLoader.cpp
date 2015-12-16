@@ -162,6 +162,7 @@ void MayaLoader::DrawScene(){
 		//transformdata ligger på plats 0, material på 1, osv
 		//set transformcbufferns värden, updatesubresource
 		allMeshTransforms[i]->UpdateCBuffer(); //slå först ihop med parentens värden innan vi updaterar cbuffern
+		UpdateLightCBufferArray();
 		gDeviceContext->Draw(allMeshTransforms[i]->mesh->nrIndecies, 0);
 		
 		//gDeviceContext->DrawIndexed(currMesh->nrIndecies, 0, 0);
@@ -238,6 +239,9 @@ void MayaLoader::ReadTransform(int i)
 			}
 
 		}
+		transformMessage->transformData.pos.z = transformMessage->transformData.pos.z*-1.0f;
+		transformMessage->transformData.rot.x = transformMessage->transformData.rot.x *-1.0f;
+		transformMessage->transformData.rot.y = transformMessage->transformData.rot.y *-1.0f;
 	}
 	else
 	{
@@ -1077,6 +1081,7 @@ bool MayaLoader::UpdateCameraValues()
 {
 	if (currentCameraTransform != nullptr)
 	{
+		//currentCameraTransform->UpdateCBuffer();
 		currentCameraTransform->camera->UpdateCBuffer(screenWidth, screenHeight);
 
 		//gDeviceContext->UpdateSubresource(cCameraConstantBuffer, 0, NULL, &cameraCBufferData, 0, 0);

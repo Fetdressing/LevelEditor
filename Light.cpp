@@ -6,11 +6,13 @@ void Light::UpdateCBuffer() {
 	lightCBufferData.type = lightData.type;
 	lightCBufferData.colorDiffuse = lightData.colorDiffuse;
 	lightCBufferData.coneAngle = lightData.coneAngle;
-	lightCBufferData.decayType = lightData.decayType;
+	//lightCBufferData.decayType = lightData.decayType;
 	lightCBufferData.intensity = lightData.intensity;
 	lightCBufferData.penumAgle = lightData.penumAgle;
 	lightCBufferData.direction = lightData.direction;	
-	lightCBufferData.dropOff = lightData.dropOff;
+	lightCBufferData.attenuation = Float3(1.0f, 1.0f, 1.0f);
+	lightCBufferData.position = Float3(1.0f, 1.0f, 1.0f);
+	//lightCBufferData.position = transform->transformData.pos;
 	
 	//gDeviceContext->UpdateSubresource(lightCbuffer, 0, NULL, &lightCBufferData, 0, 0); //ska kanske inte göras här utan i en arrayconstant buffer av lightcbufferdatas
 }

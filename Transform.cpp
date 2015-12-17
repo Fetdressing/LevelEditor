@@ -21,8 +21,9 @@ void Transform::UpdateCBuffer()
 	tempWorld = tempRotation * tempScale * tempPosition;
 	if (parent != nullptr)
 	{
+		parent->UpdateCBuffer();
 		XMMATRIX parentWorld = XMLoadFloat4x4(&parent->transformCBufferData.world);
-		tempWorld = tempWorld * parentWorld;
+		tempWorld = tempWorld /** parentWorld*/;
 	}
 
 	XMStoreFloat4x4(&transformCBufferData.world, XMMatrixTranspose(tempWorld));

@@ -244,12 +244,12 @@ static int CorrectName(char *&referenceName) { //kör tills nollbyten och biter a
 	if (referenceName != nullptr && referenceName[0] != 0)
 	{
 		for (int i = 0; i < MAX_NAME_SIZE; i++) 
-		{
+		{		
+			nameSize++; //här ??
 			if (referenceName[i] == 0) //nullterminator!!!!!!!!!!!
 			{
 				break;
 			}
-			nameSize++; //här ??
 		}
 
 		tempName = new char[nameSize];

@@ -36,6 +36,8 @@ void FileHandler::SaveScene(int maxNameSize, char* sceneName,
 		SaveLights(nrLights, allLightTransforms);
 		
 		ofs.close();
+
+		//LoadScene(); //test bara
 	}
 }
 
@@ -154,6 +156,19 @@ void FileHandler::SaveMaterials(int nrMats, vector<Material*> &materials)
 			delete(materialName);
 		}
 		ofs.write((char*)&materials[i]->materialData, sizeof(MaterialData));
+
+		//textures!!
+		char *diffuseTextureName = materials[i]->textureName;
+		int diffuseTextureSize = CorrectName(diffuseTextureName);
+
+		ofs.write((char*)&diffuseTextureSize, sizeof(int));
+		ofs.write(diffuseTextureName, sizeof(char) * diffuseTextureSize);
+
+
+		if (diffuseTextureSize > 0) //den är dynamiskt allokerad!
+		{
+			delete(diffuseTextureName);
+		}
 	}
 }
 
@@ -201,6 +216,142 @@ void FileHandler::LoadScene()
 	if (ifs.is_open() == true)
 	{
 		//testa o läsa lite
+
+		int sceneNameSize;
+		ifs.read((char*)&sceneNameSize, sizeof(int));
+		char *sceneName = new char[sceneNameSize];
+		ifs.read((char*)sceneName, sizeof(char) * sceneNameSize);
+
+		int nrMats, nrTransforms, nrMeshes, nrLights;
+		ifs.read((char*)&nrMats, sizeof(int));
+		ifs.read((char*)&nrTransforms, sizeof(int));
+		ifs.read((char*)&nrMeshes, sizeof(int));
+		ifs.read((char*)&nrLights, sizeof(int));
+
+		//ladda material
+		for (int i = 1; i < nrMats; i++) //defualt material, så kör inte hela nrMats
+		{
+			int materialNameSize;
+			ifs.read((char*)&materialNameSize, sizeof(int));
+			char* materialName = new char[materialNameSize];
+			ifs.read((char*)materialName, sizeof(char) * materialNameSize);
+
+			MaterialData materialData;
+			ifs.read((char*)&materialData.mapMasks, sizeof(int));
+			ifs.read((char*)&materialData.diffuse, sizeof(float));
+			ifs.read((char*)&materialData.color, sizeof(float) * 3);
+			ifs.read((char*)&materialData.ambColor, sizeof(float) * 3);
+			ifs.read((char*)&materialData.specColor, sizeof(float) * 3);
+			ifs.read((char*)&materialData.specCosine, sizeof(float));
+			ifs.read((char*)&materialData.specEccentricity, sizeof(float));
+			ifs.read((char*)&materialData.specRollOff, sizeof(float));
+
+			int diffuseTextureNameSize;
+			ifs.read((char*)&diffuseTextureNameSize, sizeof(int));
+			char* diffuseTextureName = new char[diffuseTextureNameSize];
+			ifs.read((char*)diffuseTextureName, sizeof(char) * diffuseTextureNameSize);
+		}
+		//ladda transforms
+		for (int i = 0; i < nrTransforms; i++)
+		{
+			int parentNameSize;
+			int transformNameSize;
+
+			ifs.read((char*)&parentNameSize, sizeof(int));
+			ifs.read((char*)&transformNameSize, sizeof(int));
+
+			char* parentName = new char[parentNameSize];
+			char* transformName = new char[transformNameSize];
+
+			ifs.read((char*)parentName, sizeof(char) * parentNameSize);
+			ifs.read((char*)transformName, sizeof(char) * transformNameSize);
+
+			TransformData transformData;
+
+			ifs.read((char*)&transformData.pos, sizeof(float) * 3);
+			ifs.read((char*)&transformData.rot, sizeof(float) * 4); //quaternion tror jag
+			ifs.read((char*)&transformData.scale, sizeof(float) * 3);
+
+		}
+		//ladda meshes
+		for (int i = 0; i < nrMeshes; i++)
+		{
+			int transformNameSize;
+			int meshNameSize;
+
+			ifs.read((char*)&transformNameSize, sizeof(int));
+			ifs.read((char*)&meshNameSize, sizeof(int));
+
+			char* transformName = new char[transformNameSize];
+			char* meshName = new char[meshNameSize];
+
+			ifs.read((char*)transformName, sizeof(char) * transformNameSize);
+			ifs.read((char*)meshName, sizeof(char) * meshNameSize);
+
+
+			int materialNameSize;
+			ifs.read((char*)&materialNameSize, sizeof(int));
+
+			char* materialName = new char[materialNameSize];
+			ifs.read((char*)materialName, sizeof(char) * materialNameSize);
+
+			//messageSTART****
+			int meshID;
+			ifs.read((char*)&meshID, sizeof(int));
+
+			MeshData meshData;
+
+			ifs.read((char*)&meshData.nrPos, sizeof(int));
+			ifs.read((char*)&meshData.nrNor, sizeof(int));
+			ifs.read((char*)&meshData.nrUV, sizeof(int));
+			ifs.read((char*)&meshData.nrI, sizeof(int));
+			ifs.read((char*)&meshData.triangleCount, sizeof(int));
+
+			meshData.positions = new Float3[meshData.nrPos];
+			meshData.normals = new Float3[meshData.nrNor];
+			meshData.uvs = new Float2[meshData.nrUV];
+
+			meshData.indexPositions = new int[meshData.nrI];
+			meshData.indexNormals = new int[meshData.nrI];
+			meshData.indexUVs = new int[meshData.nrI];
+			meshData.trianglesPerFace = new int[meshData.triangleCount];
+
+			ifs.read((char*)&meshData.positions, sizeof(Float3) * meshData.nrPos);
+			ifs.read((char*)&meshData.normals, sizeof(Float3) * meshData.nrNor);
+			ifs.read((char*)&meshData.uvs, sizeof(Float2) * meshData.nrUV);
+
+			ifs.read((char*)&meshData.indexPositions, sizeof(int) * meshData.nrI);
+			ifs.read((char*)&meshData.indexNormals, sizeof(int) * meshData.nrI);
+			ifs.read((char*)&meshData.indexUVs, sizeof(int) * meshData.nrI);
+			ifs.read((char*)&meshData.trianglesPerFace, sizeof(int) * meshData.triangleCount);
+
+		}
+
+		for (int i = 0; i < nrLights; i++) {
+			int transformNameSize;
+			int lightNameSize;
+
+			ifs.read((char*)&transformNameSize, sizeof(int));
+			ifs.read((char*)&lightNameSize, sizeof(int));
+
+			char* transformName = new char[transformNameSize];
+			char* lightName = new char[lightNameSize];
+
+			ifs.read((char*)transformName, sizeof(char) * transformNameSize);
+			ifs.read((char*)lightName, sizeof(char) * lightNameSize);
+
+			LightData lightData;
+
+			ifs.read((char*)&lightData.type, sizeof(int));
+			ifs.read((char*)&lightData.decayType, sizeof(int));
+			ifs.read((char*)&lightData.intensity, sizeof(float));
+			ifs.read((char*)&lightData.colorDiffuse, sizeof(Float3));
+			ifs.read((char*)&lightData.direction, sizeof(Float3));
+			ifs.read((char*)&lightData.dropOff, sizeof(float));
+			ifs.read((char*)&lightData.coneAngle, sizeof(float));
+			ifs.read((char*)&lightData.penumAgle, sizeof(float));
+
+		}
 	}
 
 }

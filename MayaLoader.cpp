@@ -1046,6 +1046,7 @@ void MayaLoader::CameraChange(MessageHeader mh, CameraMessage *mm)
 	}
 	else
 	{
+		tempCamera = cameraTransform->camera;
 		tempCamera->EmptyVariables();
 		tempCamera->cameraDataP = mm;
 		//tempCamera->transform = cameraTransform; //ge kameran reference till transformen, bara vid starten? den byter väl inte transform?

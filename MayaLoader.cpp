@@ -153,7 +153,7 @@ void MayaLoader::DrawScene(){
 		{
 			gDeviceContext->PSSetConstantBuffers(1, 1, &allMeshTransforms[i]->mesh->material->materialCbuffer);
 			gDeviceContext->PSSetShaderResources(0, 1, &allMeshTransforms[i]->mesh->material->diffuseTextureView);
-			gDeviceContext->PSSetSamplers(0, 1, &wrap_Sampstate);
+		gDeviceContext->PSSetSamplers(0, 1, &wrap_Sampstate);
 		}
 		else
 		{

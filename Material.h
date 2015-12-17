@@ -15,7 +15,8 @@ public:
 		float specCosine;
 		float specEccentricity;
 		float specRollOff;
-		float padding[3];
+		UINT hasTexture;
+		float padding[2];
 
 		MaterialCBufferData()
 		{
@@ -26,7 +27,8 @@ public:
 			specCosine = 0;
 			specEccentricity = 0;
 			specRollOff = 0;
-			padding[0] = padding[1] = padding[2] = 0;
+			hasTexture = 0;
+			padding[0] = padding[1] = 0;
 		}
 	};
 	

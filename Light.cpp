@@ -11,9 +11,9 @@ void Light::UpdateCBuffer() {
 	lightCBufferData.penumAgle = lightData.penumAgle;
 	lightCBufferData.direction = lightData.direction;	
 	lightCBufferData.attenuation = Float3(1.0f, 1.0f, 1.0f);
-	lightCBufferData.position = Float3(1.0f, 1.0f, 1.0f);
-	//lightCBufferData.position = transform->transformData.pos;
-	
+	//lightCBufferData.position = Float3(1.0f, 1.0f, 1.0f);
+	lightCBufferData.position = transform->transformData.pos;
+	int bajs = 0;
 	//gDeviceContext->UpdateSubresource(lightCbuffer, 0, NULL, &lightCBufferData, 0, 0); //ska kanske inte göras här utan i en arrayconstant buffer av lightcbufferdatas
 }
 

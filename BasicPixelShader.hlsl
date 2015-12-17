@@ -85,9 +85,9 @@ float3 CalcPointLight(PixelInputType input, int i)
 
 float4 PS_main(PixelInputType input) : SV_TARGET
 {
-    float4 texcolor = ObjTexture.Sample(ObjSamplerState, input.texCoord);
-    float3 rgb = float3(0, 0, 0);
-    
+    float4 texcolor = saturate(ObjTexture.Sample(ObjSamplerState, input.texCoord));
+    //float3 rgb = float3(0, 0, 0);
+	float3 rgb = saturate(color);
 
     for (int i = 0; i < NUM_LIGHTS; i++)
     {
@@ -102,5 +102,5 @@ float4 PS_main(PixelInputType input) : SV_TARGET
        
     }
 
-    return float4(rgb, 1) + texcolor * 0.15;
+    return saturate(float4(rgb, 1) + texcolor);
 }

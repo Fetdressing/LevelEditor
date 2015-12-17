@@ -18,7 +18,7 @@
 
 using namespace std;
 //const int MAX_NAME_SIZE = 100; la den i ObjectData så att alla kan komma åt den
-const UINT MAX_NR_LIGHTS = 128;
+const UINT MAX_NR_LIGHTS = 4;
 class MayaLoader{
 	
 public:	

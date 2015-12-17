@@ -152,8 +152,13 @@ void MayaLoader::DrawScene(){
 		if (allMeshTransforms[i]->mesh->material != nullptr)
 		{
 			gDeviceContext->PSSetConstantBuffers(1, 1, &allMeshTransforms[i]->mesh->material->materialCbuffer);
-			gDeviceContext->PSSetShaderResources(0, 1, &allMeshTransforms[i]->mesh->material->diffuseTextureView);
-		gDeviceContext->PSSetSamplers(0, 1, &wrap_Sampstate);
+
+			if (allMeshTransforms[i]->mesh->material->diffuseTextureView != nullptr)
+			{
+				gDeviceContext->PSSetShaderResources(0, 1, &allMeshTransforms[i]->mesh->material->diffuseTextureView);
+			}
+
+			gDeviceContext->PSSetSamplers(0, 1, &wrap_Sampstate);
 		}
 		else
 		{
@@ -636,6 +641,11 @@ void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm)
 		transform->name = transformName;
 		transform->parentName = mm->parentName;
 		transform->transformData = mm->transformData;
+
+		if (transform->light != nullptr)
+		{
+			transform->light->UpdateCBuffer();
+		}
 
 		if (transform->parentName[0] != '0') { //namnet är inte tomt -> den har en parent, så hitta den
 			for (int i = 0; i < allTransforms.size(); i++) {

@@ -647,7 +647,7 @@ void MayaLoader::TransformChange(MessageHeader mh, TransformMessage *mm)
 			transform->light->UpdateCBuffer();
 		}
 
-		if (transform->parentName[0] != '0') { //namnet är inte tomt -> den har en parent, så hitta den
+		if (transform->parentName[0] != 0) { //namnet är inte tomt -> den har en parent, så hitta den
 			for (int i = 0; i < allTransforms.size(); i++) {
 				if (strcmp(transform->parentName, allTransforms[i]->name) == 0) {
 					transform->parent = allTransforms[i];

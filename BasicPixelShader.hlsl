@@ -66,7 +66,7 @@ float3 CalcPointLight(PixelInputType input, int i)
 
     if (lightDistance < 50.0f)
     {
-        attenuation = 2.5f /
+        attenuation = 1.0f /
             (light[i].attenuation[0] + light[i].attenuation[1] * lightDistance +
                 light[i].attenuation[2] * lightDistance * lightDistance);
 
@@ -99,7 +99,6 @@ float4 PS_main(PixelInputType input) : SV_TARGET
             rgb += CalcSpotLight(input, i);
         if (light[i].type == 3)
             rgb += CalcPointLight(input, i);
-       
     }
 
     return saturate(float4(rgb, 1) + texcolor);

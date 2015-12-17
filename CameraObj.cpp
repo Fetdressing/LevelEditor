@@ -40,12 +40,25 @@ void CameraObj::UpdateCBuffer(UINT screenWidth, UINT screenHeight)
 	//XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
 	//XMMATRIX view = XMMatrixLookAtRH(pos, rot, up);
-	XMMATRIX projection = XMMatrixPerspectiveFovLH(
-		cameraData.hAngle,
-		screenWidth/screenHeight, //aspect ratio?
-		1.0f,
-		4000
-		);
+	
+	
+	XMMATRIX projection;
+	if (cameraData.isOrtho == 0)
+	{
+		float fov = (float)screenWidth / (float)screenHeight;
+		projection = XMMatrixPerspectiveFovLH(
+			XM_PIDIV2,//cameraData.hAngle,
+			fov, //aspect ratio?
+			1.0f,
+			4000
+			);
+	}
+	else
+	{
+		float fovinv = (float)screenHeight / (float)screenWidth;
+		projection = XMMatrixOrthographicLH(cameraData.hAngle, cameraData.hAngle * fovinv, 1.0f, 4000.0f);
+	}
+	
 	XMMATRIX view = cameraMat;
 	XMStoreFloat4x4(&cameraCBufferData.view, XMMatrixTranspose(view));
 	XMStoreFloat4x4(&cameraCBufferData.projection, XMMatrixTranspose(projection));

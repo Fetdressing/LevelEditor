@@ -149,13 +149,13 @@ void MayaLoader::DrawScene(){
 		gDeviceContext->IASetVertexBuffers(0, 1, &currMesh->vertexBuffer, &vertexSize2, &offset2);
 		gDeviceContext->IASetIndexBuffer(currMesh->indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-		if (allMeshTransforms[i]->mesh->material != nullptr)
+		if (currMesh->material != nullptr)
 		{
-			gDeviceContext->PSSetConstantBuffers(1, 1, &allMeshTransforms[i]->mesh->material->materialCbuffer);
+			gDeviceContext->PSSetConstantBuffers(1, 1, &currMesh->material->materialCbuffer);
 
-			if (allMeshTransforms[i]->mesh->material->diffuseTextureView != nullptr)
+			if (currMesh->material->diffuseTextureView != nullptr)
 			{
-				gDeviceContext->PSSetShaderResources(0, 1, &allMeshTransforms[i]->mesh->material->diffuseTextureView);
+				gDeviceContext->PSSetShaderResources(0, 1, &currMesh->material->diffuseTextureView);
 			}
 
 			gDeviceContext->PSSetSamplers(0, 1, &wrap_Sampstate);
@@ -168,7 +168,7 @@ void MayaLoader::DrawScene(){
 		//set transformcbufferns värden, updatesubresource
 		allMeshTransforms[i]->UpdateCBuffer(); //slå först ihop med parentens värden innan vi updaterar cbuffern
 		UpdateLightCBufferArray();
-		gDeviceContext->Draw(allMeshTransforms[i]->mesh->nrIndecies, 0);
+		gDeviceContext->Draw(currMesh->nrIndecies, 0);
 		
 		//gDeviceContext->DrawIndexed(currMesh->nrIndecies, 0, 0);
 	}

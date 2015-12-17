@@ -47,17 +47,17 @@ public:
 	ID3D11Buffer *materialCbuffer = nullptr; //här ligger den storade materialdatan
 
 	//char *textureName;
-	ID3D11Resource *diffuseTexture;
-	ID3D11ShaderResourceView *diffuseTextureView;
+	ID3D11Resource *diffuseTexture = nullptr;
+	ID3D11ShaderResourceView *diffuseTextureView = nullptr;
 
-	ID3D11Resource *normalTexture;
-	ID3D11ShaderResourceView *normalTextureView;
+	ID3D11Resource *normalTexture = nullptr;
+	ID3D11ShaderResourceView *normalTextureView = nullptr;
 
-	ID3D11Resource *specularTexture;
-	ID3D11ShaderResourceView *specularTextureView;
+	ID3D11Resource *specularTexture = nullptr;
+	ID3D11ShaderResourceView *specularTextureView = nullptr;
 
-	ID3D11Resource *emissionTexture;
-	ID3D11ShaderResourceView *emissionTextureView;
+	ID3D11Resource *emissionTexture = nullptr;
+	ID3D11ShaderResourceView *emissionTextureView = nullptr;
 
 	Material(ID3D11Device *gDevice, ID3D11DeviceContext *gDevC){
 		this->gDevice = gDevice;

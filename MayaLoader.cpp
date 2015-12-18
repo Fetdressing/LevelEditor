@@ -75,7 +75,6 @@ void MayaLoader::CreateFileMaps(unsigned int messageFilemapSize){
 	{ 
 		cout << "Creating new infofilemap\n";
 
-
 	}
 	
 
@@ -346,7 +345,7 @@ void MayaLoader::ReadMesh(int i)
 	{
 		//får bara headern plats eller får oxå meddelandet plats?
 		if (headerDidFit == true) { //headern ligger som vanligt, alltså där man är, headern får plats
-			meshMessage = (MeshMessage*)malloc(meshMessage_MaxSize);
+			meshMessage = (MeshMessage*)malloc(messageHeader.byteTotal);
 			if (messageHeader.msgConfig == 1) { //meddelandet får däremot inte plats -> meddelandet är skickat till andra sidan
 				ReadMeshData(0);
 				localTail = messageHeader.byteSize + messageHeader.bytePadding;
@@ -366,7 +365,7 @@ void MayaLoader::ReadMesh(int i)
 			}
 			else //annars bara läs den rakt av från där denna redan är placerad
 			{
-				meshMessage = (MeshMessage*)malloc(meshMessage_MaxSize);
+				meshMessage = (MeshMessage*)malloc(messageHeader.byteTotal);
 				ReadMeshData(sizeof(MessageHeader));
 				localTail = messageHeader.byteTotal;
 			}

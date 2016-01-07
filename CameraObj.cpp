@@ -45,10 +45,10 @@ void CameraObj::UpdateCBuffer(UINT screenWidth, UINT screenHeight)
 	XMMATRIX projection;
 	if (cameraData.isOrtho == 0)
 	{
-		float fov = (float)screenWidth / (float)screenHeight;
+		float aspect = (float)screenWidth / (float)screenHeight;
 		projection = XMMatrixPerspectiveFovLH(
-			XM_PIDIV2,//cameraData.hAngle,
-			fov, //aspect ratio?
+			cameraData.hAngle,//cameraData.hAngle,
+			aspect, //aspect ratio?
 			1.0f,
 			4000
 			);

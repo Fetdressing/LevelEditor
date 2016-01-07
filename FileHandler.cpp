@@ -20,8 +20,8 @@ void FileHandler::SaveScene(int maxNameSize, char* sceneName,
 	int nrMeshes = allMeshTransforms.size();
 	int nrLights = allLightTransforms.size();
 
-	std::string fileName(sceneName, sceneNameSize);
-	fileName += ".drm";
+	std::string fileName(sceneName, sceneNameSize-1); //-1 så att inte \0 kommer med
+	fileName.append(".drm");
 	lastLoadedFileName = fileName;
 
 	ofs.open(fileName, ofstream::out | ofstream::binary);

@@ -267,3 +267,29 @@ static int CorrectName(char *&referenceName) { //kör tills nollbyten och biter a
 		return 0;
 	}
 }
+
+static int CutOffFilePath(char *&referenceName)
+{
+	if (referenceName[0] != 0)
+	{
+		CorrectName(referenceName);
+		char *tempName = referenceName;
+		char *name = referenceName;
+
+		
+		tempName = strtok(name, "/");
+		while (tempName != NULL)
+		{
+			name = tempName; //spara den tidigare iterationen, varför funkar detta utan att allokera nytt minne?? den borde ju ha exakt samma värde som name?
+			tempName = strtok(NULL, "/"); //cutta nästa del
+		}
+
+		delete(referenceName); //den blev ny allokerad i CorrectName funktionen
+		referenceName = name;
+
+		int nameSize = CorrectName(referenceName);
+		//cut tempMaterialName by
+		return nameSize;
+	}
+	else return 0;
+}

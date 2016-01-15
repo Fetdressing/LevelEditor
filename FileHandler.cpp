@@ -159,7 +159,8 @@ void FileHandler::SaveMaterials(int nrMats, vector<Material*> &materials)
 
 		//textures!!
 		char *diffuseTextureName = materials[i]->textureName;
-		int diffuseTextureSize = CorrectName(diffuseTextureName);
+		//int diffuseTextureSize = CorrectName(diffuseTextureName);
+		int diffuseTextureSize = CutOffFilePath(diffuseTextureName);
 
 		ofs.write((char*)&diffuseTextureSize, sizeof(int));
 		ofs.write(diffuseTextureName, sizeof(char) * diffuseTextureSize);

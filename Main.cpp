@@ -19,7 +19,7 @@ LRESULT Main::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		case VK_ESCAPE:
 			PostQuitMessage(0);
 			return 0;
-		case VK_SPACE:
+		case VK_F1: //space?
 			mayaLoader->SaveScene();
 			break;
 		}

@@ -1,4 +1,4 @@
-#define NUM_LIGHTS 4
+#define NUM_LIGHTS 128
 
 struct PixelInputType
 {
@@ -64,7 +64,7 @@ float3 CalcPointLight(PixelInputType input, int i)
     float3 lightDirection = light[i].position - input.worldPos;
     float lightDistance = length(lightDirection);
 
-    if (lightDistance < 50.0f)
+    if (lightDistance < 300.0f)
     {
         attenuation = 1.0f /
             (light[i].attenuation[0] + light[i].attenuation[1] * lightDistance +

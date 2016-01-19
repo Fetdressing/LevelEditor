@@ -268,6 +268,39 @@ static int CorrectName(char *&referenceName) { //kör tills nollbyten och biter a
 	}
 }
 
+static int CorrectName(char *&referenceName, bool removeOldName) { //kör tills nollbyten och biter av resterande chars
+	char *tempName = nullptr;//tänk på att de sparade namnen kommer ha färre tecken än de som laddas in från maya, men den skapar en ny char array så den skriver inte över gamla variabler
+	int nameSize = 0;
+	if (referenceName != nullptr && referenceName[0] != 0)
+	{
+		for (int i = 0; i < MAX_NAME_SIZE; i++)
+		{
+			nameSize++; //här ??
+			if (referenceName[i] == 0) //nullterminator!!!!!!!!!!!
+			{
+				break;
+			}
+		}
+
+		tempName = new char[nameSize];
+		for (int i = 0; i < nameSize; i++) {
+			tempName[i] = referenceName[i];
+		}
+
+		if (removeOldName == true)
+		{
+			delete(referenceName);
+			referenceName = nullptr;
+		}
+		referenceName = tempName;
+		return nameSize;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 static int CutOffFilePath(char *&referenceName)
 {
 	if (referenceName[0] != 0)

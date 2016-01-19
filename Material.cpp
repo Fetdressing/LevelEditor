@@ -71,5 +71,6 @@ void Material::CreateTexture(char* filePath, ID3D11Resource *&texture, ID3D11Sha
 		filePathWchar = tempWString.c_str();*/
 		//HRESULT br = CreateWICTextureFromFile(gDevice, gDeviceContext, filePathWchar, nullptr, &textureView, 0);
 		HRESULT hr = CreateDDSTextureFromFile(gDevice, wcstring, &texture, &textureView, 0, nullptr); //felaktigt filnamn
+		std::cout << "Bajs";
 	}
 }

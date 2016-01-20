@@ -88,25 +88,29 @@ void FileHandler::SaveMeshes(int nrMeshes, vector<Transform*> &allMeshTransforms
 	{
 
 		//headerSTART****
-		char* transformName = allMeshTransforms[i]->mesh->transformName; //hade nog egentligen kunnat använda transformnamnet då det är samma, men consistency u know
-		char* meshName = allMeshTransforms[i]->mesh->name;
-		int transformNameSize = CorrectName(transformName);
+		for (int t = 0; t < allMeshTransforms[i]->mesh->transformNames.size(); t++) //loopa igenom alla denna meshens transforms
+		{
+			char* transformName = allMeshTransforms[i]->mesh->transformNames[t]; //hade nog egentligen kunnat använda transformnamnet då det är samma, men consistency u know
+			int transformNameSize = CorrectName(transformName);
+			ofs.write((char*)&transformNameSize, sizeof(int));
+			ofs.write(transformName, sizeof(char) * transformNameSize);
+
+			if (transformNameSize > 0) //den är dynamiskt allokerad!
+			{
+				delete(transformName);
+			}
+		}
+
+		char* meshName = allMeshTransforms[i]->mesh->name;		
 		int meshNameSize = CorrectName(meshName); //biter av vid nullterminator och returnerar längden på texten
 
-		ofs.write((char*)&transformNameSize, sizeof(int));
 		ofs.write((char*)&meshNameSize, sizeof(int));
-		ofs.write(transformName, sizeof(char) * transformNameSize);
 		ofs.write(meshName, sizeof(char) * meshNameSize);
 
-		if (transformNameSize > 0) //den är dynamiskt allokerad!
-		{
-			delete(transformName);
-		}
 		if (meshNameSize > 0) //den är dynamiskt allokerad!
 		{
 			delete(meshName);
 		}
-
 		/*ofs.write((char*)&allMeshTransforms[i]->mesh->nrVertices, sizeof(int));
 		ofs.write((char*)&allMeshTransforms[i]->mesh->nrIndecies, sizeof(int));
 		*/

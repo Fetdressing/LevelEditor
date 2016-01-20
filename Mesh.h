@@ -30,7 +30,8 @@ class Mesh : public Entity{
 public:
 	void *meshDataP = nullptr; //pointer to the current values, används endast för att ta bort all gammal data i ett svep
 	char* name; //det riktiga namnet finns i Transformen
-	char* transformName;
+	int numberOfTransforms;
+	std::vector<char*> transformNames;
 	char* materialName;
 	int meshID = 0;
 	MeshData *meshData; //pekare till denna för att den har massa egna pekare nu, förstör objektet när det ska vara nya värden!

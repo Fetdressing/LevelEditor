@@ -721,14 +721,17 @@ void MayaLoader::TransformRenamed(MessageHeader mh, NameMessage *mm)
 void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 { //material måste alltid komma före meshes!!
 	char* meshName = mm->objectName;
-	char* transformName = mm->transformName;
 	Transform *meshTransform = nullptr; //hitta den
 	Mesh *activeMesh = nullptr;
 
-	for (int i = 0; i < allTransforms.size(); i++){
-		if (strcmp(transformName, allTransforms[i]->name) == 0){
-			meshTransform = allTransforms[i];
-			break;
+	for (int y = 0; y < mm->nrOfTransforms; y++)
+	{
+		char* transformName = mm->transformNames[y].name;
+		for (int i = 0; i < allTransforms.size(); i++) {
+			if (strcmp(transformName, allTransforms[i]->name) == 0) {
+				meshTransform = allTransforms[i];
+				break;
+			}
 		}
 	}
 	if (meshTransform == nullptr){
@@ -742,7 +745,11 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 
 		activeMesh->meshDataP = mm; //endast för att kunna ta bort gamla värden properly
 		activeMesh->name = mm->objectName;
-		activeMesh->transformName = mm->transformName;
+		activeMesh->numberOfTransforms = mm->nrOfTransforms;
+		for (int i = 0; i < activeMesh->numberOfTransforms; i++)
+		{
+			activeMesh->transformNames[i] = mm->transformNames[i].name;
+		}
 		activeMesh->materialName = mm->materialName;
 		activeMesh->meshID = mm->meshID; //för instancing
 		activeMesh->meshData = mm->meshData;

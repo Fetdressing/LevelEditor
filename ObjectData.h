@@ -25,6 +25,10 @@ using namespace DirectX;
 
 const int MAX_NAME_SIZE = 100;
 
+struct NameMaxName {
+	char name[MAX_NAME_SIZE];
+};
+
 struct Float2{
 	float u, v;
 	Float2(){}

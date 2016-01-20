@@ -724,12 +724,17 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 	Transform *meshTransform = nullptr; //hitta den
 	Mesh *activeMesh = nullptr;
 
-	for (int y = 0; y < mm->nrOfTransforms; y++)
+	for (int y = 0; y < mm->nrOfTransforms; y++) //loopa igenom alla transforms som denna meshen finns på
 	{
 		char* transformName = mm->transformNames[y].name;
 		for (int i = 0; i < allTransforms.size(); i++) {
 			if (strcmp(transformName, allTransforms[i]->name) == 0) {
 				meshTransform = allTransforms[i];
+				if (y == 0) //första transformen i listan
+				{
+					meshTransform->mesh = new Mesh(gDevice, gDeviceContext);
+					activeMesh = meshTransform->mesh;
+				}
 				break;
 			}
 		}
@@ -740,15 +745,12 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 	else
 	{
 		
-		meshTransform->mesh = new Mesh(gDevice, gDeviceContext);
-		activeMesh = meshTransform->mesh;
-
 		activeMesh->meshDataP = mm; //endast för att kunna ta bort gamla värden properly
 		activeMesh->name = mm->objectName;
 		activeMesh->numberOfTransforms = mm->nrOfTransforms;
 		for (int i = 0; i < activeMesh->numberOfTransforms; i++)
 		{
-			activeMesh->transformNames[i] = mm->transformNames[i].name;
+			activeMesh->transformNames[i] = mm->transformNames[i].name; //detta kommer nog inte funka, pekaren pekar ej på ngt ännu?
 		}
 		activeMesh->materialName = mm->materialName;
 		activeMesh->meshID = mm->meshID; //för instancing

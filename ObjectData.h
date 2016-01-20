@@ -137,11 +137,26 @@ struct IndexV{
 
 };
 
-struct TransformData{
+struct CustomAttributes
+{
+	bool isRendered;
+	bool isBBox;
+	bool isCollider;
+	bool isInteractable;
+	float interactIntervalX;
+	float interactIntervalY;
+	float interactIntervalZ;
+	int typeSpawner;
+	int typeCheckPoint;
+	int typeStartEnd;
+	bool isAIground;
+};
+struct TransformData
+{
 	Float3 pos;
 	Float4 rot;
 	Float3 scale;
-	//Float3 pos, rot, scale;
+	CustomAttributes attributes;
 };
 
 struct CameraData{
@@ -297,6 +312,7 @@ static int CorrectName(char *&referenceName, bool removeOldName) { //kör tills n
 	}
 	else
 	{
+		CorrectName(referenceName);
 		return 0;
 	}
 }

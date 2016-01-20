@@ -78,6 +78,7 @@ void FileHandler::SaveTransforms(int nrTransforms, vector<Transform*> &allTransf
 		ofs.write((char*)&allTransforms[i]->transformData.pos, sizeof(allTransforms[i]->transformData.pos));
 		ofs.write((char*)&allTransforms[i]->transformData.rot, sizeof(allTransforms[i]->transformData.rot));
 		ofs.write((char*)&allTransforms[i]->transformData.scale, sizeof(allTransforms[i]->transformData.scale));
+		//ofs.write((char*)&allTransforms[i]->transformData.attributes, sizeof(allTransforms[i]->transformData.attributes)); //funkar detta? troor deeettt
 	}
 }
 

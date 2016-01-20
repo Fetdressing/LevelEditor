@@ -146,7 +146,7 @@ private:
 	struct MeshMessage{
 		char objectName[MAX_NAME_SIZE];
 		int nrOfTransforms;
-		vector<NameMaxName> transformNames; //skriver man såhär? en vector av char arrayer som är MAX_NAME_SIZE stora
+		vector<NameMaxNameStruct> transformNames; //skriver man såhär? en vector av char arrayer som är MAX_NAME_SIZE stora
 		//char transformName[MAX_NAME_SIZE];
 		char materialName[MAX_NAME_SIZE];
 		int meshID; //kolla ifall denna meshen ska instance draw:as!

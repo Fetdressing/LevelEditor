@@ -406,8 +406,17 @@ void MayaLoader::ReadMeshData(size_t offSetStart) //läser vertis data och liknan
 
 	memcpy(meshMessage->objectName, (unsigned char*)mMessageData + offSetStart, sizeof(char) * MAX_NAME_SIZE);
 	offset += (sizeof(char) * MAX_NAME_SIZE);
-	memcpy(meshMessage->transformName, (unsigned char*)mMessageData + offSetStart + offset, sizeof(char) * MAX_NAME_SIZE);
-	offset += (sizeof(char) * MAX_NAME_SIZE);
+
+	memcpy(&meshMessage->nrOfTransforms, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int));
+	offset += sizeof(int);
+	for (int i = 0; i < meshMessage->nrOfTransforms; i++)
+	{
+		NameMaxNameStruct tempNameStruct;
+		memcpy(tempNameStruct.name, (unsigned char*)mMessageData + offSetStart + offset, sizeof(char) * MAX_NAME_SIZE);
+		meshMessage->transformNames.push_back(tempNameStruct);
+		offset += (sizeof(char) * MAX_NAME_SIZE);
+	}
+
 	memcpy(meshMessage->materialName, (unsigned char*)mMessageData + offSetStart + offset, sizeof(char) * MAX_NAME_SIZE);
 	offset += (sizeof(char) * MAX_NAME_SIZE);
 
@@ -723,18 +732,26 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 	char* meshName = mm->objectName;
 	Transform *meshTransform = nullptr; //hitta den
 	Mesh *activeMesh = nullptr;
+	int firstIndex = 0;
 
 	for (int y = 0; y < mm->nrOfTransforms; y++) //loopa igenom alla transforms som denna meshen finns på
 	{
 		char* transformName = mm->transformNames[y].name;
-		for (int i = 0; i < allTransforms.size(); i++) {
+		for (int i = 0; i < allTransforms.size(); i++) { //loopa igenom ALLA transforms och hitta alla transforms som meshen ska användas på
 			if (strcmp(transformName, allTransforms[i]->name) == 0) {
 				meshTransform = allTransforms[i];
-				if (y == 0) //första transformen i listan
+				if (y == 0) //första transformen i meshlistan
 				{
-					meshTransform->mesh = new Mesh(gDevice, gDeviceContext);
+					firstIndex = i; //får den första transformen som finns med i meshens transforms
+					meshTransform->mesh = new Mesh(gDevice, gDeviceContext); //skapa meshen
 					activeMesh = meshTransform->mesh;
 				}
+				else
+				{
+					meshTransform->mesh = allTransforms[firstIndex]->mesh; //så att alla transforms för meshen får just denna mesh referencen
+				}
+				activeMesh->transformNames.push_back(meshTransform->name); //mm->transformNames[i].name;
+				allMeshTransforms.push_back(meshTransform); //skickar in denna transform i allMeshTransforms oxå!! så den kommer vara refererad i båda vektorerna
 				break;
 			}
 		}
@@ -748,10 +765,6 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 		activeMesh->meshDataP = mm; //endast för att kunna ta bort gamla värden properly
 		activeMesh->name = mm->objectName;
 		activeMesh->numberOfTransforms = mm->nrOfTransforms;
-		for (int i = 0; i < activeMesh->numberOfTransforms; i++)
-		{
-			activeMesh->transformNames[i] = mm->transformNames[i].name; //detta kommer nog inte funka, pekaren pekar ej på ngt ännu?
-		}
 		activeMesh->materialName = mm->materialName;
 		activeMesh->meshID = mm->meshID; //för instancing
 		activeMesh->meshData = mm->meshData;
@@ -770,21 +783,58 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 		}
 
 		activeMesh->CreateBuffers();
-		allMeshTransforms.push_back(meshTransform); //skickar in denna transform i allMeshTransforms oxå!! så den kommer vara refererad i båda vektorerna
 	}
 	
 }
 void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm)
 { //MÅSTE HA TRANSFORMEN FÖRST, SEN SKAPA ETT MESH OBJEKT I TRANSFORMEN
 	char* meshName = mm->objectName;
-	char* transformName = mm->transformName;
+//	char* transformName = mm->transformName;
 	Transform *meshTransform = nullptr; //hitta den
 	Mesh *activeMesh = nullptr;
 
-	for (int i = 0; i < allMeshTransforms.size(); i++){
-		if (strcmp(transformName, allMeshTransforms[i]->name) == 0){
-			meshTransform = allMeshTransforms[i];
+	//int firstIndex = 0;
+	for (int y = 0; y < mm->nrOfTransforms; y++) //hitta meshen
+	{
+		char* transformName = mm->transformNames[y].name;
+		for (int i = 0; i < allMeshTransforms.size(); i++) {
+			if (strcmp(transformName, allMeshTransforms[i]->name) == 0) {
+				activeMesh = allMeshTransforms[i]->mesh;
+				break;
+			}
+		}
+		if (activeMesh != nullptr)
+		{
 			break;
+		}
+	}
+
+	for (int y = 0; y < mm->nrOfTransforms; y++) //loopa igenom alla transforms som denna meshen finns på
+	{
+		char* transformName = mm->transformNames[y].name;
+		for (int i = 0; i < allTransforms.size(); i++) { //loopa igenom ALLA transforms och hitta alla transforms som meshen ska användas på
+			if (strcmp(transformName, allTransforms[i]->name) == 0) {
+				meshTransform = allTransforms[i];
+				meshTransform->mesh = activeMesh; //så att alla transforms för meshen får just denna mesh referencen
+				
+				activeMesh->transformNames.push_back(meshTransform->name); //mm->transformNames[i].name;
+
+				//kolla ifall den redan finns i allMeshTransforms, lägg annars till den
+				int check = 0;
+				for (int m = 0; m < allMeshTransforms.size(); m++) 
+				{
+					if (strcmp(transformName, allMeshTransforms[m]->name) == 0)
+					{
+						check = 1;
+						break;
+					}
+				}
+				if (check == 0) //den fanns inte sen tidigare, lägg till den!
+				{
+					allMeshTransforms.push_back(meshTransform); //skickar in denna transform i allMeshTransforms oxå!! så den kommer vara refererad i båda vektorerna
+				}
+				break;
+			}
 		}
 	}
 	if (meshTransform == nullptr){

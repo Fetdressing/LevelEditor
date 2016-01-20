@@ -409,11 +409,13 @@ void MayaLoader::ReadMeshData(size_t offSetStart) //läser vertis data och liknan
 
 	memcpy(&meshMessage->nrOfTransforms, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int));
 	offset += sizeof(int);
+
+	meshMessage->transformNames = new NameMaxNameStruct[meshMessage->nrOfTransforms];
 	for (int i = 0; i < meshMessage->nrOfTransforms; i++)
 	{
 		NameMaxNameStruct tempNameStruct;
 		memcpy(tempNameStruct.name, (unsigned char*)mMessageData + offSetStart + offset, sizeof(char) * MAX_NAME_SIZE);
-		meshMessage->transformNames.push_back(tempNameStruct);
+		meshMessage->transformNames[i] = tempNameStruct;
 		offset += (sizeof(char) * MAX_NAME_SIZE);
 	}
 
@@ -768,6 +770,7 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 		activeMesh->materialName = mm->materialName;
 		activeMesh->meshID = mm->meshID; //för instancing
 		activeMesh->meshData = mm->meshData;
+		activeMesh->transformNamesStruct = mm->transformNames;
 
 		activeMesh->material = materials[0]; //default material
 		if (activeMesh->material->name != nullptr)
@@ -852,10 +855,13 @@ void MayaLoader::MeshChange(MessageHeader mh, MeshMessage *mm)
 		activeMesh->materialName = mm->materialName;
 		activeMesh->meshID = mm->meshID; //för instancing
 		activeMesh->meshData = mm->meshData;
+		activeMesh->transformNamesStruct = mm->transformNames;
 
 		//activeMesh->material = materials[0]; //default material, den har redan ett material här
-		for (int i = 0; i < materials.size(); i++) {
-			if (strcmp(mm->materialName, materials[i]->name) == 0) {
+		for (int i = 0; i < materials.size(); i++) 
+		{
+			if (strcmp(mm->materialName, materials[i]->name) == 0) 
+			{
 				activeMesh->material = materials[i];
 				break;
 			}

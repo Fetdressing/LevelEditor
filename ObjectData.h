@@ -26,7 +26,7 @@ using namespace DirectX;
 const int MAX_NAME_SIZE = 100;
 
 struct NameMaxNameStruct {
-	char name[MAX_NAME_SIZE];
+	char name[100];
 };
 
 struct Float2{

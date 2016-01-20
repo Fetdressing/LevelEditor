@@ -35,6 +35,7 @@ public:
 	char* materialName;
 	int meshID = 0;
 	MeshData *meshData; //pekare till denna för att den har massa egna pekare nu, förstör objektet när det ska vara nya värden!
+	NameMaxNameStruct *transformNamesStruct; //för att releasa
 
 	int nrVertices;
 	int nrIndecies;
@@ -62,6 +63,7 @@ public:
 		delete(meshData);*/
 		free(meshDataP);
 		delete(meshData); //ta bort denna oxå coz den är en pekare i meshDataP
+		delete(transformNamesStruct);
 
 		delete(vertices);
 		delete(indecies);

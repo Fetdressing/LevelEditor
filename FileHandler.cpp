@@ -78,7 +78,7 @@ void FileHandler::SaveTransforms(int nrTransforms, vector<Transform*> &allTransf
 		ofs.write((char*)&allTransforms[i]->transformData.pos, sizeof(allTransforms[i]->transformData.pos));
 		ofs.write((char*)&allTransforms[i]->transformData.rot, sizeof(allTransforms[i]->transformData.rot));
 		ofs.write((char*)&allTransforms[i]->transformData.scale, sizeof(allTransforms[i]->transformData.scale));
-		ofs.write((char*)&allTransforms[i]->transformData.attributes, sizeof(allTransforms[i]->transformData.attributes)); //funkar detta? troor deeettt
+		ofs.write((char*)&allTransforms[i]->transformData.attributes, sizeof(CustomAttributes)); //funkar detta? troor deeettt
 	}
 }
 
@@ -88,7 +88,10 @@ void FileHandler::SaveMeshes(int nrMeshes, vector<Transform*> &allMeshTransforms
 	{
 
 		//headerSTART****
-		for (int t = 0; t < allMeshTransforms[i]->mesh->transformNames.size(); t++) //loopa igenom alla denna meshens transforms
+        int nrOfTransforms = allMeshTransforms[i]->mesh->numberOfTransforms;
+        ofs.write((char*)&nrOfTransforms, sizeof(int));
+
+		for (int t = 0; t < nrOfTransforms; t++) //loopa igenom alla denna meshens transforms
 		{
 			char* transformName = allMeshTransforms[i]->mesh->transformNames[t]; //hade nog egentligen kunnat använda transformnamnet då det är samma, men consistency u know
 			int transformNameSize = CorrectName(transformName);

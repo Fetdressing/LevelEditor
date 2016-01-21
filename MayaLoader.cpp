@@ -747,12 +747,13 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 					firstIndex = i; //får den första transformen som finns med i meshens transforms
 					meshTransform->mesh = new Mesh(gDevice, gDeviceContext); //skapa meshen
 					activeMesh = meshTransform->mesh;
+                    activeMesh->numberOfTransforms = mm->nrOfTransforms;
 				}
 				else
 				{
 					meshTransform->mesh = allTransforms[firstIndex]->mesh; //så att alla transforms för meshen får just denna mesh referencen
 				}
-				activeMesh->transformNames.push_back(meshTransform->name); //mm->transformNames[i].name;
+				//activeMesh->transformNames.push_back(meshTransform->name); //mm->transformNames[i].name;
 				allMeshTransforms.push_back(meshTransform); //skickar in denna transform i allMeshTransforms oxå!! så den kommer vara refererad i båda vektorerna
 				break;
 			}
@@ -763,6 +764,12 @@ void MayaLoader::MeshAdded(MessageHeader mh, MeshMessage *mm)
 	}
 	else
 	{
+
+        for (int y = 0; y < mm->nrOfTransforms; y++) //loopa igenom alla transforms som denna meshen finns på
+        {
+            char* transformName = mm->transformNames[y].name;
+            activeMesh->transformNames.push_back(transformName); //så att den har alla namnen hela tiden, oavsett om den hittat transformsen eller ej            
+        }
 		
 		activeMesh->meshDataP = mm; //endast för att kunna ta bort gamla värden properly
 		activeMesh->name = mm->objectName;

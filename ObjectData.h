@@ -346,7 +346,7 @@ static int CutOffFilePath(char *&referenceName)
         {
             newName[i] = name[i];
         }
-        delete(referenceName); //den blev ny allokerad i CorrectName funktionen, riskyyyyy ifall ngn läser över
+        delete(referenceName); //den blev ny allokerad i CorrectName funktionen, kommer den ta bort hela arrayen eller bara den cuttade?
         referenceName = newName;
 
 		int nameSize = CorrectName(referenceName);

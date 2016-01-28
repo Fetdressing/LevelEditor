@@ -98,7 +98,7 @@ void Mesh::CreateVertices()
 		tempV.nor = meshData->normals[indecies[i + 2].norI];
 		tempV.nor.z = tempV.nor.z * -1.0f;
 		tempV.uv = meshData->uvs[indecies[i + 2].uvI];
-		tempV.uv.v = tempV.uv.v - 1.0f;
+		tempV.uv.v = 1.0f - tempV.uv.v ;
 
 		vertices[i] = tempV;
 
@@ -107,7 +107,7 @@ void Mesh::CreateVertices()
 		tempV.nor = meshData->normals[indecies[i + 1].norI];
 		tempV.nor.z = tempV.nor.z * -1.0f;
 		tempV.uv = meshData->uvs[indecies[i + 1].uvI];
-		tempV.uv.v = tempV.uv.v - 1.0f;
+		tempV.uv.v = 1.0f - tempV.uv.v;
 
 		vertices[i + 1] = tempV;
 
@@ -116,7 +116,7 @@ void Mesh::CreateVertices()
 		tempV.nor = meshData->normals[indecies[i].norI];
 		tempV.nor.z = tempV.nor.z * -1.0f;
 		tempV.uv = meshData->uvs[indecies[i].uvI];
-		tempV.uv.v = tempV.uv.v - 1.0f;
+		tempV.uv.v = 1.0f - tempV.uv.v;
 
 		vertices[i + 2] = tempV;
 	}

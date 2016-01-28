@@ -919,7 +919,14 @@ void MayaLoader::MaterialAdded(MessageHeader mh, MaterialMessage *mm)
 
 	//ladda in alla texturer
 	tempMat->textureName = mm->textureName;
+    tempMat->glowMapName = mm->glowMapName;
+    tempMat->bumpMapName = mm->bumpMapName;
+    tempMat->specularMapName = mm->specularMapName;
+
 	tempMat->CreateTexture(tempMat->textureName, tempMat->diffuseTexture, tempMat->diffuseTextureView);
+    tempMat->CreateTexture(tempMat->glowMapName, tempMat->glowTexture, tempMat->glowTextureView);
+   /* tempMat->CreateTexture(tempMat->bumpMapName, tempMat->bumpTexture, tempMat->bumpTextureView);
+    tempMat->CreateTexture(tempMat->specularMapName, tempMat->specularTexture, tempMat->specularTextureView);*/
 	
 	tempMat->UpdateCBuffer(); //lägger in de nya värdena i cbuffern
 	materials.push_back(tempMat);
@@ -943,8 +950,15 @@ void MayaLoader::MaterialChange(MessageHeader mh, MaterialMessage *mm)
 	tempMat->materialData = mm->materialData;
 
 	//ladda in alla texturer
-	tempMat->textureName = mm->textureName;
-	tempMat->CreateTexture(tempMat->textureName, tempMat->diffuseTexture, tempMat->diffuseTextureView);
+    tempMat->textureName = mm->textureName;
+    tempMat->glowMapName = mm->glowMapName;
+    tempMat->bumpMapName = mm->bumpMapName;
+    tempMat->specularMapName = mm->specularMapName;
+
+    tempMat->CreateTexture(tempMat->textureName, tempMat->diffuseTexture, tempMat->diffuseTextureView);
+    tempMat->CreateTexture(tempMat->glowMapName, tempMat->glowTexture, tempMat->glowTextureView);
+   /* tempMat->CreateTexture(tempMat->bumpMapName, tempMat->bumpTexture, tempMat->bumpTextureView);
+    tempMat->CreateTexture(tempMat->specularMapName, tempMat->specularTexture, tempMat->specularTextureView);*/
 	
 	tempMat->UpdateCBuffer();
 	

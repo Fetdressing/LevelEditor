@@ -155,11 +155,13 @@ private:
 	};
 	struct MaterialMessage{ //namnet på den ligger i headern sen
 		char objectName[MAX_NAME_SIZE];
+
 		char textureName[MAX_NAME_SIZE];
+        char glowMapName[MAX_NAME_SIZE];
+        char specularMapName[MAX_NAME_SIZE];
+        char bumpMapName[MAX_NAME_SIZE];        
+        
 		int materialType;
-		/*	char normalMapName[MAX_NAME_SIZE];
-		char specularMapName[MAX_NAME_SIZE];
-		char emissionMapName[MAX_NAME_SIZE];*/
 		MaterialData materialData;
 	};
 	struct LightMessage{

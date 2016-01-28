@@ -178,6 +178,20 @@ void FileHandler::SaveMaterials(int nrMats, vector<Material*> &materials)
 		{
 			delete(diffuseTextureName);
 		}
+
+        //glow
+        char *glowTextureName = materials[i]->glowMapName;
+        //int diffuseTextureSize = CorrectName(diffuseTextureName);
+        int glowTextureSize = CutOffFilePath(glowTextureName);
+
+        ofs.write((char*)&glowTextureSize, sizeof(int));
+        ofs.write(glowTextureName, sizeof(char) * glowTextureSize);
+
+
+        if (glowTextureSize > 0) //den är dynamiskt allokerad!
+        {
+            delete(glowTextureName);
+        }
 	}
 }
 

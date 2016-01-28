@@ -38,9 +38,9 @@ public:
 	void *materialDataP = nullptr; //pointer to the current values, för att ta bort messaget som varit mallocat
 	char *name;
 	char *textureName; //store filpathsen, även om jag har texturen så kommer vi behöva pathsen för fileformatet sen!
-	char *normalMapName;
+	char *bumpMapName;
 	char *specularMapName;
-	char *emissionMapName;
+	char *glowMapName;
 	char dummyName[100]; //dummy variable som används som default namn, behöver inte deallokeras
 	MaterialData materialData;
 	MaterialCBufferData materialCBufferData;
@@ -50,14 +50,14 @@ public:
 	ID3D11Resource *diffuseTexture = nullptr;
 	ID3D11ShaderResourceView *diffuseTextureView = nullptr;
 
-	ID3D11Resource *normalTexture = nullptr;
-	ID3D11ShaderResourceView *normalTextureView = nullptr;
+	ID3D11Resource *bumpTexture = nullptr;
+	ID3D11ShaderResourceView *bumpTextureView = nullptr;
 
 	ID3D11Resource *specularTexture = nullptr;
 	ID3D11ShaderResourceView *specularTextureView = nullptr;
 
-	ID3D11Resource *emissionTexture = nullptr;
-	ID3D11ShaderResourceView *emissionTextureView = nullptr;
+	ID3D11Resource *glowTexture = nullptr;
+	ID3D11ShaderResourceView *glowTextureView = nullptr;
 
 	Material(ID3D11Device *gDevice, ID3D11DeviceContext *gDevC){
 		this->gDevice = gDevice;
@@ -65,9 +65,9 @@ public:
 
 		name = dummyName; //sätter den till dummy namnet bara för att ha ett default
 		textureName = dummyName;
-		normalMapName = dummyName;
+		bumpMapName = dummyName;
 		specularMapName = dummyName;
-		emissionMapName = dummyName;
+		glowMapName = dummyName;
 	}
 	~Material(){
 		//delete(name); den är statiskt allokerad
@@ -76,12 +76,12 @@ public:
 
 		diffuseTexture->Release();
 		diffuseTextureView->Release();
-		normalTexture->Release();
-		normalTextureView->Release();
+        bumpTexture->Release();
+        bumpTextureView->Release();
 		specularTexture->Release();
 		specularTextureView->Release();
-		emissionTexture->Release();
-		emissionTextureView->Release();
+        glowTexture->Release();
+        glowTextureView->Release();
 	}
 	//skapa constantbuffer här???
 	void UpdateCBuffer();

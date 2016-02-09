@@ -400,22 +400,22 @@ void Main::CreateShaders(){
 
 	//create vertex shaders
 	ID3DBlob* pVS = nullptr;
-	ShaderTest = CompileShader(L"DefaultVS.hlsl", "main", "vs_5_0", &pVS);
+	ShaderTest = CompileShader(L"DefaultVS.hlsl", "main", "vs_4_0", &pVS);
 	shaderCreationTest = gDevice->CreateVertexShader(pVS->GetBufferPointer(), pVS->GetBufferSize(), nullptr, &defaultVS);
 
 	//create pixel shader
 	ID3DBlob* pPS = nullptr;
-	ShaderTest = CompileShader(L"DefaultPS.hlsl", "main", "ps_5_0", &pPS);
+	ShaderTest = CompileShader(L"DefaultPS.hlsl", "main", "ps_4_0", &pPS);
 	ShaderTest = gDevice->CreatePixelShader(pPS->GetBufferPointer(), pPS->GetBufferSize(), nullptr, &defaultPS);
 
 	//create vertex shaders
 	pVS = nullptr;
-	ShaderTest = CompileShader(L"BasicVertexShader.hlsl", "VS_main", "vs_5_0", &pVS);
+	ShaderTest = CompileShader(L"BasicVertexShader.hlsl", "VS_main", "vs_4_0", &pVS);
 	shaderCreationTest = gDevice->CreateVertexShader(pVS->GetBufferPointer(), pVS->GetBufferSize(), nullptr, &basicVS);
 
 	//create pixel shader
 	pPS = nullptr;
-	ShaderTest = CompileShader(L"BasicPixelShader.hlsl", "PS_main", "ps_5_0", &pPS);
+	ShaderTest = CompileShader(L"BasicPixelShader.hlsl", "PS_main", "ps_4_0", &pPS);
 	ShaderTest = gDevice->CreatePixelShader(pPS->GetBufferPointer(), pPS->GetBufferSize(), nullptr, &basicPS);
 
 	// INPUT LAYOUT MÅSTE VARA ANPASSAD TILL VERTEX SHADER

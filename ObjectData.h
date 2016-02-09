@@ -148,6 +148,7 @@ struct CustomAttributes
     bool isCollider;
     bool isInteractable;
     int checkPointID;
+    int spawnPointID;
     int startOrEndPoint;
     bool isAIground;
 

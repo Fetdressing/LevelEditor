@@ -156,6 +156,8 @@ struct CustomAttributes
     Float3 interactableStartPos;
     Float3 interactableEndPos;
     Float2 interactableOffset;
+    float interactableStartSpeed;
+    float interactableEndSpeed;
     bool isPotentialFieldCollidable;
     int potentialFieldID;
     int potentialFieldNeighbour1;

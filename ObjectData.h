@@ -153,6 +153,7 @@ struct CustomAttributes
     bool isAIground;
 
     bool frequencyAffected;
+    float interactableRange;
     Float3 interactableStartPos;
     Float3 interactableEndPos;
     Float2 interactableOffset;

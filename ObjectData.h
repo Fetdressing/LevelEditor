@@ -173,8 +173,6 @@ struct CustomAttributes
     int spawnTypeBlueprint;
     float spawnFrequency;
 
-    bool isPlayerStart;
-
     bool isStatic;
     int physicsType;
 

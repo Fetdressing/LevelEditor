@@ -1219,7 +1219,9 @@ void MayaLoader::UpdateLightCBufferArray()
 
 void MayaLoader::SaveScene()
 {
-	const char* skitName = "Test" + 0;
+	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo)); //h?mta filemapinfo datan om jag har f?tt mutexInfo till den
+
+	const char* skitName = fileMapInfo.outFileName;
 	fileHandler->SaveScene(MAX_NAME_SIZE, (char*)skitName,
 		materials,
 		allTransforms,

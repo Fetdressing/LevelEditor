@@ -84,7 +84,7 @@ private:
 		size_t non_accessmemoryOffset; //memory in beginning of file thats no touchy, so that head and tail won't get to each other
 		//size_t totalConsumers;
 		size_t messageFilemap_Size;
-
+		char outFileName[MAX_NAME_SIZE];
 		FilemapInfo(){
 			head_ByteOffset = 0;
 			tail_ByteOffset = 0;

@@ -74,14 +74,38 @@ public:
 		materialCbuffer->Release();
 		free(materialDataP);
 
-		diffuseTexture->Release();
-		diffuseTextureView->Release();
-        bumpTexture->Release();
-        bumpTextureView->Release();
-		specularTexture->Release();
-		specularTextureView->Release();
-        glowTexture->Release();
-        glowTextureView->Release();
+        if (diffuseTexture != nullptr)
+        {
+            diffuseTexture->Release();
+        }
+        if (diffuseTextureView != nullptr)
+        {
+            diffuseTextureView->Release();
+        }
+        if (bumpTexture != nullptr)
+        {
+            bumpTexture->Release();
+        }
+        if (bumpTextureView != nullptr)
+        {
+            bumpTextureView->Release();
+        }
+        if (specularTexture != nullptr)
+        {
+            specularTexture->Release();
+        }
+        if (specularTextureView != nullptr)
+        {
+            specularTextureView->Release();
+        }
+        if (glowTexture != nullptr)
+        {
+            glowTexture->Release();
+        }
+        if (glowTextureView != nullptr)
+        {
+            glowTextureView->Release();
+        }
 	}
 	//skapa constantbuffer här???
 	void UpdateCBuffer();

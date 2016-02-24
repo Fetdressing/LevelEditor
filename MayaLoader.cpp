@@ -1205,7 +1205,7 @@ void MayaLoader::CreateLightCBufferArray()
 void MayaLoader::UpdateLightCBufferArray()
 {
 	int nrLights = 0;
-	for (int i = 0; i < allLightTransforms.size(); i++)
+	for (int i = 0; i < allLightTransforms.size() && i < 128; i++)
 	{
 		lightCBufferDataArray.lightDatas[i] = allLightTransforms[i]->light->lightCBufferData;
 		nrLights++;

@@ -1221,7 +1221,8 @@ void MayaLoader::SaveScene()
 {
 	memcpy(&fileMapInfo, (unsigned char*)mInfoData, sizeof(FilemapInfo)); //h?mta filemapinfo datan om jag har f?tt mutexInfo till den
 
-	const char* skitName = fileMapInfo.outFileName;
+	//const char* skitName = fileMapInfo.outFileName;
+    const char* skitName = "Zlatan";
 	fileHandler->SaveScene(MAX_NAME_SIZE, (char*)skitName,
 		materials,
 		allTransforms,

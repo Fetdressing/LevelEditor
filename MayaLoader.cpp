@@ -221,7 +221,7 @@ void MayaLoader::ReadTransform(int i)
 	{
 		//får bara headern plats eller får oxå meddelandet plats?
 		if (headerDidFit == true) { //headern ligger som vanligt, alltså där man är, headern får plats
-			transformMessage = (TransformMessage*)malloc(transformMessage_MaxSize);
+			transformMessage = (TransformMessage*)malloc(messageHeader.byteTotal);
 			if (messageHeader.msgConfig == 1) { //meddelandet får däremot inte plats -> meddelandet är skickat till andra sidan
 				memcpy(transformMessage, (unsigned char*)mMessageData, messageHeader.byteSize); //läser i början på filen utan nån offset
 				localTail = messageHeader.byteSize + messageHeader.bytePadding;
@@ -237,7 +237,7 @@ void MayaLoader::ReadTransform(int i)
 				cout << "Filemap too small, a message might be to big for the entire filemap";
 			}
 			else { //annars bara läs den rakt av från där denna redan är placerad
-				transformMessage = (TransformMessage*)malloc(transformMessage_MaxSize);
+				transformMessage = (TransformMessage*)malloc(messageHeader.byteTotal);
 				memcpy(transformMessage, (unsigned char*)mMessageData + sizeof(MessageHeader), messageHeader.byteSize);
 				localTail = messageHeader.byteTotal;
 			}
@@ -285,7 +285,7 @@ void MayaLoader::ReadMaterial(int i)
 	if (i != 4 && i != 3)
 	{
 		if (headerDidFit == true) { //headern ligger som vanligt, alltså där man är, headern får plats
-			materialMessage = (MaterialMessage*)malloc(materialMessage_MaxSize);
+			materialMessage = (MaterialMessage*)malloc(messageHeader.byteTotal);
 			if (messageHeader.msgConfig == 1) { //meddelandet får däremot inte plats -> meddelandet är skickat till andra sidan
 				memcpy(materialMessage, (unsigned char*)mMessageData, messageHeader.byteSize); //läser i början på filen utan nån offset
 				localTail = messageHeader.byteSize + messageHeader.bytePadding;
@@ -303,7 +303,7 @@ void MayaLoader::ReadMaterial(int i)
 				cout << "Filemap too small, a message might be to big for the entire filemap";
 			}
 			else { //annars bara läs den rakt av från där denna redan är placerad
-				materialMessage = (MaterialMessage*)malloc(materialMessage_MaxSize);
+				materialMessage = (MaterialMessage*)malloc(messageHeader.byteTotal);
 				memcpy(materialMessage, (unsigned char*)mMessageData + sizeof(MessageHeader), messageHeader.byteSize);
 				localTail = messageHeader.byteTotal;
 			}

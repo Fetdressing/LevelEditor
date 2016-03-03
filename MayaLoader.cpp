@@ -1,13 +1,15 @@
 #include "MayaLoader.h"
 
 Mutex mutexInfo("__info_Mutex__");
+int AnrMeshes = 0, AnrTransforms = 0, AnrMaterials = 0, AnrLights = 0, AnrCameras = 0;
+
 MayaLoader::MayaLoader(ID3D11Device* gd, ID3D11DeviceContext* gdc, UINT screenWidth, UINT screenHeight){
 	this->gDevice = gd;
 	this->gDeviceContext = gdc;
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
 
-	CreateFileMaps(1024 * 1024 * 10);
+	CreateFileMaps(1024 * 1024 * 100);
 	InitVariables();
 	
 	fileHandler = new FileHandler();
@@ -194,18 +196,23 @@ void MayaLoader::TryReadAMessage(){
 				break;
 			case 1:
 				ReadMesh(messageHeader.messageType);
+                AnrMeshes++;
 				break;
 			case 2:
 				ReadTransform(messageHeader.messageType);
+                AnrTransforms++;
 				break;
 			case 3:
-				ReadCamera(messageHeader.messageType);			
+				ReadCamera(messageHeader.messageType);
+                AnrCameras++;
 				break;
 			case 4:
-				ReadLight(messageHeader.messageType);				
+				ReadLight(messageHeader.messageType);
+                AnrLights++;
 				break;
 			case 5:
 				ReadMaterial(messageHeader.messageType);
+                AnrMaterials++;
 				break;
 			default:
 				printf("Invalid message ID");
@@ -455,6 +462,14 @@ void MayaLoader::ReadMeshData(size_t offSetStart) //läser vertis data och liknan
 
 	memcpy(meshMessage->meshData->trianglesPerFace, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->triangleCount);
 
+    if (meshMessage->meshData->nrI > 100000)
+    {
+        int bajs = 0;
+    }
+    if (meshMessage->meshData->nrPos > 100000)
+    {
+        int bajs = 0;
+    }
 }
 void MayaLoader::ReadLight(int i)
 {

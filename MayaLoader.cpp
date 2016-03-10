@@ -462,14 +462,6 @@ void MayaLoader::ReadMeshData(size_t offSetStart) //läser vertis data och liknan
 
 	memcpy(meshMessage->meshData->trianglesPerFace, (unsigned char*)mMessageData + offSetStart + offset, sizeof(int) * meshMessage->meshData->triangleCount);
 
-    if (meshMessage->meshData->nrI > 100000)
-    {
-        int bajs = 0;
-    }
-    if (meshMessage->meshData->nrPos > 100000)
-    {
-        int bajs = 0;
-    }
 }
 void MayaLoader::ReadLight(int i)
 {
